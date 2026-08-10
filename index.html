@@ -143,6 +143,55 @@
     메뉴를 불러오는 중입니다.
   </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+  const SUPABASE_URL = 'https://yookspgooyewhnkobckw.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let allMenus = [];
+
+  async function loadMenus() {
+    const menuList = document.getElementById('menu-list');
+
+    const { data, error } = await supabaseClient
+      .from('menus')
+      .select('*')
+      .eq('is_available', true)
+      .order('sort_order', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      menuList.innerHTML = '<div class="loading">메뉴를 불러오지 못했습니다.</div>';
+      return;
+    }
+
+    allMenus = data;
+    renderMenus(allMenus);
+  }
+
+  function renderMenus(menus) {
+    const menuList = document.getElementById('menu-list');
+
+    if (!menus.length) {
+      menuList.innerHTML = '<div class="loading">등록된 메뉴가 없습니다.</div>';
+      return;
+    }
+
+    menuList.innerHTML = menus.map(menu => `
+      <div class="menu-item">
+        <div class="menu-info">
+          <h3>${menu.name}</h3>
+          <p>${menu.description || ''}</p>
+        </div>
+        <div class="price">${Number(menu.price).toLocaleString()}원</div>
+      </div>
+    `).join('');
+  }
+
+  loadMenus();
+</script>
 </body>
 </html>
