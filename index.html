@@ -45,6 +45,8 @@
       background: white;
       position: sticky;
       top: 0;
+      z-index: 10;
+      border-bottom: 1px solid #eee;
     }
 
     .category-nav button {
@@ -65,10 +67,10 @@
     main {
       max-width: 700px;
       margin: auto;
-      padding: 20px 16px 100px;
+      padding: 20px 16px 120px;
     }
 
-    .menu-card {
+    .menu-item {
       background: white;
       margin-bottom: 12px;
       padding: 18px;
@@ -76,22 +78,16 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
-    .menu-name {
+    .menu-info h3 {
+      margin: 0;
       font-size: 17px;
-      font-weight: bold;
     }
 
-    .menu-name-en {
-      font-size: 12px;
-      color: #888;
-      margin-top: 4px;
-    }
-
-    .menu-description {
+    .menu-info p {
+      margin: 8px 0 0;
       font-size: 13px;
       color: #666;
       line-height: 1.5;
-      margin-top: 10px;
     }
 
     .menu-bottom {
@@ -99,6 +95,7 @@
       justify-content: space-between;
       align-items: center;
       margin-top: 15px;
+      gap: 10px;
     }
 
     .price {
@@ -111,14 +108,167 @@
       background: #111;
       color: white;
       border-radius: 8px;
-      padding: 9px 14px;
+      padding: 10px 15px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     .loading {
       text-align: center;
       padding: 50px 10px;
       color: #777;
+    }
+
+    .cart-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 668px;
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      z-index: 50;
+      font-size: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.25);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      margin: 30px auto;
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .close-button {
+      border: none;
+      background: none;
+      font-size: 26px;
+      cursor: pointer;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 14px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cart-item-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .cart-item-price {
+      font-size: 13px;
+      color: #777;
+    }
+
+    .quantity-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .quantity-box button {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 20px 0;
+    }
+
+    .order-form {
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+
+    .order-form label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin: 14px 0 7px;
+    }
+
+    .order-form input,
+    .order-form textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+
+    .order-form textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .submit-order {
+      width: 100%;
+      margin-top: 20px;
+      border: none;
+      background: #111;
+      color: white;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .submit-order:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .empty-cart {
+      text-align: center;
+      color: #777;
+      padding: 30px 10px;
     }
   </style>
 </head>
@@ -131,11 +281,11 @@
 </header>
 
 <div class="category-nav">
-  <button class="active">전체</button>
-  <button>샐러드</button>
-  <button>파스타</button>
-  <button>리조또</button>
-  <button>피자</button>
+  <button class="active" data-category="ALL">전체</button>
+  <button data-category="SALAD">샐러드</button>
+  <button data-category="PASTA">파스타</button>
+  <button data-category="RISOTTO">리조또</button>
+  <button data-category="PIZZA">피자</button>
 </div>
 
 <main id="menu-list">
@@ -143,17 +293,84 @@
     메뉴를 불러오는 중입니다.
   </div>
 </main>
+
+<button id="cart-bar" class="cart-bar">
+  <span id="cart-count">장바구니 0개</span>
+  <span id="cart-total-bar">0원</span>
+</button>
+
+<div id="cart-modal" class="modal">
+  <div class="modal-content">
+
+    <div class="modal-header">
+      <h2>주문 내역</h2>
+      <button class="close-button" onclick="closeCart()">×</button>
+    </div>
+
+    <div id="cart-items"></div>
+
+    <div class="cart-total">
+      <span>총 주문금액</span>
+      <span id="cart-total">0원</span>
+    </div>
+
+    <div class="order-form">
+
+      <label for="room-number">객실번호 *</label>
+      <input
+        type="text"
+        id="room-number"
+        placeholder="예: 305"
+      >
+
+      <label for="guest-name">고객명 *</label>
+      <input
+        type="text"
+        id="guest-name"
+        placeholder="성함을 입력해주세요"
+      >
+
+      <label for="phone">전화번호</label>
+      <input
+        type="tel"
+        id="phone"
+        placeholder="선택 입력"
+      >
+
+      <label for="request-note">요청사항</label>
+      <textarea
+        id="request-note"
+        placeholder="알레르기, 조리 요청 등 전달사항을 입력해주세요."
+      ></textarea>
+
+      <button
+        id="submit-order"
+        class="submit-order"
+        onclick="submitOrder()"
+      >
+        주문하기
+      </button>
+
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
   const SUPABASE_URL = 'https://yookspgooyewhnkobckw.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
   let allMenus = [];
+  let cart = [];
 
   async function loadMenus() {
+
     const menuList = document.getElementById('menu-list');
 
     const { data, error } = await supabaseClient
@@ -163,35 +380,371 @@
       .order('sort_order', { ascending: true });
 
     if (error) {
+
       console.error(error);
-      menuList.innerHTML = '<div class="loading">메뉴를 불러오지 못했습니다.</div>';
+
+      menuList.innerHTML =
+        '<div class="loading">메뉴를 불러오지 못했습니다.</div>';
+
       return;
     }
 
-    allMenus = data;
+    allMenus = data || [];
+
     renderMenus(allMenus);
   }
 
   function renderMenus(menus) {
+
     const menuList = document.getElementById('menu-list');
 
     if (!menus.length) {
-      menuList.innerHTML = '<div class="loading">등록된 메뉴가 없습니다.</div>';
+
+      menuList.innerHTML =
+        '<div class="loading">등록된 메뉴가 없습니다.</div>';
+
       return;
     }
 
     menuList.innerHTML = menus.map(menu => `
+
       <div class="menu-item">
+
         <div class="menu-info">
-          <h3>${menu.name}</h3>
-          <p>${menu.description || ''}</p>
+
+          <h3>${escapeHtml(menu.name || '')}</h3>
+
+          ${
+            menu.name_en
+            ? `<div style="font-size:12px;color:#888;margin-top:4px;">
+                ${escapeHtml(menu.name_en)}
+              </div>`
+            : ''
+          }
+
+          <p>${escapeHtml(menu.description || '')}</p>
+
         </div>
-        <div class="price">${Number(menu.price).toLocaleString()}원</div>
+
+        <div class="menu-bottom">
+
+          <div class="price">
+            ${Number(menu.price || 0).toLocaleString()}원
+          </div>
+
+          <button
+            class="add-button"
+            onclick="addToCart(${Number(menu.id)})"
+          >
+            담기
+          </button>
+
+        </div>
+
       </div>
+
     `).join('');
+  }
+
+  document.querySelectorAll('.category-nav button').forEach(button => {
+
+    button.addEventListener('click', () => {
+
+      document
+        .querySelectorAll('.category-nav button')
+        .forEach(btn => btn.classList.remove('active'));
+
+      button.classList.add('active');
+
+      const category = button.dataset.category;
+
+      if (category === 'ALL') {
+
+        renderMenus(allMenus);
+
+        return;
+      }
+
+      const filteredMenus = allMenus.filter(menu =>
+        String(menu.category || '').toUpperCase() === category
+      );
+
+      renderMenus(filteredMenus);
+    });
+  });
+
+  function addToCart(menuId) {
+
+    const menu = allMenus.find(
+      item => Number(item.id) === Number(menuId)
+    );
+
+    if (!menu) return;
+
+    const existingItem = cart.find(
+      item => Number(item.id) === Number(menuId)
+    );
+
+    if (existingItem) {
+
+      existingItem.quantity += 1;
+
+    } else {
+
+      cart.push({
+        id: Number(menu.id),
+        name: menu.name,
+        price: Number(menu.price || 0),
+        quantity: 1
+      });
+    }
+
+    updateCartBar();
+  }
+
+  function changeQuantity(menuId, amount) {
+
+    const item = cart.find(
+      cartItem => Number(cartItem.id) === Number(menuId)
+    );
+
+    if (!item) return;
+
+    item.quantity += amount;
+
+    if (item.quantity <= 0) {
+
+      cart = cart.filter(
+        cartItem => Number(cartItem.id) !== Number(menuId)
+      );
+    }
+
+    updateCartBar();
+    renderCart();
+  }
+
+  function getCartTotal() {
+
+    return cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+  }
+
+  function getCartCount() {
+
+    return cart.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+  }
+
+  function updateCartBar() {
+
+    const cartBar = document.getElementById('cart-bar');
+
+    const count = getCartCount();
+
+    if (count === 0) {
+
+      cartBar.style.display = 'none';
+
+      return;
+    }
+
+    cartBar.style.display = 'flex';
+
+    document.getElementById('cart-count').textContent =
+      `장바구니 ${count}개`;
+
+    document.getElementById('cart-total-bar').textContent =
+      `${getCartTotal().toLocaleString()}원`;
+  }
+
+  function openCart() {
+
+    renderCart();
+
+    document.getElementById('cart-modal').style.display = 'block';
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCart() {
+
+    document.getElementById('cart-modal').style.display = 'none';
+
+    document.body.style.overflow = '';
+  }
+
+  document
+    .getElementById('cart-bar')
+    .addEventListener('click', openCart);
+
+  function renderCart() {
+
+    const cartItems = document.getElementById('cart-items');
+
+    if (!cart.length) {
+
+      cartItems.innerHTML =
+        '<div class="empty-cart">장바구니가 비어 있습니다.</div>';
+
+    } else {
+
+      cartItems.innerHTML = cart.map(item => `
+
+        <div class="cart-item">
+
+          <div>
+
+            <div class="cart-item-name">
+              ${escapeHtml(item.name)}
+            </div>
+
+            <div class="cart-item-price">
+              ${item.price.toLocaleString()}원
+            </div>
+
+          </div>
+
+          <div class="quantity-box">
+
+            <button onclick="changeQuantity(${item.id}, -1)">
+              −
+            </button>
+
+            <span>
+              ${item.quantity}
+            </span>
+
+            <button onclick="changeQuantity(${item.id}, 1)">
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+      `).join('');
+    }
+
+    document.getElementById('cart-total').textContent =
+      `${getCartTotal().toLocaleString()}원`;
+  }
+
+  async function submitOrder() {
+
+    if (!cart.length) {
+
+      alert('주문하실 메뉴를 선택해주세요.');
+
+      return;
+    }
+
+    const roomNumber =
+      document.getElementById('room-number').value.trim();
+
+    const guestName =
+      document.getElementById('guest-name').value.trim();
+
+    const phone =
+      document.getElementById('phone').value.trim();
+
+    const requestNote =
+      document.getElementById('request-note').value.trim();
+
+    if (!roomNumber) {
+
+      alert('객실번호를 입력해주세요.');
+
+      return;
+    }
+
+    if (!guestName) {
+
+      alert('고객명을 입력해주세요.');
+
+      return;
+    }
+
+    const submitButton =
+      document.getElementById('submit-order');
+
+    submitButton.disabled = true;
+    submitButton.textContent = '주문 접수 중...';
+
+    const orderItems = cart.map(item => ({
+      menu_id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      subtotal: item.price * item.quantity
+    }));
+
+    const orderData = {
+
+      room_number: roomNumber,
+
+      guest_name: guestName,
+
+      phone: phone || null,
+
+      status: 'pending',
+
+      total_amount: getCartTotal(),
+
+      request_note: requestNote || null,
+
+      order_items: orderItems,
+
+      ordered_at: new Date().toISOString()
+    };
+
+    const { error } = await supabaseClient
+      .from('orders')
+      .insert(orderData);
+
+    submitButton.disabled = false;
+    submitButton.textContent = '주문하기';
+
+    if (error) {
+
+      console.error(error);
+
+      alert(
+        '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      );
+
+      return;
+    }
+
+    alert('주문이 정상적으로 접수되었습니다.');
+
+    cart = [];
+
+    updateCartBar();
+
+    document.getElementById('room-number').value = '';
+    document.getElementById('guest-name').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('request-note').value = '';
+
+    closeCart();
+  }
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   loadMenus();
 </script>
+
 </body>
 </html>
