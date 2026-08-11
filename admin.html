@@ -6,7 +6,9 @@
   <title>BOTTEGA 주문관리</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -201,6 +203,48 @@
       text-align: right;
       font-size: 18px;
       font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .action-area {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .action-button {
+      width: 100%;
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .accept-button {
+      background: #111;
+      color: #fff;
+    }
+
+    .complete-button {
+      background: #2457a7;
+      color: #fff;
+    }
+
+    .action-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .completed-message {
+      text-align: center;
+      padding: 11px;
+      background: #e8f7ed;
+      color: #24753d;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
     }
 
     .empty {
@@ -293,6 +337,7 @@
 
   let allOrders = [];
   let currentFilter = 'all';
+  let isUpdating = false;
 
   async function loadOrders() {
 
@@ -413,6 +458,108 @@
     }
   }
 
+  function getActionButton(order) {
+
+    const status = order.status || 'pending';
+
+    if (status === 'pending') {
+
+      return `
+        <div class="action-area">
+          <button
+            class="action-button accept-button"
+            onclick="changeOrderStatus(${Number(order.id)}, 'cooking', this)"
+          >
+            접수
+          </button>
+        </div>
+      `;
+    }
+
+    if (status === 'cooking') {
+
+      return `
+        <div class="action-area">
+          <button
+            class="action-button complete-button"
+            onclick="changeOrderStatus(${Number(order.id)}, 'completed', this)"
+          >
+            완료
+          </button>
+        </div>
+      `;
+    }
+
+    if (status === 'completed') {
+
+      return `
+        <div class="action-area">
+          <div class="completed-message">
+            처리 완료
+          </div>
+        </div>
+      `;
+    }
+
+    return '';
+  }
+
+  async function changeOrderStatus(orderId, newStatus, button) {
+
+    if (isUpdating) {
+      return;
+    }
+
+    const actionText =
+      newStatus === 'cooking'
+        ? '이 주문을 접수하시겠습니까?'
+        : '이 주문을 완료 처리하시겠습니까?';
+
+    if (!confirm(actionText)) {
+      return;
+    }
+
+    isUpdating = true;
+
+    if (button) {
+      button.disabled = true;
+      button.textContent =
+        newStatus === 'cooking'
+          ? '접수 중...'
+          : '완료 처리 중...';
+    }
+
+    const { error } = await supabaseClient
+      .from('orders')
+      .update({
+        status: newStatus
+      })
+      .eq('id', orderId);
+
+    if (error) {
+
+      console.error(error);
+
+      alert('주문 상태 변경에 실패했습니다.');
+
+      if (button) {
+        button.disabled = false;
+        button.textContent =
+          newStatus === 'cooking'
+            ? '접수'
+            : '완료';
+      }
+
+      isUpdating = false;
+
+      return;
+    }
+
+    isUpdating = false;
+
+    await loadOrders();
+  }
+
   function renderOrders(orders) {
 
     const orderList =
@@ -524,6 +671,8 @@
             ${Number(order.total_amount || 0)
               .toLocaleString()}원
           </div>
+
+          ${getActionButton(order)}
 
         </div>
       `;
