@@ -6,9 +6,7 @@
   <title>BOTTEGA 주문관리</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -41,12 +39,12 @@
       max-width: 1000px;
       margin: 20px auto 0;
       padding: 0 16px;
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
 
     .summary-box {
-      flex: 1;
       background: white;
       padding: 16px;
       border-radius: 10px;
@@ -66,10 +64,56 @@
       color: #777;
     }
 
+    .filters {
+      max-width: 1000px;
+      margin: 15px auto 0;
+      padding: 0 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .filter-button {
+      border: 1px solid #ddd;
+      background: white;
+      padding: 9px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .filter-button.active {
+      background: #111;
+      color: white;
+      border-color: #111;
+    }
+
     main {
       max-width: 1000px;
       margin: auto;
       padding: 20px 16px 80px;
+    }
+
+    .top-tools {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .refresh-info {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .refresh-button {
+      border: 0;
+      background: #111;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
     .order-card {
@@ -102,11 +146,25 @@
     }
 
     .status {
-      padding: 7px 11px;
+      padding: 7px 12px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: bold;
-      background: #eee;
+    }
+
+    .status-pending {
+      background: #fff1d6;
+      color: #8a5900;
+    }
+
+    .status-cooking {
+      background: #e8f0ff;
+      color: #2457a7;
+    }
+
+    .status-completed {
+      background: #e8f7ed;
+      color: #24753d;
     }
 
     .guest-info {
@@ -153,20 +211,9 @@
       color: #777;
     }
 
-    .refresh-button {
-      display: block;
-      margin: 0 auto 20px;
-      border: 0;
-      background: #111;
-      color: white;
-      padding: 11px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .summary {
-        flex-direction: column;
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .order-top {
@@ -184,42 +231,70 @@
 </header>
 
 <div class="summary">
+
   <div class="summary-box">
     <span class="summary-number" id="order-count">0</span>
     <span class="summary-label">전체 주문</span>
   </div>
 
   <div class="summary-box">
+    <span class="summary-number" id="pending-count">0</span>
+    <span class="summary-label">신규 주문</span>
+  </div>
+
+  <div class="summary-box">
+    <span class="summary-number" id="cooking-count">0</span>
+    <span class="summary-label">조리중</span>
+  </div>
+
+  <div class="summary-box">
     <span class="summary-number" id="total-sales">0원</span>
     <span class="summary-label">주문 금액</span>
   </div>
+
+</div>
+
+<div class="filters">
+  <button class="filter-button active" data-filter="all">전체</button>
+  <button class="filter-button" data-filter="pending">신규</button>
+  <button class="filter-button" data-filter="cooking">조리중</button>
+  <button class="filter-button" data-filter="completed">완료</button>
 </div>
 
 <main>
-  <button class="refresh-button" onclick="loadOrders()">새로고침</button>
+
+  <div class="top-tools">
+    <span class="refresh-info">
+      주문은 10초마다 자동 갱신됩니다.
+    </span>
+
+    <button class="refresh-button" onclick="loadOrders()">
+      새로고침
+    </button>
+  </div>
 
   <div id="order-list">
     <div class="empty">주문을 불러오는 중입니다.</div>
   </div>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  const SUPABASE_URL = 'https://yookspgooyewhnkobckw.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+  const SUPABASE_URL =
+    'https://yookspgooyewhnkobckw.supabase.co';
 
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  const SUPABASE_KEY =
+    'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
+  const supabaseClient =
+    supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let allOrders = [];
+  let currentFilter = 'all';
 
   async function loadOrders() {
-
-    const orderList = document.getElementById('order-list');
-
-    orderList.innerHTML =
-      '<div class="empty">주문을 불러오는 중입니다.</div>';
 
     const { data, error } = await supabaseClient
       .from('orders')
@@ -229,43 +304,136 @@
     if (error) {
       console.error(error);
 
-      orderList.innerHTML =
+      document.getElementById('order-list').innerHTML =
         '<div class="empty">주문을 불러오지 못했습니다.</div>';
 
       return;
     }
 
-    renderOrders(data || []);
+    allOrders = data || [];
+
+    updateSummary();
+    applyFilter();
   }
 
-  function renderOrders(orders) {
-
-    const orderList = document.getElementById('order-list');
+  function updateSummary() {
 
     document.getElementById('order-count').textContent =
-      orders.length;
+      allOrders.length;
 
-    const totalSales = orders.reduce(
-      (sum, order) => sum + Number(order.total_amount || 0),
+    const pendingCount =
+      allOrders.filter(order =>
+        (order.status || 'pending') === 'pending'
+      ).length;
+
+    const cookingCount =
+      allOrders.filter(order =>
+        order.status === 'cooking'
+      ).length;
+
+    document.getElementById('pending-count').textContent =
+      pendingCount;
+
+    document.getElementById('cooking-count').textContent =
+      cookingCount;
+
+    const totalSales = allOrders.reduce(
+      (sum, order) =>
+        sum + Number(order.total_amount || 0),
       0
     );
 
     document.getElementById('total-sales').textContent =
       totalSales.toLocaleString() + '원';
+  }
+
+  function applyFilter() {
+
+    if (currentFilter === 'all') {
+      renderOrders(allOrders);
+      return;
+    }
+
+    const filtered = allOrders.filter(order => {
+      const status = order.status || 'pending';
+      return status === currentFilter;
+    });
+
+    renderOrders(filtered);
+  }
+
+  document
+    .querySelectorAll('.filter-button')
+    .forEach(button => {
+
+      button.addEventListener('click', () => {
+
+        document
+          .querySelectorAll('.filter-button')
+          .forEach(btn =>
+            btn.classList.remove('active')
+          );
+
+        button.classList.add('active');
+
+        currentFilter = button.dataset.filter;
+
+        applyFilter();
+      });
+
+    });
+
+  function getStatusText(status) {
+
+    switch (status) {
+      case 'cooking':
+        return '조리중';
+
+      case 'completed':
+        return '완료';
+
+      case 'pending':
+      default:
+        return '신규';
+    }
+  }
+
+  function getStatusClass(status) {
+
+    switch (status) {
+      case 'cooking':
+        return 'status-cooking';
+
+      case 'completed':
+        return 'status-completed';
+
+      case 'pending':
+      default:
+        return 'status-pending';
+    }
+  }
+
+  function renderOrders(orders) {
+
+    const orderList =
+      document.getElementById('order-list');
 
     if (!orders.length) {
 
       orderList.innerHTML =
-        '<div class="empty">현재 접수된 주문이 없습니다.</div>';
+        '<div class="empty">해당 주문이 없습니다.</div>';
 
       return;
     }
 
     orderList.innerHTML = orders.map(order => {
 
-      const items = Array.isArray(order.order_items)
-        ? order.order_items
-        : [];
+      const status = order.status || 'pending';
+
+      const items =
+        Array.isArray(order.order_items)
+          ? order.order_items
+          : [];
 
       const itemHtml = items.map(item => {
 
@@ -282,7 +450,10 @@
 
         return `
           <div class="item-row">
-            <span>${escapeHtml(name)} × ${quantity}</span>
+            <span>
+              ${escapeHtml(name)} × ${quantity}
+            </span>
+
             <strong>
               ${(price * quantity).toLocaleString()}원
             </strong>
@@ -291,9 +462,11 @@
 
       }).join('');
 
-      const createdAt = order.created_at
-        ? new Date(order.created_at).toLocaleString('ko-KR')
-        : '-';
+      const createdAt =
+        order.created_at
+          ? new Date(order.created_at)
+              .toLocaleString('ko-KR')
+          : '-';
 
       return `
         <div class="order-card">
@@ -306,12 +479,12 @@
               </div>
 
               <div class="order-time">
-                ${createdAt}
+                주문번호 #${order.id} · ${createdAt}
               </div>
             </div>
 
-            <div class="status">
-              ${escapeHtml(order.status || '신규')}
+            <div class="status ${getStatusClass(status)}">
+              ${getStatusText(status)}
             </div>
 
           </div>
@@ -329,10 +502,10 @@
           </div>
 
           <div class="items">
-
-            ${itemHtml ||
-              '<div class="item-row">주문 메뉴 정보 없음</div>'}
-
+            ${
+              itemHtml ||
+              '<div class="item-row">주문 메뉴 정보 없음</div>'
+            }
           </div>
 
           ${
@@ -347,9 +520,9 @@
           }
 
           <div class="total">
-            총 ${Number(
-              order.total_amount || 0
-            ).toLocaleString()}원
+            총
+            ${Number(order.total_amount || 0)
+              .toLocaleString()}원
           </div>
 
         </div>
@@ -366,10 +539,11 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
-
   }
 
   loadOrders();
+
+  setInterval(loadOrders, 10000);
 </script>
 
 </body>
