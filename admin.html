@@ -529,11 +529,17 @@
           : '완료 처리 중...';
     }
 
+    const updateData = {
+      status: newStatus
+    };
+
+    if (newStatus === 'completed') {
+      updateData.completed_at = new Date().toISOString();
+    }
+
     const { error } = await supabaseClient
       .from('orders')
-      .update({
-        status: newStatus
-      })
+      .update(updateData)
       .eq('id', orderId);
 
     if (error) {
