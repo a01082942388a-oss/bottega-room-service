@@ -249,17 +249,24 @@
 
     .completion-info {
       margin-top: 10px;
-      padding: 12px;
+      padding: 13px 15px;
       background: #f5faf7;
-      border: 1px solid #dfeee4;
+      border: 1px solid #dcecdf;
       border-radius: 8px;
-      font-size: 12px;
-      line-height: 1.8;
-      color: #4a5f50;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #444;
     }
 
     .completion-info strong {
+      display: inline-block;
+      min-width: 75px;
       color: #24753d;
+    }
+
+    .elapsed {
+      font-weight: bold;
+      color: #111;
     }
 
     .empty {
@@ -323,7 +330,6 @@
 <main>
 
   <div class="top-tools">
-
     <span class="refresh-info">
       주문은 10초마다 자동 갱신됩니다.
     </span>
@@ -331,7 +337,6 @@
     <button class="refresh-button" onclick="loadOrders()">
       새로고침
     </button>
-
   </div>
 
   <div id="order-list">
@@ -343,7 +348,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-
   const SUPABASE_URL =
     'https://yookspgooyewhnkobckw.supabase.co';
 
@@ -351,7 +355,10 @@
     'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
 
   const supabaseClient =
-    supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
   let allOrders = [];
   let currentFilter = 'all';
@@ -360,16 +367,21 @@
 
   async function loadOrders() {
 
-    const { data, error } = await supabaseClient
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } =
+      await supabaseClient
+        .from('orders')
+        .select('*')
+        .order('created_at', {
+          ascending: false
+        });
 
     if (error) {
 
       console.error(error);
 
-      document.getElementById('order-list').innerHTML =
+      document
+        .getElementById('order-list')
+        .innerHTML =
         '<div class="empty">주문을 불러오지 못했습니다.</div>';
 
       return;
@@ -378,115 +390,171 @@
     allOrders = data || [];
 
     updateSummary();
+
     applyFilter();
   }
 
 
   function updateSummary() {
 
-    document.getElementById('order-count').textContent =
+    document
+      .getElementById('order-count')
+      .textContent =
       allOrders.length;
+
 
     const pendingCount =
       allOrders.filter(order =>
-        (order.status || 'pending') === 'pending'
+        (order.status || 'pending') ===
+        'pending'
       ).length;
+
 
     const cookingCount =
       allOrders.filter(order =>
         order.status === 'cooking'
       ).length;
 
-    document.getElementById('pending-count').textContent =
+
+    document
+      .getElementById('pending-count')
+      .textContent =
       pendingCount;
 
-    document.getElementById('cooking-count').textContent =
+
+    document
+      .getElementById('cooking-count')
+      .textContent =
       cookingCount;
+
 
     const totalSales =
       allOrders.reduce(
         (sum, order) =>
-          sum + Number(order.total_amount || 0),
+          sum +
+          Number(
+            order.total_amount || 0
+          ),
         0
       );
 
-    document.getElementById('total-sales').textContent =
-      totalSales.toLocaleString() + '원';
+
+    document
+      .getElementById('total-sales')
+      .textContent =
+      totalSales.toLocaleString() +
+      '원';
   }
 
 
   function applyFilter() {
 
+    let ordersToRender = [];
+
+
     if (currentFilter === 'all') {
 
-      renderOrders(allOrders);
+      ordersToRender =
+        [...allOrders];
 
-      return;
+    } else {
+
+      ordersToRender =
+        allOrders.filter(order => {
+
+          const status =
+            order.status || 'pending';
+
+          return (
+            status === currentFilter
+          );
+
+        });
+
     }
 
-    let filtered =
-      allOrders.filter(order => {
 
-        const status =
-          order.status || 'pending';
+    if (
+      currentFilter ===
+      'completed'
+    ) {
 
-        return status === currentFilter;
+      ordersToRender.sort(
+        (a, b) => {
 
-      });
+          const aTime =
+            a.completed_at
+              ? new Date(
+                  a.completed_at
+                ).getTime()
+              : 0;
 
-    /*
-      완료 탭에서는
-      가장 최근에 완료된 주문이 위로 올라옴
-    */
 
-    if (currentFilter === 'completed') {
+          const bTime =
+            b.completed_at
+              ? new Date(
+                  b.completed_at
+                ).getTime()
+              : 0;
 
-      filtered = [...filtered].sort((a, b) => {
 
-        const aTime =
-          a.completed_at
-            ? new Date(a.completed_at).getTime()
-            : 0;
+          return bTime - aTime;
 
-        const bTime =
-          b.completed_at
-            ? new Date(b.completed_at).getTime()
-            : 0;
+        }
+      );
 
-        return bTime - aTime;
-
-      });
     }
 
-    renderOrders(filtered);
+
+    renderOrders(
+      ordersToRender
+    );
   }
 
 
   document
-    .querySelectorAll('.filter-button')
+    .querySelectorAll(
+      '.filter-button'
+    )
     .forEach(button => {
 
-      button.addEventListener('click', () => {
+      button.addEventListener(
+        'click',
+        () => {
 
-        document
-          .querySelectorAll('.filter-button')
-          .forEach(btn =>
-            btn.classList.remove('active')
+          document
+            .querySelectorAll(
+              '.filter-button'
+            )
+            .forEach(btn => {
+
+              btn.classList.remove(
+                'active'
+              );
+
+            });
+
+
+          button.classList.add(
+            'active'
           );
 
-        button.classList.add('active');
 
-        currentFilter =
-          button.dataset.filter;
+          currentFilter =
+            button.dataset.filter;
 
-        applyFilter();
 
-      });
+          applyFilter();
+
+        }
+      );
 
     });
 
 
-  function getStatusText(status) {
+  function getStatusText(
+    status
+  ) {
 
     switch (status) {
 
@@ -496,15 +564,17 @@
       case 'completed':
         return '완료';
 
-      case 'pending':
-
       default:
         return '신규';
+
     }
+
   }
 
 
-  function getStatusClass(status) {
+  function getStatusClass(
+    status
+  ) {
 
     switch (status) {
 
@@ -514,21 +584,167 @@
       case 'completed':
         return 'status-completed';
 
-      case 'pending':
-
       default:
         return 'status-pending';
+
     }
+
   }
 
 
-  function getActionButton(order) {
+  function formatDateTime(
+    value
+  ) {
+
+    if (!value) {
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return '-';
+
+    }
+
+
+    return date.toLocaleString(
+      'ko-KR',
+      {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }
+    );
+
+  }
+
+
+  function getElapsedTime(
+    startValue,
+    endValue
+  ) {
+
+    if (
+      !startValue ||
+      !endValue
+    ) {
+
+      return '-';
+
+    }
+
+
+    const start =
+      new Date(
+        startValue
+      ).getTime();
+
+
+    const end =
+      new Date(
+        endValue
+      ).getTime();
+
+
+    if (
+      Number.isNaN(start) ||
+      Number.isNaN(end) ||
+      end < start
+    ) {
+
+      return '-';
+
+    }
+
+
+    const totalSeconds =
+      Math.floor(
+        (end - start) /
+        1000
+      );
+
+
+    const hours =
+      Math.floor(
+        totalSeconds /
+        3600
+      );
+
+
+    const minutes =
+      Math.floor(
+        (
+          totalSeconds %
+          3600
+        ) /
+        60
+      );
+
+
+    const seconds =
+      totalSeconds %
+      60;
+
+
+    if (hours > 0) {
+
+      return (
+        hours +
+        '시간 ' +
+        minutes +
+        '분 ' +
+        seconds +
+        '초'
+      );
+
+    }
+
+
+    if (minutes > 0) {
+
+      return (
+        minutes +
+        '분 ' +
+        seconds +
+        '초'
+      );
+
+    }
+
+
+    return (
+      seconds +
+      '초'
+    );
+
+  }
+
+
+  function getActionButton(
+    order
+  ) {
 
     const status =
-      order.status || 'pending';
+      order.status ||
+      'pending';
 
 
-    if (status === 'pending') {
+    if (
+      status ===
+      'pending'
+    ) {
 
       return `
         <div class="action-area">
@@ -542,10 +758,14 @@
 
         </div>
       `;
+
     }
 
 
-    if (status === 'cooking') {
+    if (
+      status ===
+      'cooking'
+    ) {
 
       return `
         <div class="action-area">
@@ -559,10 +779,33 @@
 
         </div>
       `;
+
     }
 
 
-    if (status === 'completed') {
+    if (
+      status ===
+      'completed'
+    ) {
+
+      const completedAt =
+        formatDateTime(
+          order.completed_at
+        );
+
+
+      const elapsedTime =
+        getElapsedTime(
+          order.created_at,
+          order.completed_at
+        );
+
+
+      const createdAt =
+        formatDateTime(
+          order.created_at
+        );
+
 
       return `
         <div class="action-area">
@@ -571,8 +814,39 @@
             처리 완료
           </div>
 
+          <div class="completion-info">
+
+            <div>
+              <strong>
+                주문시간
+              </strong>
+
+              ${createdAt}
+            </div>
+
+            <div>
+              <strong>
+                완료시간
+              </strong>
+
+              ${completedAt}
+            </div>
+
+            <div>
+              <strong>
+                소요시간
+              </strong>
+
+              <span class="elapsed">
+                ${elapsedTime}
+              </span>
+            </div>
+
+          </div>
+
         </div>
       `;
+
     }
 
 
@@ -592,12 +866,16 @@
 
 
     const actionText =
-      newStatus === 'cooking'
+      newStatus ===
+      'cooking'
         ? '이 주문을 접수하시겠습니까?'
         : '이 주문을 완료 처리하시겠습니까?';
 
 
-    if (!confirm(actionText)) {
+    if (
+      !confirm(actionText)
+    ) {
+
       return;
     }
 
@@ -609,8 +887,10 @@
 
       button.disabled = true;
 
+
       button.textContent =
-        newStatus === 'cooking'
+        newStatus ===
+        'cooking'
           ? '접수 중...'
           : '완료 처리 중...';
 
@@ -622,15 +902,14 @@
     };
 
 
-    /*
-      완료 버튼을 누르면
-      completed_at에 현재 시간 저장
-    */
-
-    if (newStatus === 'completed') {
+    if (
+      newStatus ===
+      'completed'
+    ) {
 
       updateData.completed_at =
-        new Date().toISOString();
+        new Date()
+          .toISOString();
 
     }
 
@@ -638,23 +917,33 @@
     const { error } =
       await supabaseClient
         .from('orders')
-        .update(updateData)
-        .eq('id', orderId);
+        .update(
+          updateData
+        )
+        .eq(
+          'id',
+          orderId
+        );
 
 
     if (error) {
 
       console.error(error);
 
-      alert('주문 상태 변경에 실패했습니다.');
+      alert(
+        '주문 상태 변경에 실패했습니다.'
+      );
 
 
       if (button) {
 
-        button.disabled = false;
+        button.disabled =
+          false;
+
 
         button.textContent =
-          newStatus === 'cooking'
+          newStatus ===
+          'cooking'
             ? '접수'
             : '완료';
 
@@ -673,110 +962,19 @@
   }
 
 
-  /*
-    날짜 표시
-  */
-
-  function formatDateTime(value) {
-
-    if (!value) {
-      return '-';
-    }
-
-    return new Date(value)
-      .toLocaleString(
-        'ko-KR',
-        {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        }
-      );
-  }
-
-
-  /*
-    주문부터 완료까지 걸린 시간 계산
-  */
-
-  function getElapsedTime(
-    startValue,
-    endValue
+  function renderOrders(
+    orders
   ) {
 
-    if (!startValue || !endValue) {
-      return '-';
-    }
-
-
-    const start =
-      new Date(startValue).getTime();
-
-    const end =
-      new Date(endValue).getTime();
+    const orderList =
+      document.getElementById(
+        'order-list'
+      );
 
 
     if (
-      !Number.isFinite(start) ||
-      !Number.isFinite(end) ||
-      end < start
+      !orders.length
     ) {
-
-      return '-';
-
-    }
-
-
-    const totalSeconds =
-      Math.floor(
-        (end - start) / 1000
-      );
-
-
-    const hours =
-      Math.floor(
-        totalSeconds / 3600
-      );
-
-
-    const minutes =
-      Math.floor(
-        (totalSeconds % 3600) / 60
-      );
-
-
-    const seconds =
-      totalSeconds % 60;
-
-
-    if (hours > 0) {
-
-      return `${hours}시간 ${minutes}분 ${seconds}초`;
-
-    }
-
-
-    if (minutes > 0) {
-
-      return `${minutes}분 ${seconds}초`;
-
-    }
-
-
-    return `${seconds}초`;
-  }
-
-
-  function renderOrders(orders) {
-
-    const orderList =
-      document.getElementById('order-list');
-
-
-    if (!orders.length) {
 
       orderList.innerHTML =
         '<div class="empty">해당 주문이 없습니다.</div>';
@@ -790,11 +988,14 @@
 
 
         const status =
-          order.status || 'pending';
+          order.status ||
+          'pending';
 
 
         const items =
-          Array.isArray(order.order_items)
+          Array.isArray(
+            order.order_items
+          )
             ? order.order_items
             : [];
 
@@ -819,7 +1020,8 @@
 
             const price =
               Number(
-                item.price || 0
+                item.price ||
+                0
               );
 
 
@@ -833,7 +1035,13 @@
                 </span>
 
                 <strong>
-                  ${(price * quantity).toLocaleString()}원
+                  ${
+                    (
+                      price *
+                      quantity
+                    )
+                      .toLocaleString()
+                  }원
                 </strong>
 
               </div>
@@ -848,36 +1056,22 @@
           );
 
 
-        const completedAt =
-          formatDateTime(
-            order.completed_at
-          );
-
-
-        const elapsedTime =
-          getElapsedTime(
-            order.created_at,
-            order.completed_at
-          );
-
-
         return `
-
           <div class="order-card">
 
-
             <div class="order-top">
-
 
               <div>
 
                 <div class="room-number">
+
                   객실
                   ${escapeHtml(
-                    order.room_number || '-'
+                    order.room_number ||
+                    '-'
                   )}
-                </div>
 
+                </div>
 
                 <div class="order-time">
 
@@ -891,33 +1085,35 @@
 
               </div>
 
-
               <div
                 class="status ${getStatusClass(status)}"
               >
-
                 ${getStatusText(status)}
-
               </div>
-
 
             </div>
 
 
             <div class="guest-info">
 
-              <strong>고객명</strong>
+              <strong>
+                고객명
+              </strong>
 
               ${escapeHtml(
-                order.guest_name || '-'
+                order.guest_name ||
+                '-'
               )}
 
               <br>
 
-              <strong>전화번호</strong>
+              <strong>
+                전화번호
+              </strong>
 
               ${escapeHtml(
-                order.phone || '-'
+                order.phone ||
+                '-'
               )}
 
             </div>
@@ -935,21 +1131,23 @@
 
             ${
               order.request_note
+
                 ? `
-                    <div class="request">
+                  <div class="request">
 
-                      <strong>
-                        요청사항
-                      </strong>
+                    <strong>
+                      요청사항
+                    </strong>
 
-                      <br>
+                    <br>
 
-                      ${escapeHtml(
-                        order.request_note
-                      )}
+                    ${escapeHtml(
+                      order.request_note
+                    )}
 
-                    </div>
-                  `
+                  </div>
+                `
+
                 : ''
             }
 
@@ -958,93 +1156,59 @@
 
               총
 
-              ${Number(
-                order.total_amount || 0
-              ).toLocaleString()}원
+              ${
+                Number(
+                  order.total_amount ||
+                  0
+                )
+                  .toLocaleString()
+              }원
 
             </div>
 
 
             ${getActionButton(order)}
 
-
-            ${
-              status === 'completed'
-
-                ? `
-
-                  <div class="completion-info">
-
-                    <div>
-                      <strong>
-                        주문시간
-                      </strong>
-
-                      ${createdAt}
-                    </div>
-
-
-                    <div>
-                      <strong>
-                        완료시간
-                      </strong>
-
-                      ${completedAt}
-                    </div>
-
-
-                    <div>
-                      <strong>
-                        총 소요시간
-                      </strong>
-
-                      ${elapsedTime}
-                    </div>
-
-                  </div>
-
-                `
-
-                : ''
-            }
-
-
           </div>
-
         `;
-
 
       }).join('');
   }
 
 
-  function escapeHtml(value) {
+  function escapeHtml(
+    value
+  ) {
 
-    return String(value ?? '')
-
-      .replace(/&/g, '&amp;')
-
-      .replace(/</g, '&lt;')
-
-      .replace(/>/g, '&gt;')
-
-      .replace(/"/g, '&quot;')
-
-      .replace(/'/g, '&#039;');
+    return String(
+      value ?? ''
+    )
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
 
   }
 
 
-  /*
-    처음 페이지 열었을 때 주문 불러오기
-  */
-
   loadOrders();
 
-
-  /*
-    10초마다 자동 갱신
-  */
 
   setInterval(
     loadOrders,
