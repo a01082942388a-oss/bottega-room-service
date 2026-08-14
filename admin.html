@@ -124,6 +124,26 @@
       padding: 20px;
       margin-bottom: 14px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border: 2px solid transparent;
+    }
+
+    /* 신규 주문 깜빡임 */
+    .new-order-blink {
+      animation: newOrderBlink 1.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes newOrderBlink {
+      0% {
+        background: #ffffff;
+        border-color: #f0c36a;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      }
+
+      100% {
+        background: #fff5df;
+        border-color: #e39a19;
+        box-shadow: 0 0 18px rgba(227,154,25,0.35);
+      }
     }
 
     .order-top {
@@ -348,6 +368,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
   const SUPABASE_URL =
     'https://yookspgooyewhnkobckw.supabase.co';
 
@@ -1056,8 +1077,14 @@
           );
 
 
+        const blinkClass =
+          status === 'pending'
+            ? 'new-order-blink'
+            : '';
+
+
         return `
-          <div class="order-card">
+          <div class="order-card ${blinkClass}">
 
             <div class="order-top">
 
