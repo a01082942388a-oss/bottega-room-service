@@ -19,8 +19,8 @@
 
     header {
       background: #111;
-      color: white;
-      padding: 38px 20px 30px;
+      color: #fff;
+      padding: 34px 20px 26px;
       text-align: center;
     }
 
@@ -31,17 +31,36 @@
     }
 
     header p {
-      margin: 10px 0 0;
-      font-size: 12px;
+      margin: 9px 0 0;
       color: #bbb;
+      font-size: 12px;
       letter-spacing: 2px;
+    }
+
+    .room-info {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 13px 16px;
+      background: #fff;
+      text-align: center;
+      font-size: 13px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .room-info strong {
+      font-size: 15px;
+    }
+
+    .room-error {
+      color: #b42318;
+      font-weight: bold;
     }
 
     .category-nav {
       display: flex;
       overflow-x: auto;
       gap: 8px;
-      padding: 15px;
+      padding: 14px 15px;
       background: white;
       position: sticky;
       top: 0;
@@ -67,10 +86,10 @@
     main {
       max-width: 700px;
       margin: auto;
-      padding: 20px 16px 120px;
+      padding: 18px 16px 110px;
     }
 
-    .menu-item {
+    .menu-card {
       background: white;
       margin-bottom: 12px;
       padding: 18px;
@@ -78,16 +97,16 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
-    .menu-info h3 {
-      margin: 0;
+    .menu-name {
       font-size: 17px;
+      font-weight: bold;
     }
 
-    .menu-info p {
-      margin: 8px 0 0;
+    .menu-description {
       font-size: 13px;
       color: #666;
-      line-height: 1.5;
+      line-height: 1.55;
+      margin-top: 9px;
     }
 
     .menu-bottom {
@@ -108,7 +127,7 @@
       background: #111;
       color: white;
       border-radius: 8px;
-      padding: 10px 15px;
+      padding: 10px 16px;
       cursor: pointer;
       font-weight: bold;
     }
@@ -125,56 +144,64 @@
       bottom: 18px;
       transform: translateX(-50%);
       width: calc(100% - 32px);
-      max-width: 668px;
+      max-width: 670px;
       background: #111;
       color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 16px 18px;
+      border-radius: 12px;
+      padding: 15px 18px;
       display: none;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      z-index: 50;
-      font-size: 15px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.25);
+      z-index: 20;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.22);
     }
 
-    .modal {
-      display: none;
+    .cart-bar.show {
+      display: flex;
+    }
+
+    .cart-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
       z-index: 100;
-      padding: 20px;
-      overflow-y: auto;
     }
 
-    .modal-content {
+    .cart-overlay.show {
+      display: flex;
+    }
+
+    .cart-modal {
       background: white;
       width: 100%;
-      max-width: 600px;
-      margin: 30px auto;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
       border-radius: 16px;
-      padding: 22px;
+      padding: 20px;
     }
 
-    .modal-header {
+    .cart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    .modal-header h2 {
+    .cart-header h2 {
       margin: 0;
       font-size: 21px;
     }
 
     .close-button {
-      border: none;
-      background: none;
-      font-size: 26px;
+      border: 0;
+      background: transparent;
+      font-size: 24px;
       cursor: pointer;
     }
 
@@ -182,30 +209,30 @@
       display: flex;
       justify-content: space-between;
       gap: 15px;
-      padding: 14px 0;
+      padding: 13px 0;
       border-bottom: 1px solid #eee;
     }
 
     .cart-item-name {
       font-weight: bold;
-      margin-bottom: 5px;
+      font-size: 14px;
     }
 
     .cart-item-price {
-      font-size: 13px;
+      margin-top: 5px;
       color: #777;
+      font-size: 12px;
     }
 
-    .quantity-box {
+    .quantity-control {
       display: flex;
       align-items: center;
       gap: 10px;
-      white-space: nowrap;
     }
 
-    .quantity-box button {
-      width: 30px;
-      height: 30px;
+    .quantity-control button {
+      width: 28px;
+      height: 28px;
       border: 1px solid #ddd;
       background: white;
       border-radius: 6px;
@@ -215,60 +242,129 @@
     .cart-total {
       display: flex;
       justify-content: space-between;
+      padding: 18px 0;
       font-size: 18px;
       font-weight: bold;
-      padding: 20px 0;
     }
 
-    .order-form {
-      border-top: 1px solid #eee;
-      padding-top: 20px;
+    .section-title {
+      margin: 10px 0 10px;
+      font-size: 14px;
+      font-weight: bold;
     }
 
-    .order-form label {
+    .payment-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 17px;
+    }
+
+    .payment-option {
+      position: relative;
+    }
+
+    .payment-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .payment-option label {
+      display: block;
+      padding: 15px 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .payment-option input:checked + label {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .card-notice {
+      display: none;
+      margin: -5px 0 16px;
+      padding: 11px 12px;
+      background: #f6f6f6;
+      border-radius: 8px;
+      color: #666;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .card-notice.show {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group.hidden {
+      display: none;
+    }
+
+    .form-group label {
       display: block;
       font-size: 13px;
       font-weight: bold;
-      margin: 14px 0 7px;
+      margin-bottom: 7px;
     }
 
-    .order-form input,
-    .order-form textarea {
+    .required {
+      color: #b42318;
+    }
+
+    .form-group input,
+    .form-group textarea {
       width: 100%;
-      padding: 13px;
       border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 15px;
+      border-radius: 9px;
+      padding: 13px;
+      font-size: 14px;
       font-family: inherit;
     }
 
-    .order-form textarea {
-      min-height: 90px;
+    .form-group textarea {
       resize: vertical;
+      min-height: 85px;
     }
 
-    .submit-order {
+    .order-button {
       width: 100%;
-      margin-top: 20px;
-      border: none;
+      border: 0;
       background: #111;
       color: white;
-      border-radius: 10px;
       padding: 15px;
-      font-size: 16px;
+      border-radius: 9px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 5px;
     }
 
-    .submit-order:disabled {
+    .order-button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
     .empty-cart {
       text-align: center;
-      color: #777;
       padding: 30px 10px;
+      color: #777;
+    }
+
+    @media (max-width: 500px) {
+      .payment-options {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -280,12 +376,12 @@
   <p>ROOM SERVICE</p>
 </header>
 
-<div class="category-nav">
+<div class="room-info" id="room-info">
+  객실 정보를 확인하는 중입니다.
+</div>
+
+<div class="category-nav" id="category-nav">
   <button class="active" data-category="ALL">전체</button>
-  <button data-category="SALAD">샐러드</button>
-  <button data-category="PASTA">파스타</button>
-  <button data-category="RISOTTO">리조또</button>
-  <button data-category="PIZZA">피자</button>
 </div>
 
 <main id="menu-list">
@@ -294,15 +390,15 @@
   </div>
 </main>
 
-<button id="cart-bar" class="cart-bar">
+<div class="cart-bar" id="cart-bar" onclick="openCart()">
   <span id="cart-count">장바구니 0개</span>
-  <span id="cart-total-bar">0원</span>
-</button>
+  <strong id="cart-total-bar">0원</strong>
+</div>
 
-<div id="cart-modal" class="modal">
-  <div class="modal-content">
+<div class="cart-overlay" id="cart-overlay">
+  <div class="cart-modal">
 
-    <div class="modal-header">
+    <div class="cart-header">
       <h2>주문 내역</h2>
       <button class="close-button" onclick="closeCart()">×</button>
     </div>
@@ -314,70 +410,163 @@
       <span id="cart-total">0원</span>
     </div>
 
-    <div class="order-form">
+    <div class="section-title">
+      결제방법 <span class="required">*</span>
+    </div>
 
-      <label for="room-number">객실번호 *</label>
-      <input
-        type="text"
-        id="room-number"
-        placeholder="예: 305"
-      >
+    <div class="payment-options">
 
-      <label for="guest-name">고객명 *</label>
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="payment-checkout"
+          name="payment-method"
+          value="checkout"
+          onchange="handlePaymentChange()"
+        >
+        <label for="payment-checkout">
+          체크아웃 시 결제
+        </label>
+      </div>
+
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="payment-card"
+          name="payment-method"
+          value="card"
+          onchange="handlePaymentChange()"
+        >
+        <label for="payment-card">
+          카드결제
+        </label>
+      </div>
+
+    </div>
+
+    <div class="card-notice" id="card-notice">
+      카드결제는 현재 결제방법 선택 정보만 저장됩니다.
+      실제 카드 결제 연결은 추후 적용됩니다.
+    </div>
+
+    <div class="form-group hidden" id="guest-name-group">
+      <label for="guest-name">
+        고객명 <span class="required">*</span>
+      </label>
+
       <input
         type="text"
         id="guest-name"
         placeholder="성함을 입력해주세요"
       >
+    </div>
 
-      <label for="phone">전화번호</label>
+    <div class="form-group">
+      <label for="phone">
+        전화번호
+      </label>
+
       <input
         type="tel"
         id="phone"
         placeholder="선택 입력"
       >
+    </div>
 
-      <label for="request-note">요청사항</label>
+    <div class="form-group">
+      <label for="request-note">
+        요청사항
+      </label>
+
       <textarea
         id="request-note"
         placeholder="알레르기, 조리 요청 등 전달사항을 입력해주세요."
       ></textarea>
-
-      <button
-        id="submit-order"
-        class="submit-order"
-        onclick="submitOrder()"
-      >
-        주문하기
-      </button>
-
     </div>
+
+    <button
+      class="order-button"
+      id="order-button"
+      onclick="submitOrder()"
+    >
+      주문하기
+    </button>
+
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  const SUPABASE_URL = 'https://yookspgooyewhnkobckw.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
 
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  const SUPABASE_URL =
+    'https://yookspgooyewhnkobckw.supabase.co';
+
+  const SUPABASE_KEY =
+    'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
   let allMenus = [];
   let cart = [];
+  let currentCategory = 'ALL';
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const roomNumber =
+    params.get('room');
+
+
+  function showRoomInfo() {
+
+    const roomInfo =
+      document.getElementById(
+        'room-info'
+      );
+
+    if (roomNumber) {
+
+      roomInfo.innerHTML =
+        `객실 <strong>${escapeHtml(roomNumber)}</strong> · BOTTEGA ROOM SERVICE`;
+
+    } else {
+
+      roomInfo.innerHTML =
+        '<span class="room-error">객실 QR코드를 통해 접속해주세요.</span>';
+
+    }
+
+  }
+
 
   async function loadMenus() {
 
-    const menuList = document.getElementById('menu-list');
+    const menuList =
+      document.getElementById(
+        'menu-list'
+      );
 
-    const { data, error } = await supabaseClient
-      .from('menus')
-      .select('*')
-      .eq('is_available', true)
-      .order('sort_order', { ascending: true });
+    const { data, error } =
+      await supabaseClient
+        .from('menus')
+        .select('*')
+        .eq(
+          'is_available',
+          true
+        )
+        .order(
+          'sort_order',
+          {
+            ascending: true
+          }
+        );
 
     if (error) {
 
@@ -389,14 +578,122 @@
       return;
     }
 
-    allMenus = data || [];
+    allMenus =
+      data || [];
 
-    renderMenus(allMenus);
+    buildCategories();
+
+    renderMenus(
+      allMenus
+    );
+
   }
 
-  function renderMenus(menus) {
 
-    const menuList = document.getElementById('menu-list');
+  function buildCategories() {
+
+    const nav =
+      document.getElementById(
+        'category-nav'
+      );
+
+    const categories =
+      [
+        ...new Set(
+          allMenus
+            .map(menu =>
+              menu.category
+            )
+            .filter(Boolean)
+        )
+      ];
+
+    nav.innerHTML =
+      `
+        <button
+          class="active"
+          data-category="ALL"
+        >
+          전체
+        </button>
+      ` +
+      categories
+        .map(category => `
+          <button
+            data-category="${escapeHtml(category)}"
+          >
+            ${escapeHtml(category)}
+          </button>
+        `)
+        .join('');
+
+
+    nav
+      .querySelectorAll(
+        'button'
+      )
+      .forEach(button => {
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            nav
+              .querySelectorAll(
+                'button'
+              )
+              .forEach(btn =>
+                btn.classList.remove(
+                  'active'
+                )
+              );
+
+            button
+              .classList
+              .add(
+                'active'
+              );
+
+            currentCategory =
+              button.dataset.category;
+
+            if (
+              currentCategory ===
+              'ALL'
+            ) {
+
+              renderMenus(
+                allMenus
+              );
+
+            } else {
+
+              renderMenus(
+                allMenus.filter(
+                  menu =>
+                    menu.category ===
+                    currentCategory
+                )
+              );
+
+            }
+
+          }
+        );
+
+      });
+
+  }
+
+
+  function renderMenus(
+    menus
+  ) {
+
+    const menuList =
+      document.getElementById(
+        'menu-list'
+      );
 
     if (!menus.length) {
 
@@ -406,184 +703,177 @@
       return;
     }
 
-    menuList.innerHTML = menus.map(menu => `
+    menuList.innerHTML =
+      menus.map(menu => `
 
-      <div class="menu-item">
+        <div class="menu-card">
 
-        <div class="menu-info">
-
-          <h3>${escapeHtml(menu.name || '')}</h3>
-
-          ${
-            menu.name_en
-            ? `<div style="font-size:12px;color:#888;margin-top:4px;">
-                ${escapeHtml(menu.name_en)}
-              </div>`
-            : ''
-          }
-
-          <p>${escapeHtml(menu.description || '')}</p>
-
-        </div>
-
-        <div class="menu-bottom">
-
-          <div class="price">
-            ${Number(menu.price || 0).toLocaleString()}원
+          <div class="menu-name">
+            ${escapeHtml(menu.name)}
           </div>
 
-          <button
-            class="add-button"
-            onclick="addToCart(${Number(menu.id)})"
-          >
-            담기
-          </button>
+          ${
+            menu.description
+              ? `
+                <div class="menu-description">
+                  ${escapeHtml(menu.description)}
+                </div>
+              `
+              : ''
+          }
+
+          <div class="menu-bottom">
+
+            <div class="price">
+              ${Number(
+                menu.price || 0
+              ).toLocaleString()}원
+            </div>
+
+            <button
+              class="add-button"
+              onclick="addToCart(${Number(menu.id)})"
+            >
+              담기
+            </button>
+
+          </div>
 
         </div>
 
-      </div>
+      `).join('');
 
-    `).join('');
   }
 
-  document.querySelectorAll('.category-nav button').forEach(button => {
 
-    button.addEventListener('click', () => {
+  function addToCart(
+    menuId
+  ) {
 
-      document
-        .querySelectorAll('.category-nav button')
-        .forEach(btn => btn.classList.remove('active'));
-
-      button.classList.add('active');
-
-      const category = button.dataset.category;
-
-      if (category === 'ALL') {
-
-        renderMenus(allMenus);
-
-        return;
-      }
-
-      const filteredMenus = allMenus.filter(menu =>
-        String(menu.category || '').toUpperCase() === category
+    const menu =
+      allMenus.find(
+        item =>
+          Number(item.id) ===
+          Number(menuId)
       );
 
-      renderMenus(filteredMenus);
-    });
-  });
+    if (!menu) {
+      return;
+    }
 
-  function addToCart(menuId) {
+    const existing =
+      cart.find(
+        item =>
+          Number(item.id) ===
+          Number(menuId)
+      );
 
-    const menu = allMenus.find(
-      item => Number(item.id) === Number(menuId)
-    );
+    if (existing) {
 
-    if (!menu) return;
-
-    const existingItem = cart.find(
-      item => Number(item.id) === Number(menuId)
-    );
-
-    if (existingItem) {
-
-      existingItem.quantity += 1;
+      existing.quantity += 1;
 
     } else {
 
       cart.push({
-        id: Number(menu.id),
+        id: menu.id,
         name: menu.name,
-        price: Number(menu.price || 0),
+        price: Number(
+          menu.price || 0
+        ),
         quantity: 1
       });
+
     }
 
     updateCartBar();
+
   }
 
-  function changeQuantity(menuId, amount) {
-
-    const item = cart.find(
-      cartItem => Number(cartItem.id) === Number(menuId)
-    );
-
-    if (!item) return;
-
-    item.quantity += amount;
-
-    if (item.quantity <= 0) {
-
-      cart = cart.filter(
-        cartItem => Number(cartItem.id) !== Number(menuId)
-      );
-    }
-
-    updateCartBar();
-    renderCart();
-  }
-
-  function getCartTotal() {
-
-    return cart.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-  }
-
-  function getCartCount() {
-
-    return cart.reduce(
-      (sum, item) => sum + item.quantity,
-      0
-    );
-  }
 
   function updateCartBar() {
 
-    const cartBar = document.getElementById('cart-bar');
+    const cartBar =
+      document.getElementById(
+        'cart-bar'
+      );
 
-    const count = getCartCount();
+    const count =
+      cart.reduce(
+        (sum, item) =>
+          sum +
+          item.quantity,
+        0
+      );
 
-    if (count === 0) {
+    const total =
+      getCartTotal();
 
-      cartBar.style.display = 'none';
-
-      return;
-    }
-
-    cartBar.style.display = 'flex';
-
-    document.getElementById('cart-count').textContent =
+    document
+      .getElementById(
+        'cart-count'
+      )
+      .textContent =
       `장바구니 ${count}개`;
 
-    document.getElementById('cart-total-bar').textContent =
-      `${getCartTotal().toLocaleString()}원`;
+    document
+      .getElementById(
+        'cart-total-bar'
+      )
+      .textContent =
+      total.toLocaleString() +
+      '원';
+
+    if (
+      count > 0
+    ) {
+
+      cartBar
+        .classList
+        .add('show');
+
+    } else {
+
+      cartBar
+        .classList
+        .remove('show');
+
+    }
+
   }
+
 
   function openCart() {
 
     renderCart();
 
-    document.getElementById('cart-modal').style.display = 'block';
+    document
+      .getElementById(
+        'cart-overlay'
+      )
+      .classList
+      .add('show');
 
-    document.body.style.overflow = 'hidden';
   }
+
 
   function closeCart() {
 
-    document.getElementById('cart-modal').style.display = 'none';
+    document
+      .getElementById(
+        'cart-overlay'
+      )
+      .classList
+      .remove('show');
 
-    document.body.style.overflow = '';
   }
 
-  document
-    .getElementById('cart-bar')
-    .addEventListener('click', openCart);
 
   function renderCart() {
 
-    const cartItems = document.getElementById('cart-items');
+    const cartItems =
+      document.getElementById(
+        'cart-items'
+      );
 
     if (!cart.length) {
 
@@ -592,158 +882,524 @@
 
     } else {
 
-      cartItems.innerHTML = cart.map(item => `
+      cartItems.innerHTML =
+        cart.map(item => `
 
-        <div class="cart-item">
+          <div class="cart-item">
 
-          <div>
+            <div>
 
-            <div class="cart-item-name">
-              ${escapeHtml(item.name)}
+              <div class="cart-item-name">
+                ${escapeHtml(item.name)}
+              </div>
+
+              <div class="cart-item-price">
+                ${Number(item.price).toLocaleString()}원
+              </div>
+
             </div>
 
-            <div class="cart-item-price">
-              ${item.price.toLocaleString()}원
+            <div class="quantity-control">
+
+              <button
+                onclick="changeQuantity(${Number(item.id)}, -1)"
+              >
+                −
+              </button>
+
+              <span>
+                ${item.quantity}
+              </span>
+
+              <button
+                onclick="changeQuantity(${Number(item.id)}, 1)"
+              >
+                +
+              </button>
+
             </div>
 
           </div>
 
-          <div class="quantity-box">
+        `).join('');
 
-            <button onclick="changeQuantity(${item.id}, -1)">
-              −
-            </button>
-
-            <span>
-              ${item.quantity}
-            </span>
-
-            <button onclick="changeQuantity(${item.id}, 1)">
-              +
-            </button>
-
-          </div>
-
-        </div>
-
-      `).join('');
     }
 
-    document.getElementById('cart-total').textContent =
-      `${getCartTotal().toLocaleString()}원`;
+    document
+      .getElementById(
+        'cart-total'
+      )
+      .textContent =
+      getCartTotal()
+        .toLocaleString() +
+      '원';
+
   }
+
+
+  function changeQuantity(
+    menuId,
+    amount
+  ) {
+
+    const item =
+      cart.find(
+        item =>
+          Number(item.id) ===
+          Number(menuId)
+      );
+
+    if (!item) {
+      return;
+    }
+
+    item.quantity +=
+      amount;
+
+    if (
+      item.quantity <= 0
+    ) {
+
+      cart =
+        cart.filter(
+          item =>
+            Number(item.id) !==
+            Number(menuId)
+        );
+
+    }
+
+    updateCartBar();
+
+    renderCart();
+
+  }
+
+
+  function getCartTotal() {
+
+    return cart.reduce(
+      (sum, item) =>
+        sum +
+        (
+          Number(item.price) *
+          Number(item.quantity)
+        ),
+      0
+    );
+
+  }
+
+
+  function getPaymentMethod() {
+
+    const selected =
+      document.querySelector(
+        'input[name="payment-method"]:checked'
+      );
+
+    return selected
+      ? selected.value
+      : '';
+
+  }
+
+
+  function handlePaymentChange() {
+
+    const paymentMethod =
+      getPaymentMethod();
+
+    const guestNameGroup =
+      document.getElementById(
+        'guest-name-group'
+      );
+
+    const guestNameInput =
+      document.getElementById(
+        'guest-name'
+      );
+
+    const cardNotice =
+      document.getElementById(
+        'card-notice'
+      );
+
+
+    if (
+      paymentMethod ===
+      'checkout'
+    ) {
+
+      guestNameGroup
+        .classList
+        .remove('hidden');
+
+      guestNameInput.required =
+        true;
+
+      cardNotice
+        .classList
+        .remove('show');
+
+    } else if (
+      paymentMethod ===
+      'card'
+    ) {
+
+      guestNameGroup
+        .classList
+        .add('hidden');
+
+      guestNameInput.required =
+        false;
+
+      guestNameInput.value =
+        '';
+
+      cardNotice
+        .classList
+        .add('show');
+
+    }
+
+  }
+
 
   async function submitOrder() {
 
-    if (!cart.length) {
-
-      alert('주문하실 메뉴를 선택해주세요.');
-
-      return;
-    }
-
-    const roomNumber =
-      document.getElementById('room-number').value.trim();
-
-    const guestName =
-      document.getElementById('guest-name').value.trim();
-
-    const phone =
-      document.getElementById('phone').value.trim();
-
-    const requestNote =
-      document.getElementById('request-note').value.trim();
-
     if (!roomNumber) {
 
-      alert('객실번호를 입력해주세요.');
-
-      return;
-    }
-
-    if (!guestName) {
-
-      alert('고객명을 입력해주세요.');
-
-      return;
-    }
-
-    const submitButton =
-      document.getElementById('submit-order');
-
-    submitButton.disabled = true;
-    submitButton.textContent = '주문 접수 중...';
-
-    const orderItems = cart.map(item => ({
-      menu_id: item.id,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-      subtotal: item.price * item.quantity
-    }));
-
-    const orderData = {
-
-      room_number: roomNumber,
-
-      guest_name: guestName,
-
-      phone: phone || null,
-
-      status: 'pending',
-
-      total_amount: getCartTotal(),
-
-      request_note: requestNote || null,
-
-      order_items: orderItems,
-
-      ordered_at: new Date().toISOString()
-    };
-
-    const { error } = await supabaseClient
-      .from('orders')
-      .insert(orderData);
-
-    submitButton.disabled = false;
-    submitButton.textContent = '주문하기';
-
-    if (error) {
-
-      console.error(error);
-
       alert(
-        '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+        '객실 QR코드를 통해 다시 접속해주세요.'
       );
 
       return;
     }
 
-    alert('주문이 정상적으로 접수되었습니다.');
+
+    if (!cart.length) {
+
+      alert(
+        '주문할 메뉴를 선택해주세요.'
+      );
+
+      return;
+    }
+
+
+    const paymentMethod =
+      getPaymentMethod();
+
+
+    if (!paymentMethod) {
+
+      alert(
+        '결제방법을 선택해주세요.'
+      );
+
+      return;
+    }
+
+
+    const guestName =
+      document
+        .getElementById(
+          'guest-name'
+        )
+        .value
+        .trim();
+
+
+    if (
+      paymentMethod ===
+        'checkout' &&
+      !guestName
+    ) {
+
+      alert(
+        '체크아웃 시 결제를 선택한 경우 고객명을 입력해주세요.'
+      );
+
+      document
+        .getElementById(
+          'guest-name'
+        )
+        .focus();
+
+      return;
+    }
+
+
+    const phone =
+      document
+        .getElementById(
+          'phone'
+        )
+        .value
+        .trim();
+
+
+    const requestNote =
+      document
+        .getElementById(
+          'request-note'
+        )
+        .value
+        .trim();
+
+
+    const paymentText =
+      paymentMethod ===
+      'checkout'
+        ? '체크아웃 시 결제'
+        : '카드결제';
+
+
+    const orderButton =
+      document.getElementById(
+        'order-button'
+      );
+
+
+    orderButton.disabled =
+      true;
+
+    orderButton.textContent =
+      '주문 접수 중...';
+
+
+    const orderItems =
+      cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }));
+
+
+    const payload = {
+
+      room_number:
+        String(roomNumber),
+
+      guest_name:
+        paymentMethod ===
+        'checkout'
+          ? guestName
+          : '',
+
+      phone:
+        phone,
+
+      status:
+        'pending',
+
+      total_amount:
+        getCartTotal(),
+
+      request_note:
+        requestNote,
+
+      order_items:
+        orderItems,
+
+      ordered_at:
+        new Date()
+          .toISOString(),
+
+      payment_method:
+        paymentMethod
+
+    };
+
+
+    let result =
+      await supabaseClient
+        .from('orders')
+        .insert(payload);
+
+
+    /*
+      아직 Supabase에 payment_method 컬럼을
+      추가하지 않은 경우에도
+      주문 테스트가 가능하도록 자동 재시도
+    */
+
+    if (
+      result.error &&
+      String(
+        result.error.message ||
+        ''
+      )
+        .toLowerCase()
+        .includes(
+          'payment_method'
+        )
+    ) {
+
+      const fallbackPayload =
+        { ...payload };
+
+
+      delete fallbackPayload
+        .payment_method;
+
+
+      const paymentInfo =
+        `[결제방법] ${paymentText}`;
+
+
+      fallbackPayload
+        .request_note =
+        requestNote
+          ? paymentInfo +
+            '\n' +
+            requestNote
+          : paymentInfo;
+
+
+      result =
+        await supabaseClient
+          .from('orders')
+          .insert(
+            fallbackPayload
+          );
+
+    }
+
+
+    if (
+      result.error
+    ) {
+
+      console.error(
+        result.error
+      );
+
+      alert(
+        '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      );
+
+      orderButton.disabled =
+        false;
+
+      orderButton.textContent =
+        '주문하기';
+
+      return;
+
+    }
+
+
+    alert(
+      '주문이 정상적으로 접수되었습니다.'
+    );
+
 
     cart = [];
 
     updateCartBar();
 
-    document.getElementById('room-number').value = '';
-    document.getElementById('guest-name').value = '';
-    document.getElementById('phone').value = '';
-    document.getElementById('request-note').value = '';
-
     closeCart();
+
+
+    document
+      .querySelectorAll(
+        'input[name="payment-method"]'
+      )
+      .forEach(input => {
+
+        input.checked =
+          false;
+
+      });
+
+
+    document
+      .getElementById(
+        'guest-name'
+      )
+      .value =
+      '';
+
+
+    document
+      .getElementById(
+        'phone'
+      )
+      .value =
+      '';
+
+
+    document
+      .getElementById(
+        'request-note'
+      )
+      .value =
+      '';
+
+
+    document
+      .getElementById(
+        'guest-name-group'
+      )
+      .classList
+      .add('hidden');
+
+
+    document
+      .getElementById(
+        'card-notice'
+      )
+      .classList
+      .remove('show');
+
+
+    orderButton.disabled =
+      false;
+
+    orderButton.textContent =
+      '주문하기';
+
   }
 
-  function escapeHtml(value) {
 
-    return String(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value ?? ''
+    )
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+
   }
+
+
+  showRoomInfo();
 
   loadMenus();
+
 </script>
 
 </body>
