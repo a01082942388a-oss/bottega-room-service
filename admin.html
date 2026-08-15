@@ -37,9 +37,80 @@
       letter-spacing: 2px;
     }
 
-    .summary {
+    .service-panel {
       max-width: 1000px;
       margin: 20px auto 0;
+      padding: 0 16px;
+    }
+
+    .service-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .service-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .service-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .current-service-status {
+      font-size: 13px;
+      font-weight: bold;
+      padding: 7px 11px;
+      border-radius: 20px;
+      background: #eee;
+    }
+
+    .service-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .service-button {
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 9px;
+      padding: 12px 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .service-button.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .service-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .service-description {
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 8px;
+      background: #f7f7f7;
+      color: #666;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .summary {
+      max-width: 1000px;
+      margin: 14px auto 0;
       padding: 0 16px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -127,7 +198,6 @@
       border: 2px solid transparent;
     }
 
-    /* 신규 주문 깜빡임 */
     .new-order-blink {
       animation: newOrderBlink 1.4s ease-in-out infinite alternate;
     }
@@ -313,7 +383,6 @@
       color: #777;
     }
 
-    /* 예상시간 선택창 */
     .time-modal-overlay {
       position: fixed;
       inset: 0;
@@ -413,6 +482,10 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
+      .service-buttons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
       .order-top {
         align-items: flex-start;
       }
@@ -426,6 +499,81 @@
   <h1>BOTTEGA</h1>
   <p>ROOM SERVICE · ORDER MANAGEMENT</p>
 </header>
+
+
+<div class="service-panel">
+
+  <div class="service-box">
+
+    <div class="service-title-row">
+
+      <div class="service-title">
+        영업상태
+      </div>
+
+      <div
+        class="current-service-status"
+        id="current-service-status"
+      >
+        확인 중
+      </div>
+
+    </div>
+
+    <div class="service-buttons">
+
+      <button
+        class="service-button"
+        data-status="open"
+        onclick="changeServiceStatus('open')"
+      >
+        정상영업
+      </button>
+
+      <button
+        class="service-button"
+        data-status="busy"
+        onclick="changeServiceStatus('busy')"
+      >
+        주문폭주
+      </button>
+
+      <button
+        class="service-button"
+        data-status="preparing"
+        onclick="changeServiceStatus('preparing')"
+      >
+        영업준비중
+      </button>
+
+      <button
+        class="service-button"
+        data-status="closed"
+        onclick="changeServiceStatus('closed')"
+      >
+        영업마감
+      </button>
+
+      <button
+        class="service-button"
+        data-status="soldout"
+        onclick="changeServiceStatus('soldout')"
+      >
+        재료소진
+      </button>
+
+    </div>
+
+    <div
+      class="service-description"
+      id="service-description"
+    >
+      현재 영업상태를 불러오는 중입니다.
+    </div>
+
+  </div>
+
+</div>
 
 
 <div class="summary">
@@ -454,10 +602,35 @@
 
 
 <div class="filters">
-  <button class="filter-button active" data-filter="all">전체</button>
-  <button class="filter-button" data-filter="pending">신규</button>
-  <button class="filter-button" data-filter="cooking">조리중</button>
-  <button class="filter-button" data-filter="completed">완료</button>
+
+  <button
+    class="filter-button active"
+    data-filter="all"
+  >
+    전체
+  </button>
+
+  <button
+    class="filter-button"
+    data-filter="pending"
+  >
+    신규
+  </button>
+
+  <button
+    class="filter-button"
+    data-filter="cooking"
+  >
+    조리중
+  </button>
+
+  <button
+    class="filter-button"
+    data-filter="completed"
+  >
+    완료
+  </button>
+
 </div>
 
 
@@ -479,15 +652,16 @@
   </div>
 
   <div id="order-list">
+
     <div class="empty">
       주문을 불러오는 중입니다.
     </div>
+
   </div>
 
 </main>
 
 
-<!-- 예상 조리시간 선택창 -->
 <div
   class="time-modal-overlay"
   id="time-modal-overlay"
@@ -495,7 +669,9 @@
 
   <div class="time-modal">
 
-    <h2>예상 조리시간 선택</h2>
+    <h2>
+      예상 조리시간 선택
+    </h2>
 
     <p class="time-modal-description">
       고객에게 안내할 예상 조리시간을 선택해주세요.
@@ -580,14 +756,250 @@
   let allOrders = [];
   let currentFilter = 'all';
   let isUpdating = false;
+  let serviceStatusUpdating = false;
 
   let selectedOrderId = null;
   let selectedOrderButton = null;
 
 
+  const serviceStatusInfo = {
+
+    open: {
+      label: '정상영업',
+      description:
+        '정상적으로 룸서비스 주문을 받고 있습니다.'
+    },
+
+    busy: {
+      label: '주문폭주',
+      description:
+        '현재 주문이 많습니다. 고객은 주문할 수 있지만 준비시간 지연 안내가 표시됩니다.'
+    },
+
+    preparing: {
+      label: '영업준비중',
+      description:
+        '현재 영업 준비 중입니다. 고객 주문이 제한됩니다.'
+    },
+
+    closed: {
+      label: '영업마감',
+      description:
+        '룸서비스 영업이 종료된 상태입니다. 고객 주문이 제한됩니다.'
+    },
+
+    soldout: {
+      label: '재료소진',
+      description:
+        '재료 소진 상태입니다. 고객 주문이 제한됩니다.'
+    }
+
+  };
+
+
+  async function loadServiceStatus() {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('service_status')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        'SERVICE STATUS ERROR:',
+        error
+      );
+
+      document.getElementById(
+        'current-service-status'
+      ).textContent =
+        '오류';
+
+      document.getElementById(
+        'service-description'
+      ).textContent =
+        '영업상태를 불러오지 못했습니다.';
+
+      return;
+    }
+
+
+    if (!data) {
+      return;
+    }
+
+
+    renderServiceStatus(
+      data.status
+    );
+
+  }
+
+
+  function renderServiceStatus(
+    status
+  ) {
+
+    const info =
+      serviceStatusInfo[status] ||
+      serviceStatusInfo.open;
+
+
+    document.getElementById(
+      'current-service-status'
+    ).textContent =
+      info.label;
+
+
+    document.getElementById(
+      'service-description'
+    ).textContent =
+      info.description;
+
+
+    document
+      .querySelectorAll(
+        '.service-button'
+      )
+      .forEach(
+        button => {
+
+          button.classList.toggle(
+            'active',
+            button.dataset.status ===
+            status
+          );
+
+        }
+      );
+
+  }
+
+
+  async function changeServiceStatus(
+    newStatus
+  ) {
+
+    if (
+      serviceStatusUpdating
+    ) {
+      return;
+    }
+
+
+    const info =
+      serviceStatusInfo[
+        newStatus
+      ];
+
+
+    if (!info) {
+      return;
+    }
+
+
+    if (
+      !confirm(
+        `영업상태를 "${info.label}" 상태로 변경하시겠습니까?`
+      )
+    ) {
+      return;
+    }
+
+
+    serviceStatusUpdating =
+      true;
+
+
+    document
+      .querySelectorAll(
+        '.service-button'
+      )
+      .forEach(
+        button => {
+
+          button.disabled =
+            true;
+
+        }
+      );
+
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from('service_status')
+        .update({
+
+          status:
+            newStatus,
+
+          updated_at:
+            new Date()
+              .toISOString()
+
+        })
+        .eq(
+          'id',
+          1
+        );
+
+
+    document
+      .querySelectorAll(
+        '.service-button'
+      )
+      .forEach(
+        button => {
+
+          button.disabled =
+            false;
+
+        }
+      );
+
+
+    serviceStatusUpdating =
+      false;
+
+
+    if (error) {
+
+      console.error(
+        'SERVICE UPDATE ERROR:',
+        error
+      );
+
+
+      alert(
+        '영업상태 변경에 실패했습니다.'
+      );
+
+      return;
+    }
+
+
+    renderServiceStatus(
+      newStatus
+    );
+
+  }
+
+
   async function loadOrders() {
 
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await supabaseClient
         .from('orders')
         .select('*')
@@ -627,11 +1039,9 @@
 
   function updateSummary() {
 
-    document
-      .getElementById(
-        'order-count'
-      )
-      .textContent =
+    document.getElementById(
+      'order-count'
+    ).textContent =
       allOrders.length;
 
 
@@ -654,19 +1064,15 @@
       ).length;
 
 
-    document
-      .getElementById(
-        'pending-count'
-      )
-      .textContent =
+    document.getElementById(
+      'pending-count'
+    ).textContent =
       pendingCount;
 
 
-    document
-      .getElementById(
-        'cooking-count'
-      )
-      .textContent =
+    document.getElementById(
+      'cooking-count'
+    ).textContent =
       cookingCount;
 
 
@@ -682,11 +1088,9 @@
       );
 
 
-    document
-      .getElementById(
-        'total-sales'
-      )
-      .textContent =
+    document.getElementById(
+      'total-sales'
+    ).textContent =
       totalSales.toLocaleString() +
       '원';
 
@@ -934,9 +1338,7 @@
       !acceptedAt ||
       !minutes
     ) {
-
       return '-';
-
     }
 
 
@@ -967,9 +1369,7 @@
       !startValue ||
       !endValue
     ) {
-
       return '-';
-
     }
 
 
@@ -990,9 +1390,7 @@
       Number.isNaN(end) ||
       end < start
     ) {
-
       return '-';
-
     }
 
 
@@ -1191,7 +1589,6 @@
               <strong>
                 주문시간
               </strong>
-
               ${createdAt}
             </div>
 
@@ -1199,7 +1596,6 @@
               <strong>
                 접수시간
               </strong>
-
               ${formatDateTime(order.accepted_at)}
             </div>
 
@@ -1207,7 +1603,6 @@
               <strong>
                 안내시간
               </strong>
-
               ${
                 order.estimated_minutes
                   ? Number(
@@ -1221,7 +1616,6 @@
               <strong>
                 완료시간
               </strong>
-
               ${completedAt}
             </div>
 
@@ -1269,36 +1663,28 @@
       button;
 
 
-    document
-      .getElementById(
-        'custom-time-input'
-      )
-      .value =
+    document.getElementById(
+      'custom-time-input'
+    ).value =
       '';
 
 
-    document
-      .getElementById(
-        'time-modal-overlay'
-      )
-      .classList
-      .add(
-        'show'
-      );
+    document.getElementById(
+      'time-modal-overlay'
+    ).classList.add(
+      'show'
+    );
 
   }
 
 
   function closeTimeModal() {
 
-    document
-      .getElementById(
-        'time-modal-overlay'
-      )
-      .classList
-      .remove(
-        'show'
-      );
+    document.getElementById(
+      'time-modal-overlay'
+    ).classList.remove(
+      'show'
+    );
 
 
     selectedOrderId =
@@ -1315,11 +1701,9 @@
 
     const value =
       Number(
-        document
-          .getElementById(
-            'custom-time-input'
-          )
-          .value
+        document.getElementById(
+          'custom-time-input'
+        ).value
       );
 
 
@@ -1445,7 +1829,6 @@
         false;
 
       return;
-
     }
 
 
@@ -1478,7 +1861,6 @@
         '이 주문을 완료 처리하시겠습니까?'
       )
     ) {
-
       return;
     }
 
@@ -1546,7 +1928,6 @@
         false;
 
       return;
-
     }
 
 
@@ -1822,11 +2203,19 @@
   }
 
 
+  loadServiceStatus();
+
   loadOrders();
 
 
   setInterval(
     loadOrders,
+    10000
+  );
+
+
+  setInterval(
+    loadServiceStatus,
     10000
   );
 
