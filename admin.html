@@ -217,6 +217,7 @@
       margin-bottom: 14px;
       font-size: 13px;
       line-height: 1.5;
+      white-space: pre-wrap;
     }
 
     .total {
@@ -255,6 +256,21 @@
     .action-button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .cooking-info {
+      margin-bottom: 13px;
+      padding: 13px 15px;
+      background: #f3f7ff;
+      border: 1px solid #dce6fa;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #444;
+    }
+
+    .cooking-info strong {
+      color: #2457a7;
     }
 
     .completed-message {
@@ -297,6 +313,101 @@
       color: #777;
     }
 
+    /* 예상시간 선택창 */
+    .time-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.58);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .time-modal-overlay.show {
+      display: flex;
+    }
+
+    .time-modal {
+      width: 100%;
+      max-width: 430px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.25);
+    }
+
+    .time-modal h2 {
+      margin: 0 0 8px;
+      font-size: 21px;
+    }
+
+    .time-modal-description {
+      margin: 0 0 20px;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .time-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .time-button {
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 9px;
+      padding: 14px 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .time-button:hover {
+      background: #111;
+      color: white;
+      border-color: #111;
+    }
+
+    .custom-time-area {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .custom-time-input {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      padding: 12px;
+      font-size: 15px;
+    }
+
+    .custom-time-button {
+      min-width: 90px;
+      border: 0;
+      border-radius: 9px;
+      background: #2457a7;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .time-modal-cancel {
+      width: 100%;
+      border: 0;
+      background: #eee;
+      color: #444;
+      padding: 12px;
+      border-radius: 9px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
     @media (max-width: 700px) {
       .summary {
         grid-template-columns: repeat(2, 1fr);
@@ -315,6 +426,7 @@
   <h1>BOTTEGA</h1>
   <p>ROOM SERVICE · ORDER MANAGEMENT</p>
 </header>
+
 
 <div class="summary">
 
@@ -340,6 +452,7 @@
 
 </div>
 
+
 <div class="filters">
   <button class="filter-button active" data-filter="all">전체</button>
   <button class="filter-button" data-filter="pending">신규</button>
@@ -347,23 +460,104 @@
   <button class="filter-button" data-filter="completed">완료</button>
 </div>
 
+
 <main>
 
   <div class="top-tools">
+
     <span class="refresh-info">
       주문은 10초마다 자동 갱신됩니다.
     </span>
 
-    <button class="refresh-button" onclick="loadOrders()">
+    <button
+      class="refresh-button"
+      onclick="loadOrders()"
+    >
       새로고침
     </button>
+
   </div>
 
   <div id="order-list">
-    <div class="empty">주문을 불러오는 중입니다.</div>
+    <div class="empty">
+      주문을 불러오는 중입니다.
+    </div>
   </div>
 
 </main>
+
+
+<!-- 예상 조리시간 선택창 -->
+<div
+  class="time-modal-overlay"
+  id="time-modal-overlay"
+>
+
+  <div class="time-modal">
+
+    <h2>예상 조리시간 선택</h2>
+
+    <p class="time-modal-description">
+      고객에게 안내할 예상 조리시간을 선택해주세요.
+      접수 후 고객 화면에 바로 표시됩니다.
+    </p>
+
+    <div class="time-buttons">
+
+      <button
+        class="time-button"
+        onclick="confirmAcceptOrder(10)"
+      >
+        10분
+      </button>
+
+      <button
+        class="time-button"
+        onclick="confirmAcceptOrder(20)"
+      >
+        20분
+      </button>
+
+      <button
+        class="time-button"
+        onclick="confirmAcceptOrder(30)"
+      >
+        30분
+      </button>
+
+    </div>
+
+    <div class="custom-time-area">
+
+      <input
+        type="number"
+        id="custom-time-input"
+        class="custom-time-input"
+        min="1"
+        max="180"
+        placeholder="직접 입력 (분)"
+      >
+
+      <button
+        class="custom-time-button"
+        onclick="acceptCustomTime()"
+      >
+        적용
+      </button>
+
+    </div>
+
+    <button
+      class="time-modal-cancel"
+      onclick="closeTimeModal()"
+    >
+      취소
+    </button>
+
+  </div>
+
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -375,15 +569,20 @@
   const SUPABASE_KEY =
     'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
 
+
   const supabaseClient =
     supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
 
+
   let allOrders = [];
   let currentFilter = 'all';
   let isUpdating = false;
+
+  let selectedOrderId = null;
+  let selectedOrderButton = null;
 
 
   async function loadOrders() {
@@ -392,59 +591,81 @@
       await supabaseClient
         .from('orders')
         .select('*')
-        .order('created_at', {
-          ascending: false
-        });
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        );
+
 
     if (error) {
 
       console.error(error);
 
       document
-        .getElementById('order-list')
+        .getElementById(
+          'order-list'
+        )
         .innerHTML =
         '<div class="empty">주문을 불러오지 못했습니다.</div>';
 
       return;
     }
 
-    allOrders = data || [];
+
+    allOrders =
+      data || [];
+
 
     updateSummary();
 
     applyFilter();
+
   }
 
 
   function updateSummary() {
 
     document
-      .getElementById('order-count')
+      .getElementById(
+        'order-count'
+      )
       .textContent =
       allOrders.length;
 
 
     const pendingCount =
-      allOrders.filter(order =>
-        (order.status || 'pending') ===
-        'pending'
+      allOrders.filter(
+        order =>
+          (
+            order.status ||
+            'pending'
+          ) ===
+          'pending'
       ).length;
 
 
     const cookingCount =
-      allOrders.filter(order =>
-        order.status === 'cooking'
+      allOrders.filter(
+        order =>
+          order.status ===
+          'cooking'
       ).length;
 
 
     document
-      .getElementById('pending-count')
+      .getElementById(
+        'pending-count'
+      )
       .textContent =
       pendingCount;
 
 
     document
-      .getElementById('cooking-count')
+      .getElementById(
+        'cooking-count'
+      )
       .textContent =
       cookingCount;
 
@@ -454,17 +675,21 @@
         (sum, order) =>
           sum +
           Number(
-            order.total_amount || 0
+            order.total_amount ||
+            0
           ),
         0
       );
 
 
     document
-      .getElementById('total-sales')
+      .getElementById(
+        'total-sales'
+      )
       .textContent =
       totalSales.toLocaleString() +
       '원';
+
   }
 
 
@@ -473,7 +698,10 @@
     let ordersToRender = [];
 
 
-    if (currentFilter === 'all') {
+    if (
+      currentFilter ===
+      'all'
+    ) {
 
       ordersToRender =
         [...allOrders];
@@ -481,16 +709,20 @@
     } else {
 
       ordersToRender =
-        allOrders.filter(order => {
+        allOrders.filter(
+          order => {
 
-          const status =
-            order.status || 'pending';
+            const status =
+              order.status ||
+              'pending';
 
-          return (
-            status === currentFilter
-          );
+            return (
+              status ===
+              currentFilter
+            );
 
-        });
+          }
+        );
 
     }
 
@@ -519,7 +751,10 @@
               : 0;
 
 
-          return bTime - aTime;
+          return (
+            bTime -
+            aTime
+          );
 
         }
       );
@@ -530,6 +765,7 @@
     renderOrders(
       ordersToRender
     );
+
   }
 
 
@@ -537,40 +773,44 @@
     .querySelectorAll(
       '.filter-button'
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        'click',
-        () => {
+        button.addEventListener(
+          'click',
+          () => {
 
-          document
-            .querySelectorAll(
-              '.filter-button'
-            )
-            .forEach(btn => {
+            document
+              .querySelectorAll(
+                '.filter-button'
+              )
+              .forEach(
+                btn => {
 
-              btn.classList.remove(
-                'active'
+                  btn.classList.remove(
+                    'active'
+                  );
+
+                }
               );
 
-            });
+
+            button.classList.add(
+              'active'
+            );
 
 
-          button.classList.add(
-            'active'
-          );
+            currentFilter =
+              button.dataset.filter;
 
 
-          currentFilter =
-            button.dataset.filter;
+            applyFilter();
 
+          }
+        );
 
-          applyFilter();
-
-        }
-      );
-
-    });
+      }
+    );
 
 
   function getStatusText(
@@ -652,6 +892,72 @@
   }
 
 
+  function formatClockTime(
+    value
+  ) {
+
+    if (!value) {
+      return '-';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '-';
+    }
+
+
+    return date.toLocaleTimeString(
+      'ko-KR',
+      {
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
+
+  }
+
+
+  function getEstimatedFinishTime(
+    acceptedAt,
+    minutes
+  ) {
+
+    if (
+      !acceptedAt ||
+      !minutes
+    ) {
+
+      return '-';
+
+    }
+
+
+    const finish =
+      new Date(
+        new Date(
+          acceptedAt
+        ).getTime() +
+        Number(minutes) *
+        60 *
+        1000
+      );
+
+
+    return formatClockTime(
+      finish
+    );
+
+  }
+
+
   function getElapsedTime(
     startValue,
     endValue
@@ -692,7 +998,10 @@
 
     const totalSeconds =
       Math.floor(
-        (end - start) /
+        (
+          end -
+          start
+        ) /
         1000
       );
 
@@ -719,7 +1028,9 @@
       60;
 
 
-    if (hours > 0) {
+    if (
+      hours > 0
+    ) {
 
       return (
         hours +
@@ -733,7 +1044,9 @@
     }
 
 
-    if (minutes > 0) {
+    if (
+      minutes > 0
+    ) {
 
       return (
         minutes +
@@ -768,16 +1081,18 @@
     ) {
 
       return `
+
         <div class="action-area">
 
           <button
             class="action-button accept-button"
-            onclick="changeOrderStatus(${Number(order.id)}, 'cooking', this)"
+            onclick="openTimeModal(${Number(order.id)}, this)"
           >
             접수
           </button>
 
         </div>
+
       `;
 
     }
@@ -788,17 +1103,51 @@
       'cooking'
     ) {
 
+      const expectedFinish =
+        getEstimatedFinishTime(
+          order.accepted_at,
+          order.estimated_minutes
+        );
+
+
       return `
+
         <div class="action-area">
+
+          <div class="cooking-info">
+
+            <div>
+              <strong>
+                접수시간
+              </strong>
+              ${formatDateTime(order.accepted_at)}
+            </div>
+
+            <div>
+              <strong>
+                예상 조리시간
+              </strong>
+              ${Number(order.estimated_minutes || 0)}분
+            </div>
+
+            <div>
+              <strong>
+                완료 예정
+              </strong>
+              ${expectedFinish}
+            </div>
+
+          </div>
 
           <button
             class="action-button complete-button"
-            onclick="changeOrderStatus(${Number(order.id)}, 'completed', this)"
+            onclick="completeOrder(${Number(order.id)}, this)"
           >
             완료
           </button>
 
         </div>
+
       `;
 
     }
@@ -829,6 +1178,7 @@
 
 
       return `
+
         <div class="action-area">
 
           <div class="completed-message">
@@ -843,6 +1193,28 @@
               </strong>
 
               ${createdAt}
+            </div>
+
+            <div>
+              <strong>
+                접수시간
+              </strong>
+
+              ${formatDateTime(order.accepted_at)}
+            </div>
+
+            <div>
+              <strong>
+                안내시간
+              </strong>
+
+              ${
+                order.estimated_minutes
+                  ? Number(
+                      order.estimated_minutes
+                    ) + '분'
+                  : '-'
+              }
             </div>
 
             <div>
@@ -866,81 +1238,180 @@
           </div>
 
         </div>
+
       `;
 
     }
 
 
     return '';
+
   }
 
 
-  async function changeOrderStatus(
+  function openTimeModal(
     orderId,
-    newStatus,
     button
   ) {
 
-    if (isUpdating) {
+    if (
+      isUpdating
+    ) {
       return;
     }
 
 
-    const actionText =
-      newStatus ===
-      'cooking'
-        ? '이 주문을 접수하시겠습니까?'
-        : '이 주문을 완료 처리하시겠습니까?';
+    selectedOrderId =
+      Number(orderId);
+
+
+    selectedOrderButton =
+      button;
+
+
+    document
+      .getElementById(
+        'custom-time-input'
+      )
+      .value =
+      '';
+
+
+    document
+      .getElementById(
+        'time-modal-overlay'
+      )
+      .classList
+      .add(
+        'show'
+      );
+
+  }
+
+
+  function closeTimeModal() {
+
+    document
+      .getElementById(
+        'time-modal-overlay'
+      )
+      .classList
+      .remove(
+        'show'
+      );
+
+
+    selectedOrderId =
+      null;
+
+
+    selectedOrderButton =
+      null;
+
+  }
+
+
+  function acceptCustomTime() {
+
+    const value =
+      Number(
+        document
+          .getElementById(
+            'custom-time-input'
+          )
+          .value
+      );
 
 
     if (
-      !confirm(actionText)
+      !Number.isInteger(value) ||
+      value < 1 ||
+      value > 180
     ) {
+
+      alert(
+        '1분부터 180분 사이의 시간을 입력해주세요.'
+      );
 
       return;
     }
 
 
-    isUpdating = true;
+    confirmAcceptOrder(
+      value
+    );
+
+  }
+
+
+  async function confirmAcceptOrder(
+    minutes
+  ) {
+
+    if (
+      !selectedOrderId ||
+      isUpdating
+    ) {
+      return;
+    }
+
+
+    const orderId =
+      selectedOrderId;
+
+
+    const button =
+      selectedOrderButton;
+
+
+    const confirmed =
+      confirm(
+        `예상 조리시간을 ${minutes}분으로 안내하고 주문을 접수하시겠습니까?`
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    isUpdating =
+      true;
 
 
     if (button) {
 
-      button.disabled = true;
-
+      button.disabled =
+        true;
 
       button.textContent =
-        newStatus ===
-        'cooking'
-          ? '접수 중...'
-          : '완료 처리 중...';
+        '접수 중...';
 
     }
 
 
-    const updateData = {
-      status: newStatus
-    };
+    const acceptedAt =
+      new Date()
+        .toISOString();
 
 
-    if (
-      newStatus ===
-      'completed'
-    ) {
-
-      updateData.completed_at =
-        new Date()
-          .toISOString();
-
-    }
-
-
-    const { error } =
+    const {
+      error
+    } =
       await supabaseClient
         .from('orders')
-        .update(
-          updateData
-        )
+        .update({
+
+          status:
+            'cooking',
+
+          accepted_at:
+            acceptedAt,
+
+          estimated_minutes:
+            Number(minutes)
+
+        })
         .eq(
           'id',
           orderId
@@ -949,10 +1420,13 @@
 
     if (error) {
 
-      console.error(error);
+      console.error(
+        error
+      );
+
 
       alert(
-        '주문 상태 변경에 실패했습니다.'
+        '주문 접수에 실패했습니다.'
       );
 
 
@@ -961,25 +1435,127 @@
         button.disabled =
           false;
 
-
         button.textContent =
-          newStatus ===
-          'cooking'
-            ? '접수'
-            : '완료';
+          '접수';
 
       }
 
 
-      isUpdating = false;
+      isUpdating =
+        false;
+
+      return;
+
+    }
+
+
+    isUpdating =
+      false;
+
+
+    closeTimeModal();
+
+
+    await loadOrders();
+
+  }
+
+
+  async function completeOrder(
+    orderId,
+    button
+  ) {
+
+    if (
+      isUpdating
+    ) {
+      return;
+    }
+
+
+    if (
+      !confirm(
+        '이 주문을 완료 처리하시겠습니까?'
+      )
+    ) {
 
       return;
     }
 
 
-    isUpdating = false;
+    isUpdating =
+      true;
+
+
+    if (button) {
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        '완료 처리 중...';
+
+    }
+
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from('orders')
+        .update({
+
+          status:
+            'completed',
+
+          completed_at:
+            new Date()
+              .toISOString()
+
+        })
+        .eq(
+          'id',
+          orderId
+        );
+
+
+    if (error) {
+
+      console.error(
+        error
+      );
+
+
+      alert(
+        '완료 처리에 실패했습니다.'
+      );
+
+
+      if (button) {
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          '완료';
+
+      }
+
+
+      isUpdating =
+        false;
+
+      return;
+
+    }
+
+
+    isUpdating =
+      false;
+
 
     await loadOrders();
+
   }
 
 
@@ -1005,201 +1581,213 @@
 
 
     orderList.innerHTML =
-      orders.map(order => {
+      orders.map(
+        order => {
 
 
-        const status =
-          order.status ||
-          'pending';
+          const status =
+            order.status ||
+            'pending';
 
 
-        const items =
-          Array.isArray(
-            order.order_items
-          )
-            ? order.order_items
-            : [];
+          const items =
+            Array.isArray(
+              order.order_items
+            )
+              ? order.order_items
+              : [];
 
 
-        const itemHtml =
-          items.map(item => {
+          const itemHtml =
+            items.map(
+              item => {
 
 
-            const name =
-              item.name ||
-              item.menu_name ||
-              '메뉴';
+                const name =
+                  item.name ||
+                  item.menu_name ||
+                  '메뉴';
 
 
-            const quantity =
-              Number(
-                item.quantity ||
-                item.qty ||
-                1
-              );
+                const quantity =
+                  Number(
+                    item.quantity ||
+                    item.qty ||
+                    1
+                  );
 
 
-            const price =
-              Number(
-                item.price ||
-                0
-              );
+                const price =
+                  Number(
+                    item.price ||
+                    0
+                  );
 
 
-            return `
-              <div class="item-row">
+                return `
 
-                <span>
-                  ${escapeHtml(name)}
-                  ×
-                  ${quantity}
-                </span>
+                  <div class="item-row">
 
-                <strong>
-                  ${
-                    (
-                      price *
-                      quantity
-                    )
-                      .toLocaleString()
-                  }원
-                </strong>
-
-              </div>
-            `;
-
-          }).join('');
-
-
-        const createdAt =
-          formatDateTime(
-            order.created_at
-          );
-
-
-        const blinkClass =
-          status === 'pending'
-            ? 'new-order-blink'
-            : '';
-
-
-        return `
-          <div class="order-card ${blinkClass}">
-
-            <div class="order-top">
-
-              <div>
-
-                <div class="room-number">
-
-                  객실
-                  ${escapeHtml(
-                    order.room_number ||
-                    '-'
-                  )}
-
-                </div>
-
-                <div class="order-time">
-
-                  주문번호 #${order.id}
-
-                  ·
-
-                  ${createdAt}
-
-                </div>
-
-              </div>
-
-              <div
-                class="status ${getStatusClass(status)}"
-              >
-                ${getStatusText(status)}
-              </div>
-
-            </div>
-
-
-            <div class="guest-info">
-
-              <strong>
-                고객명
-              </strong>
-
-              ${escapeHtml(
-                order.guest_name ||
-                '-'
-              )}
-
-              <br>
-
-              <strong>
-                전화번호
-              </strong>
-
-              ${escapeHtml(
-                order.phone ||
-                '-'
-              )}
-
-            </div>
-
-
-            <div class="items">
-
-              ${
-                itemHtml ||
-                '<div class="item-row">주문 메뉴 정보 없음</div>'
-              }
-
-            </div>
-
-
-            ${
-              order.request_note
-
-                ? `
-                  <div class="request">
+                    <span>
+                      ${escapeHtml(name)}
+                      ×
+                      ${quantity}
+                    </span>
 
                     <strong>
-                      요청사항
+                      ${
+                        (
+                          price *
+                          quantity
+                        )
+                          .toLocaleString()
+                      }원
                     </strong>
 
-                    <br>
+                  </div>
 
+                `;
+
+              }
+            ).join('');
+
+
+          const createdAt =
+            formatDateTime(
+              order.created_at
+            );
+
+
+          const blinkClass =
+            status ===
+            'pending'
+              ? 'new-order-blink'
+              : '';
+
+
+          return `
+
+            <div class="order-card ${blinkClass}">
+
+              <div class="order-top">
+
+                <div>
+
+                  <div class="room-number">
+
+                    객실
                     ${escapeHtml(
-                      order.request_note
+                      order.room_number ||
+                      '-'
                     )}
 
                   </div>
-                `
 
-                : ''
-            }
+                  <div class="order-time">
+
+                    주문번호 #${order.id}
+
+                    ·
+
+                    ${createdAt}
+
+                  </div>
+
+                </div>
+
+                <div
+                  class="status ${getStatusClass(status)}"
+                >
+                  ${getStatusText(status)}
+                </div>
+
+              </div>
 
 
-            <div class="total">
+              <div class="guest-info">
 
-              총
+                <strong>
+                  고객명
+                </strong>
+
+                ${escapeHtml(
+                  order.guest_name ||
+                  '-'
+                )}
+
+                <br>
+
+                <strong>
+                  전화번호
+                </strong>
+
+                ${escapeHtml(
+                  order.phone ||
+                  '-'
+                )}
+
+              </div>
+
+
+              <div class="items">
+
+                ${
+                  itemHtml ||
+                  '<div class="item-row">주문 메뉴 정보 없음</div>'
+                }
+
+              </div>
+
 
               ${
-                Number(
-                  order.total_amount ||
-                  0
-                )
-                  .toLocaleString()
-              }원
+                order.request_note
+
+                  ? `
+
+                    <div class="request">
+
+                      <strong>
+                        요청사항
+                      </strong>
+
+                      <br>
+
+                      ${escapeHtml(
+                        order.request_note
+                      )}
+
+                    </div>
+
+                  `
+
+                  : ''
+              }
+
+
+              <div class="total">
+
+                총
+
+                ${
+                  Number(
+                    order.total_amount ||
+                    0
+                  )
+                    .toLocaleString()
+                }원
+
+              </div>
+
+
+              ${getActionButton(order)}
 
             </div>
 
+          `;
 
-            ${getActionButton(order)}
+        }
+      ).join('');
 
-          </div>
-        `;
-
-      }).join('');
   }
 
 
