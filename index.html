@@ -394,6 +394,128 @@
       color: #777;
     }
 
+    /* 주문상태 화면 */
+
+    .status-page {
+      display: none;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 35px 16px 80px;
+    }
+
+    .status-page.show {
+      display: block;
+    }
+
+    .status-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px 22px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .status-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .status-icon.pending {
+      background: #fff2d9;
+      color: #9a6200;
+    }
+
+    .status-icon.cooking {
+      background: #e9f0ff;
+      color: #2457a7;
+    }
+
+    .status-icon.completed {
+      background: #e8f7ed;
+      color: #24753d;
+    }
+
+    .status-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .status-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .estimate-box {
+      display: none;
+      background: #f7f7f7;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 20px 0;
+    }
+
+    .estimate-box.show {
+      display: block;
+    }
+
+    .estimate-label {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+
+    .estimate-time {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .estimate-finish {
+      margin-top: 7px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .status-order-info {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid #eee;
+      color: #777;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .status-refresh {
+      margin-top: 22px;
+      font-size: 11px;
+      color: #999;
+    }
+
+    .new-order-button {
+      display: none;
+      margin-top: 22px;
+      width: 100%;
+      border: 0;
+      background: #111;
+      color: #fff;
+      padding: 14px;
+      border-radius: 9px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .new-order-button.show {
+      display: block;
+    }
+
     @media (max-width: 500px) {
       .payment-options {
         grid-template-columns: 1fr;
@@ -416,27 +538,110 @@
   <button class="language-button" data-lang="zh">中文</button>
 </div>
 
-<div class="room-info" id="room-info">
-  객실 정보를 확인하는 중입니다.
+<div id="order-section">
+
+  <div class="room-info" id="room-info">
+    객실 정보를 확인하는 중입니다.
+  </div>
+
+  <div class="category-nav" id="category-nav"></div>
+
+  <main id="menu-list">
+    <div class="loading">메뉴를 불러오는 중입니다.</div>
+  </main>
+
+  <div class="cart-bar" id="cart-bar" onclick="openCart()">
+    <span id="cart-count">장바구니 0</span>
+    <strong id="cart-total-bar">0원</strong>
+  </div>
+
 </div>
 
-<div class="category-nav" id="category-nav"></div>
 
-<main id="menu-list">
-  <div class="loading">메뉴를 불러오는 중입니다.</div>
-</main>
+<div class="status-page" id="status-page">
 
-<div class="cart-bar" id="cart-bar" onclick="openCart()">
-  <span id="cart-count">장바구니 0</span>
-  <strong id="cart-total-bar">0원</strong>
+  <div class="status-card">
+
+    <div
+      class="status-icon pending"
+      id="status-icon"
+    >
+      ···
+    </div>
+
+    <div
+      class="status-title"
+      id="status-title"
+    >
+      주문 접수 대기
+    </div>
+
+    <div
+      class="status-description"
+      id="status-description"
+    >
+      주문이 전달되었습니다.
+    </div>
+
+    <div
+      class="estimate-box"
+      id="estimate-box"
+    >
+
+      <div
+        class="estimate-label"
+        id="estimate-label"
+      >
+        예상 조리시간
+      </div>
+
+      <div
+        class="estimate-time"
+        id="estimate-time"
+      ></div>
+
+      <div
+        class="estimate-finish"
+        id="estimate-finish"
+      ></div>
+
+    </div>
+
+    <div
+      class="status-order-info"
+      id="status-order-info"
+    ></div>
+
+    <div
+      class="status-refresh"
+      id="status-refresh"
+    >
+      주문 상태는 자동으로 업데이트됩니다.
+    </div>
+
+    <button
+      type="button"
+      class="new-order-button"
+      id="new-order-button"
+      onclick="startNewOrder()"
+    >
+      추가 주문하기
+    </button>
+
+  </div>
+
 </div>
+
 
 <div class="cart-overlay" id="cart-overlay">
 
   <div class="cart-modal">
 
     <div class="cart-header">
-      <h2 id="cart-title">주문 내역</h2>
+
+      <h2 id="cart-title">
+        주문 내역
+      </h2>
 
       <button
         class="close-button"
@@ -445,23 +650,37 @@
       >
         ×
       </button>
+
     </div>
 
     <div id="cart-items"></div>
 
     <div class="cart-total">
-      <span id="total-label">총 주문금액</span>
-      <span id="cart-total">0원</span>
+
+      <span id="total-label">
+        총 주문금액
+      </span>
+
+      <span id="cart-total">
+        0원
+      </span>
+
     </div>
 
     <div class="section-title">
-      <span id="payment-title">결제방법</span>
+
+      <span id="payment-title">
+        결제방법
+      </span>
+
       <span class="required">*</span>
+
     </div>
 
     <div class="payment-options">
 
       <div class="payment-option">
+
         <input
           type="radio"
           id="payment-checkout"
@@ -476,9 +695,12 @@
         >
           체크아웃 시 결제
         </label>
+
       </div>
 
+
       <div class="payment-option">
+
         <input
           type="radio"
           id="payment-card"
@@ -493,6 +715,7 @@
         >
           카드결제
         </label>
+
       </div>
 
     </div>
@@ -510,8 +733,13 @@
     >
 
       <label for="guest-name">
-        <span id="guest-name-label">고객명</span>
+
+        <span id="guest-name-label">
+          고객명
+        </span>
+
         <span class="required">*</span>
+
       </label>
 
       <input
@@ -521,6 +749,7 @@
       >
 
     </div>
+
 
     <div class="form-group">
 
@@ -539,6 +768,7 @@
 
     </div>
 
+
     <div class="form-group">
 
       <label
@@ -554,6 +784,7 @@
       ></textarea>
 
     </div>
+
 
     <button
       class="order-button"
@@ -619,10 +850,29 @@
       selectPayment: '결제방법을 선택해주세요.',
       guestRequired:
         '체크아웃 시 결제를 선택한 경우 고객명을 입력해주세요.',
-      orderSuccess:
-        '주문이 정상적으로 접수되었습니다.',
       orderError:
-        '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+        '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+
+      pendingTitle: '주문 접수 대기',
+      pendingDescription:
+        '주문이 전달되었습니다. 직원이 주문을 확인하고 있습니다.',
+
+      cookingTitle: '주문이 접수되었습니다',
+      cookingDescription:
+        '현재 주문하신 메뉴를 준비하고 있습니다.',
+
+      completedTitle: '주문 준비 완료',
+      completedDescription:
+        '주문 준비가 완료되었습니다.',
+
+      estimateLabel: '예상 조리시간',
+      minutes: '분',
+      expectedFinish: '완료 예정',
+      orderNumber: '주문번호',
+      orderedRoom: '객실',
+      autoRefresh:
+        '주문 상태는 자동으로 업데이트됩니다.',
+      newOrder: '추가 주문하기'
     },
 
 
@@ -659,10 +909,29 @@
         'Please select a payment method.',
       guestRequired:
         'Please enter the guest name when paying at checkout.',
-      orderSuccess:
-        'Your order has been successfully received.',
       orderError:
-        'An error occurred while submitting your order. Please try again.'
+        'An error occurred while submitting your order. Please try again.',
+
+      pendingTitle: 'Waiting for Confirmation',
+      pendingDescription:
+        'Your order has been sent and is waiting for confirmation.',
+
+      cookingTitle: 'Order Confirmed',
+      cookingDescription:
+        'Your order is currently being prepared.',
+
+      completedTitle: 'Order Ready',
+      completedDescription:
+        'Your order is ready.',
+
+      estimateLabel: 'Estimated Preparation Time',
+      minutes: 'min',
+      expectedFinish: 'Estimated completion',
+      orderNumber: 'Order',
+      orderedRoom: 'Room',
+      autoRefresh:
+        'Order status updates automatically.',
+      newOrder: 'Place Another Order'
     },
 
 
@@ -703,10 +972,29 @@
         'お支払い方法を選択してください。',
       guestRequired:
         'チェックアウト時のお支払いを選択した場合は、お名前を入力してください。',
-      orderSuccess:
-        'ご注文を承りました。',
       orderError:
-        '注文受付中にエラーが発生しました。もう一度お試しください。'
+        '注文受付中にエラーが発生しました。もう一度お試しください。',
+
+      pendingTitle: 'ご注文確認中',
+      pendingDescription:
+        'ご注文を受け付けました。スタッフが確認しております。',
+
+      cookingTitle: 'ご注文を承りました',
+      cookingDescription:
+        '現在、お料理を準備しております。',
+
+      completedTitle: 'ご注文の準備ができました',
+      completedDescription:
+        'ご注文の準備が完了しました。',
+
+      estimateLabel: '予想調理時間',
+      minutes: '分',
+      expectedFinish: '完成予定',
+      orderNumber: '注文番号',
+      orderedRoom: '客室',
+      autoRefresh:
+        '注文状況は自動的に更新されます。',
+      newOrder: '追加注文'
     },
 
 
@@ -744,10 +1032,29 @@
         '请选择付款方式。',
       guestRequired:
         '如果选择退房时付款，请填写客人姓名。',
-      orderSuccess:
-        '您的订单已成功提交。',
       orderError:
-        '提交订单时发生错误，请稍后重试。'
+        '提交订单时发生错误，请稍后重试。',
+
+      pendingTitle: '等待确认订单',
+      pendingDescription:
+        '您的订单已发送，工作人员正在确认。',
+
+      cookingTitle: '订单已确认',
+      cookingDescription:
+        '您的餐点正在准备中。',
+
+      completedTitle: '订单已准备完成',
+      completedDescription:
+        '您的订单已准备完成。',
+
+      estimateLabel: '预计制作时间',
+      minutes: '分钟',
+      expectedFinish: '预计完成',
+      orderNumber: '订单号',
+      orderedRoom: '房间',
+      autoRefresh:
+        '订单状态将自动更新。',
+      newOrder: '继续点餐'
     }
 
   };
@@ -813,9 +1120,7 @@
     ) || 'ko';
 
 
-  if (
-    !translations[currentLanguage]
-  ) {
+  if (!translations[currentLanguage]) {
     currentLanguage = 'ko';
   }
 
@@ -823,6 +1128,8 @@
   let allMenus = [];
   let cart = [];
   let currentCategory = 'ALL';
+  let currentOrderToken = null;
+  let statusTimer = null;
 
 
   const params =
@@ -833,6 +1140,13 @@
 
   const roomNumber =
     params.get('room');
+
+
+  const orderStorageKey =
+    'bottega_active_order_' +
+    (
+      roomNumber || 'unknown'
+    );
 
 
   function t(key) {
@@ -851,6 +1165,34 @@
     return Number(
       value || 0
     ).toLocaleString() + '원';
+
+  }
+
+
+  function generateOrderToken() {
+
+    if (
+      window.crypto &&
+      typeof crypto.randomUUID ===
+      'function'
+    ) {
+
+      return crypto.randomUUID();
+
+    }
+
+
+    return (
+      Date.now().toString(36) +
+      '-' +
+      Math.random()
+        .toString(36)
+        .slice(2) +
+      '-' +
+      Math.random()
+        .toString(36)
+        .slice(2)
+    );
 
   }
 
@@ -881,14 +1223,17 @@
       .querySelectorAll(
         '.language-button'
       )
-      .forEach(button => {
+      .forEach(
+        button => {
 
-        button.classList.toggle(
-          'active',
-          button.dataset.lang === lang
-        );
+          button.classList.toggle(
+            'active',
+            button.dataset.lang ===
+            lang
+          );
 
-      });
+        }
+      );
 
 
     applyTranslations();
@@ -901,7 +1246,10 @@
 
     renderCart();
 
-    handlePaymentChange();
+
+    if (currentOrderToken) {
+      loadOrderStatus();
+    }
 
   }
 
@@ -910,126 +1258,120 @@
     .querySelectorAll(
       '.language-button'
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        'click',
-        () => {
+        button.addEventListener(
+          'click',
+          () => {
 
-          setLanguage(
-            button.dataset.lang
-          );
+            setLanguage(
+              button.dataset.lang
+            );
 
-        }
-      );
+          }
+        );
 
-    });
+      }
+    );
 
 
   function applyTranslations() {
 
-    document
-      .getElementById(
-        'cart-title'
-      )
-      .textContent =
+    document.getElementById(
+      'cart-title'
+    ).textContent =
       t('cartTitle');
 
 
-    document
-      .getElementById(
-        'total-label'
-      )
-      .textContent =
+    document.getElementById(
+      'total-label'
+    ).textContent =
       t('total');
 
 
-    document
-      .getElementById(
-        'payment-title'
-      )
-      .textContent =
+    document.getElementById(
+      'payment-title'
+    ).textContent =
       t('payment');
 
 
-    document
-      .getElementById(
-        'checkout-label'
-      )
-      .textContent =
+    document.getElementById(
+      'checkout-label'
+    ).textContent =
       t('checkout');
 
 
-    document
-      .getElementById(
-        'card-label'
-      )
-      .textContent =
+    document.getElementById(
+      'card-label'
+    ).textContent =
       t('card');
 
 
-    document
-      .getElementById(
-        'card-notice'
-      )
-      .textContent =
+    document.getElementById(
+      'card-notice'
+    ).textContent =
       t('cardNotice');
 
 
-    document
-      .getElementById(
-        'guest-name-label'
-      )
-      .textContent =
+    document.getElementById(
+      'guest-name-label'
+    ).textContent =
       t('guestName');
 
 
-    document
-      .getElementById(
-        'guest-name'
-      )
-      .placeholder =
+    document.getElementById(
+      'guest-name'
+    ).placeholder =
       t('guestPlaceholder');
 
 
-    document
-      .getElementById(
-        'phone-label'
-      )
-      .textContent =
+    document.getElementById(
+      'phone-label'
+    ).textContent =
       t('phone');
 
 
-    document
-      .getElementById(
-        'phone'
-      )
-      .placeholder =
+    document.getElementById(
+      'phone'
+    ).placeholder =
       t('phonePlaceholder');
 
 
-    document
-      .getElementById(
-        'request-label'
-      )
-      .textContent =
+    document.getElementById(
+      'request-label'
+    ).textContent =
       t('request');
 
 
-    document
-      .getElementById(
-        'request-note'
-      )
-      .placeholder =
+    document.getElementById(
+      'request-note'
+    ).placeholder =
       t('requestPlaceholder');
 
 
-    document
-      .getElementById(
-        'order-button'
-      )
-      .textContent =
+    document.getElementById(
+      'order-button'
+    ).textContent =
       t('order');
+
+
+    document.getElementById(
+      'estimate-label'
+    ).textContent =
+      t('estimateLabel');
+
+
+    document.getElementById(
+      'status-refresh'
+    ).textContent =
+      t('autoRefresh');
+
+
+    document.getElementById(
+      'new-order-button'
+    ).textContent =
+      t('newOrder');
 
 
     updateCartBar();
@@ -1093,11 +1435,7 @@
 
     if (error) {
 
-      console.error(
-        'MENU LOAD ERROR:',
-        error
-      );
-
+      console.error(error);
 
       menuList.innerHTML =
         `<div class="loading">${t('loadError')}</div>`;
@@ -1167,18 +1505,6 @@
     ];
 
 
-    if (
-      currentCategory !== 'ALL' &&
-      !categories.includes(
-        currentCategory
-      )
-    ) {
-
-      currentCategory = 'ALL';
-
-    }
-
-
     nav.innerHTML = `
 
       <button
@@ -1199,7 +1525,8 @@
 
               <button
                 class="${
-                  currentCategory === category
+                  currentCategory ===
+                  category
                     ? 'active'
                     : ''
                 }"
@@ -1234,7 +1561,6 @@
               currentCategory =
                 button.dataset.category;
 
-
               buildCategories();
 
               applyCategoryFilter();
@@ -1263,16 +1589,12 @@
     }
 
 
-    const filtered =
+    renderMenus(
       allMenus.filter(
         menu =>
           menu.category ===
           currentCategory
-      );
-
-
-    renderMenus(
-      filtered
+      )
     );
 
   }
@@ -1290,33 +1612,23 @@
     if (
       currentLanguage === 'ko'
     ) {
-
-      return (
-        menu.name || ''
-      );
-
+      return menu.name || '';
     }
 
 
     const field =
-      fields[
-        currentLanguage
-      ];
+      fields[currentLanguage];
 
 
     if (
       field &&
       menu[field]
     ) {
-
       return menu[field];
-
     }
 
 
-    return (
-      menu.name || ''
-    );
+    return menu.name || '';
 
   }
 
@@ -1344,9 +1656,7 @@
 
 
     const field =
-      fields[
-        currentLanguage
-      ];
+      fields[currentLanguage];
 
 
     if (
@@ -1366,9 +1676,7 @@
   }
 
 
-  function renderMenus(
-    menus
-  ) {
+  function renderMenus(menus) {
 
     const menuList =
       document.getElementById(
@@ -1390,87 +1698,76 @@
 
 
     menuList.innerHTML =
-      menus
-        .map(
-          menu => {
+      menus.map(
+        menu => {
 
-            const displayName =
-              getMenuName(
-                menu
-              );
+          const displayName =
+            getMenuName(menu);
 
-
-            const displayDescription =
-              getMenuDescription(
-                menu
-              );
+          const displayDescription =
+            getMenuDescription(menu);
 
 
-            const koreanEnglishName =
-              (
+          return `
+
+            <div class="menu-card">
+
+              <div class="menu-name">
+                ${escapeHtml(displayName)}
+              </div>
+
+              ${
                 currentLanguage === 'ko' &&
                 menu.name_en
-              )
-                ? `
-                  <div class="menu-name-en">
-                    ${escapeHtml(menu.name_en)}
-                  </div>
-                `
-                : '';
 
+                  ? `
+                    <div class="menu-name-en">
+                      ${escapeHtml(menu.name_en)}
+                    </div>
+                  `
 
-            const descriptionHtml =
-              displayDescription
-                ? `
-                  <div class="menu-description">
-                    ${escapeHtml(displayDescription)}
-                  </div>
-                `
-                : '';
+                  : ''
+              }
 
+              ${
+                displayDescription
 
-            return `
+                  ? `
+                    <div class="menu-description">
+                      ${escapeHtml(displayDescription)}
+                    </div>
+                  `
 
-              <div class="menu-card">
+                  : ''
+              }
 
-                <div class="menu-name">
-                  ${escapeHtml(displayName)}
+              <div class="menu-bottom">
+
+                <div class="price">
+                  ${formatWon(menu.price)}
                 </div>
 
-                ${koreanEnglishName}
-
-                ${descriptionHtml}
-
-                <div class="menu-bottom">
-
-                  <div class="price">
-                    ${formatWon(menu.price)}
-                  </div>
-
-                  <button
-                    type="button"
-                    class="add-button"
-                    onclick="addToCart(${Number(menu.id)})"
-                  >
-                    ${escapeHtml(t('add'))}
-                  </button>
-
-                </div>
+                <button
+                  type="button"
+                  class="add-button"
+                  onclick="addToCart(${Number(menu.id)})"
+                >
+                  ${escapeHtml(t('add'))}
+                </button>
 
               </div>
 
-            `;
+            </div>
 
-          }
-        )
-        .join('');
+          `;
+
+        }
+      ).join('');
 
   }
 
 
-  function addToCart(
-    menuId
-  ) {
+  function addToCart(menuId) {
 
     const menu =
       allMenus.find(
@@ -1542,31 +1839,22 @@
       currentLanguage === 'en' &&
       item.name_en
     ) {
-
       return item.name_en;
-
     }
-
 
     if (
       currentLanguage === 'ja' &&
       item.name_ja
     ) {
-
       return item.name_ja;
-
     }
-
 
     if (
       currentLanguage === 'zh' &&
       item.name_zh
     ) {
-
       return item.name_zh;
-
     }
-
 
     return item.name || '';
 
@@ -1577,10 +1865,7 @@
 
     const count =
       cart.reduce(
-        (
-          sum,
-          item
-        ) =>
+        (sum, item) =>
           sum +
           Number(
             item.quantity || 0
@@ -1589,35 +1874,26 @@
       );
 
 
-    const total =
-      getCartTotal();
-
-
-    document
-      .getElementById(
-        'cart-count'
-      )
-      .textContent =
+    document.getElementById(
+      'cart-count'
+    ).textContent =
       `${t('cart')} ${count}`;
 
 
-    document
-      .getElementById(
-        'cart-total-bar'
-      )
-      .textContent =
-      formatWon(total);
-
-
-    document
-      .getElementById(
-        'cart-bar'
-      )
-      .classList
-      .toggle(
-        'show',
-        count > 0
+    document.getElementById(
+      'cart-total-bar'
+    ).textContent =
+      formatWon(
+        getCartTotal()
       );
+
+
+    document.getElementById(
+      'cart-bar'
+    ).classList.toggle(
+      'show',
+      count > 0
+    );
 
   }
 
@@ -1626,29 +1902,22 @@
 
     renderCart();
 
-
-    document
-      .getElementById(
-        'cart-overlay'
-      )
-      .classList
-      .add(
-        'show'
-      );
+    document.getElementById(
+      'cart-overlay'
+    ).classList.add(
+      'show'
+    );
 
   }
 
 
   function closeCart() {
 
-    document
-      .getElementById(
-        'cart-overlay'
-      )
-      .classList
-      .remove(
-        'show'
-      );
+    document.getElementById(
+      'cart-overlay'
+    ).classList.remove(
+      'show'
+    );
 
   }
 
@@ -1669,66 +1938,62 @@
     } else {
 
       cartItems.innerHTML =
-        cart
-          .map(
-            item => `
+        cart.map(
+          item => `
 
-              <div class="cart-item">
+            <div class="cart-item">
 
-                <div>
+              <div>
 
-                  <div class="cart-item-name">
-                    ${escapeHtml(
-                      getCartItemName(
-                        item
-                      )
-                    )}
-                  </div>
-
-                  <div class="cart-item-price">
-                    ${formatWon(
-                      item.price
-                    )}
-                  </div>
-
+                <div class="cart-item-name">
+                  ${escapeHtml(
+                    getCartItemName(
+                      item
+                    )
+                  )}
                 </div>
 
-                <div class="quantity-control">
-
-                  <button
-                    type="button"
-                    onclick="changeQuantity(${Number(item.id)}, -1)"
-                  >
-                    −
-                  </button>
-
-                  <span>
-                    ${Number(item.quantity)}
-                  </span>
-
-                  <button
-                    type="button"
-                    onclick="changeQuantity(${Number(item.id)}, 1)"
-                  >
-                    +
-                  </button>
-
+                <div class="cart-item-price">
+                  ${formatWon(
+                    item.price
+                  )}
                 </div>
 
               </div>
 
-            `
-          )
-          .join('');
+              <div class="quantity-control">
+
+                <button
+                  type="button"
+                  onclick="changeQuantity(${Number(item.id)}, -1)"
+                >
+                  −
+                </button>
+
+                <span>
+                  ${Number(item.quantity)}
+                </span>
+
+                <button
+                  type="button"
+                  onclick="changeQuantity(${Number(item.id)}, 1)"
+                >
+                  +
+                </button>
+
+              </div>
+
+            </div>
+
+          `
+        ).join('');
 
     }
 
 
-    document
-      .getElementById(
-        'cart-total'
-      )
-      .textContent =
+    document.getElementById(
+      'cart-total'
+    ).textContent =
       formatWon(
         getCartTotal()
       );
@@ -1782,10 +2047,7 @@
   function getCartTotal() {
 
     return cart.reduce(
-      (
-        sum,
-        item
-      ) =>
+      (sum, item) =>
         sum +
         (
           Number(
@@ -1845,67 +2107,48 @@
       'checkout'
     ) {
 
-      guestNameGroup
-        .classList
-        .remove(
-          'hidden'
-        );
-
+      guestNameGroup.classList.remove(
+        'hidden'
+      );
 
       guestNameInput.required =
         true;
 
-
-      cardNotice
-        .classList
-        .remove(
-          'show'
-        );
+      cardNotice.classList.remove(
+        'show'
+      );
 
     } else if (
       paymentMethod ===
       'card'
     ) {
 
-      guestNameGroup
-        .classList
-        .add(
-          'hidden'
-        );
-
+      guestNameGroup.classList.add(
+        'hidden'
+      );
 
       guestNameInput.required =
         false;
-
 
       guestNameInput.value =
         '';
 
-
-      cardNotice
-        .classList
-        .add(
-          'show'
-        );
+      cardNotice.classList.add(
+        'show'
+      );
 
     } else {
 
-      guestNameGroup
-        .classList
-        .add(
-          'hidden'
-        );
-
+      guestNameGroup.classList.add(
+        'hidden'
+      );
 
       guestNameInput.required =
         false;
 
-
-      cardNotice
-        .classList
-        .remove(
-          'show'
-        );
+      cardNotice.classList.remove(
+        'show'
+      );
 
     }
 
@@ -1952,12 +2195,9 @@
 
 
     const guestName =
-      document
-        .getElementById(
-          'guest-name'
-        )
-        .value
-        .trim();
+      document.getElementById(
+        'guest-name'
+      ).value.trim();
 
 
     if (
@@ -1970,13 +2210,9 @@
         t('guestRequired')
       );
 
-
-      document
-        .getElementById(
-          'guest-name'
-        )
-        .focus();
-
+      document.getElementById(
+        'guest-name'
+      ).focus();
 
       return;
 
@@ -1984,28 +2220,15 @@
 
 
     const phone =
-      document
-        .getElementById(
-          'phone'
-        )
-        .value
-        .trim();
+      document.getElementById(
+        'phone'
+      ).value.trim();
 
 
     const requestNote =
-      document
-        .getElementById(
-          'request-note'
-        )
-        .value
-        .trim();
-
-
-    const paymentText =
-      paymentMethod ===
-      'checkout'
-        ? t('checkout')
-        : t('card');
+      document.getElementById(
+        'request-note'
+      ).value.trim();
 
 
     const orderButton =
@@ -2017,9 +2240,12 @@
     orderButton.disabled =
       true;
 
-
     orderButton.textContent =
       t('ordering');
+
+
+    const orderToken =
+      generateOrderToken();
 
 
     const orderItems =
@@ -2054,9 +2280,7 @@
     const payload = {
 
       room_number:
-        String(
-          roomNumber
-        ),
+        String(roomNumber),
 
       guest_name:
         paymentMethod ===
@@ -2084,79 +2308,27 @@
           .toISOString(),
 
       payment_method:
-        paymentMethod
+        paymentMethod,
+
+      order_token:
+        orderToken
 
     };
 
 
-    let result =
+    const {
+      error
+    } =
       await supabaseClient
-        .from(
-          'orders'
-        )
-        .insert(
-          payload
-        );
+        .from('orders')
+        .insert(payload);
 
 
-    /*
-      payment_method 컬럼이 없는 경우
-      기존 구조로 자동 재시도
-    */
-
-    if (
-      result.error &&
-      String(
-        result.error.message ||
-        ''
-      )
-        .toLowerCase()
-        .includes(
-          'payment_method'
-        )
-    ) {
-
-      const fallbackPayload =
-        {
-          ...payload
-        };
-
-
-      delete fallbackPayload
-        .payment_method;
-
-
-      const paymentInfo =
-        `[결제방법] ${paymentText}`;
-
-
-      fallbackPayload.request_note =
-        requestNote
-          ? paymentInfo +
-            '\n' +
-            requestNote
-          : paymentInfo;
-
-
-      result =
-        await supabaseClient
-          .from(
-            'orders'
-          )
-          .insert(
-            fallbackPayload
-          );
-
-    }
-
-
-    if (
-      result.error
-    ) {
+    if (error) {
 
       console.error(
         'ORDER ERROR:',
-        result.error
+        error
       );
 
 
@@ -2168,26 +2340,27 @@
       orderButton.disabled =
         false;
 
-
       orderButton.textContent =
         t('order');
-
 
       return;
 
     }
 
 
-    alert(
-      t('orderSuccess')
+    currentOrderToken =
+      orderToken;
+
+
+    localStorage.setItem(
+      orderStorageKey,
+      orderToken
     );
 
 
     cart = [];
 
-
     updateCartBar();
-
 
     closeCart();
 
@@ -2206,28 +2379,17 @@
       );
 
 
-    document
-      .getElementById(
-        'guest-name'
-      )
-      .value =
-      '';
+    document.getElementById(
+      'guest-name'
+    ).value = '';
 
+    document.getElementById(
+      'phone'
+    ).value = '';
 
-    document
-      .getElementById(
-        'phone'
-      )
-      .value =
-      '';
-
-
-    document
-      .getElementById(
-        'request-note'
-      )
-      .value =
-      '';
+    document.getElementById(
+      'request-note'
+    ).value = '';
 
 
     handlePaymentChange();
@@ -2236,9 +2398,365 @@
     orderButton.disabled =
       false;
 
-
     orderButton.textContent =
       t('order');
+
+
+    showStatusPage();
+
+    await loadOrderStatus();
+
+    startStatusPolling();
+
+  }
+
+
+  function showStatusPage() {
+
+    document.getElementById(
+      'order-section'
+    ).style.display =
+      'none';
+
+
+    document.getElementById(
+      'status-page'
+    ).classList.add(
+      'show'
+    );
+
+
+    document.getElementById(
+      'cart-bar'
+    ).classList.remove(
+      'show'
+    );
+
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  function hideStatusPage() {
+
+    document.getElementById(
+      'order-section'
+    ).style.display =
+      'block';
+
+
+    document.getElementById(
+      'status-page'
+    ).classList.remove(
+      'show'
+    );
+
+  }
+
+
+  async function loadOrderStatus() {
+
+    if (!currentOrderToken) {
+      return;
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('orders')
+        .select(
+          'id, room_number, status, created_at, ordered_at, accepted_at, completed_at, estimated_minutes'
+        )
+        .eq(
+          'order_token',
+          currentOrderToken
+        )
+        .maybeSingle();
+
+
+    if (
+      error ||
+      !data
+    ) {
+
+      console.error(
+        'STATUS ERROR:',
+        error
+      );
+
+      return;
+
+    }
+
+
+    renderOrderStatus(
+      data
+    );
+
+  }
+
+
+  function renderOrderStatus(
+    order
+  ) {
+
+    const status =
+      order.status ||
+      'pending';
+
+
+    const statusIcon =
+      document.getElementById(
+        'status-icon'
+      );
+
+
+    const statusTitle =
+      document.getElementById(
+        'status-title'
+      );
+
+
+    const statusDescription =
+      document.getElementById(
+        'status-description'
+      );
+
+
+    const estimateBox =
+      document.getElementById(
+        'estimate-box'
+      );
+
+
+    const estimateTime =
+      document.getElementById(
+        'estimate-time'
+      );
+
+
+    const estimateFinish =
+      document.getElementById(
+        'estimate-finish'
+      );
+
+
+    const newOrderButton =
+      document.getElementById(
+        'new-order-button'
+      );
+
+
+    statusIcon.className =
+      'status-icon ' +
+      status;
+
+
+    if (
+      status ===
+      'completed'
+    ) {
+
+      statusIcon.textContent =
+        '✓';
+
+      statusTitle.textContent =
+        t('completedTitle');
+
+      statusDescription.textContent =
+        t('completedDescription');
+
+      newOrderButton.classList.add(
+        'show'
+      );
+
+    } else if (
+      status ===
+      'cooking'
+    ) {
+
+      statusIcon.textContent =
+        '●';
+
+      statusTitle.textContent =
+        t('cookingTitle');
+
+      statusDescription.textContent =
+        t('cookingDescription');
+
+      newOrderButton.classList.remove(
+        'show'
+      );
+
+    } else {
+
+      statusIcon.textContent =
+        '···';
+
+      statusTitle.textContent =
+        t('pendingTitle');
+
+      statusDescription.textContent =
+        t('pendingDescription');
+
+      newOrderButton.classList.remove(
+        'show'
+      );
+
+    }
+
+
+    const minutes =
+      Number(
+        order.estimated_minutes ||
+        0
+      );
+
+
+    if (
+      minutes > 0 &&
+      status !== 'pending'
+    ) {
+
+      estimateBox.classList.add(
+        'show'
+      );
+
+
+      estimateTime.textContent =
+        `${minutes}${t('minutes')}`;
+
+
+      if (
+        order.accepted_at
+      ) {
+
+        const finishDate =
+          new Date(
+            new Date(
+              order.accepted_at
+            ).getTime() +
+            minutes *
+            60 *
+            1000
+          );
+
+
+        estimateFinish.textContent =
+          `${t('expectedFinish')} · ${formatClockTime(finishDate)}`;
+
+      } else {
+
+        estimateFinish.textContent =
+          '';
+
+      }
+
+    } else {
+
+      estimateBox.classList.remove(
+        'show'
+      );
+
+    }
+
+
+    document.getElementById(
+      'status-order-info'
+    ).innerHTML = `
+
+      ${escapeHtml(t('orderNumber'))}
+      #${Number(order.id)}
+
+      <br>
+
+      ${escapeHtml(t('orderedRoom'))}
+      ${escapeHtml(order.room_number || '-')}
+
+    `;
+
+  }
+
+
+  function formatClockTime(
+    date
+  ) {
+
+    return date.toLocaleTimeString(
+      currentLanguage === 'ko'
+        ? 'ko-KR'
+        : currentLanguage === 'ja'
+          ? 'ja-JP'
+          : currentLanguage === 'zh'
+            ? 'zh-CN'
+            : 'en-US',
+      {
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    );
+
+  }
+
+
+  function startStatusPolling() {
+
+    if (statusTimer) {
+
+      clearInterval(
+        statusTimer
+      );
+
+    }
+
+
+    statusTimer =
+      setInterval(
+        loadOrderStatus,
+        5000
+      );
+
+  }
+
+
+  function startNewOrder() {
+
+    localStorage.removeItem(
+      orderStorageKey
+    );
+
+
+    currentOrderToken =
+      null;
+
+
+    if (statusTimer) {
+
+      clearInterval(
+        statusTimer
+      );
+
+      statusTimer =
+        null;
+
+    }
+
+
+    hideStatusPage();
+
+    updateCartBar();
+
+    window.scrollTo(
+      0,
+      0
+    );
 
   }
 
@@ -2306,6 +2824,33 @@
   handlePaymentChange();
 
   loadMenus();
+
+
+  /*
+    고객이 페이지를 새로고침해도
+    기존 주문상태 화면 복구
+  */
+
+  const savedOrderToken =
+    localStorage.getItem(
+      orderStorageKey
+    );
+
+
+  if (
+    savedOrderToken
+  ) {
+
+    currentOrderToken =
+      savedOrderToken;
+
+    showStatusPage();
+
+    loadOrderStatus();
+
+    startStatusPolling();
+
+  }
 
 </script>
 
