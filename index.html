@@ -83,6 +83,99 @@
       font-weight: bold;
     }
 
+    /* 영업상태 안내 */
+
+    .service-banner-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 12px 16px 0;
+      display: none;
+    }
+
+    .service-banner-wrap.show {
+      display: block;
+    }
+
+    .service-banner {
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .service-banner strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .service-banner.busy {
+      background: #fff4da;
+      color: #805500;
+      border: 1px solid #f0d28c;
+    }
+
+    .service-banner.preparing {
+      background: #eef3ff;
+      color: #325b9a;
+      border: 1px solid #d6e0f7;
+    }
+
+    .service-banner.closed {
+      background: #f2f2f2;
+      color: #555;
+      border: 1px solid #ddd;
+    }
+
+    .service-banner.soldout {
+      background: #fff0f0;
+      color: #9b3131;
+      border: 1px solid #efcccc;
+    }
+
+    .service-block-page {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 35px 16px 90px;
+      display: none;
+    }
+
+    .service-block-page.show {
+      display: block;
+    }
+
+    .service-block-card {
+      background: white;
+      padding: 38px 24px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .service-block-icon {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: #f3f3f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .service-block-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .service-block-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
     .category-nav {
       display: flex;
       overflow-x: auto;
@@ -163,6 +256,11 @@
       padding: 10px 16px;
       cursor: pointer;
       font-weight: bold;
+    }
+
+    .add-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
     .loading {
@@ -394,7 +492,7 @@
       color: #777;
     }
 
-    /* 주문상태 화면 */
+    /* 주문 상태 페이지 */
 
     .status-page {
       display: none;
@@ -538,27 +636,93 @@
   <button class="language-button" data-lang="zh">中文</button>
 </div>
 
+
 <div id="order-section">
 
   <div class="room-info" id="room-info">
     객실 정보를 확인하는 중입니다.
   </div>
 
-  <div class="category-nav" id="category-nav"></div>
+  <div
+    class="service-banner-wrap"
+    id="service-banner-wrap"
+  >
+    <div
+      class="service-banner"
+      id="service-banner"
+    >
+      <strong id="service-banner-title"></strong>
+      <span id="service-banner-description"></span>
+    </div>
+  </div>
 
-  <main id="menu-list">
-    <div class="loading">메뉴를 불러오는 중입니다.</div>
-  </main>
 
-  <div class="cart-bar" id="cart-bar" onclick="openCart()">
-    <span id="cart-count">장바구니 0</span>
-    <strong id="cart-total-bar">0원</strong>
+  <div
+    class="service-block-page"
+    id="service-block-page"
+  >
+    <div class="service-block-card">
+
+      <div
+        class="service-block-icon"
+        id="service-block-icon"
+      >
+        !
+      </div>
+
+      <div
+        class="service-block-title"
+        id="service-block-title"
+      ></div>
+
+      <div
+        class="service-block-description"
+        id="service-block-description"
+      ></div>
+
+    </div>
+  </div>
+
+
+  <div
+    id="menu-area"
+  >
+
+    <div
+      class="category-nav"
+      id="category-nav"
+    ></div>
+
+    <main id="menu-list">
+      <div class="loading">
+        메뉴를 불러오는 중입니다.
+      </div>
+    </main>
+
+  </div>
+
+
+  <div
+    class="cart-bar"
+    id="cart-bar"
+    onclick="openCart()"
+  >
+    <span id="cart-count">
+      장바구니 0
+    </span>
+
+    <strong id="cart-total-bar">
+      0원
+    </strong>
   </div>
 
 </div>
 
 
-<div class="status-page" id="status-page">
+<div
+  class="status-page"
+  id="status-page"
+>
 
   <div class="status-card">
 
@@ -633,7 +797,10 @@
 </div>
 
 
-<div class="cart-overlay" id="cart-overlay">
+<div
+  class="cart-overlay"
+  id="cart-overlay"
+>
 
   <div class="cart-modal">
 
@@ -655,6 +822,7 @@
 
     <div id="cart-items"></div>
 
+
     <div class="cart-total">
 
       <span id="total-label">
@@ -667,15 +835,19 @@
 
     </div>
 
+
     <div class="section-title">
 
       <span id="payment-title">
         결제방법
       </span>
 
-      <span class="required">*</span>
+      <span class="required">
+        *
+      </span>
 
     </div>
+
 
     <div class="payment-options">
 
@@ -720,12 +892,14 @@
 
     </div>
 
+
     <div
       class="card-notice"
       id="card-notice"
     >
       카드결제 선택 시 직원이 객실로 방문하여 카드리더기로 결제를 도와드립니다.
     </div>
+
 
     <div
       class="form-group hidden"
@@ -738,7 +912,9 @@
           고객명
         </span>
 
-        <span class="required">*</span>
+        <span class="required">
+          *
+        </span>
 
       </label>
 
@@ -796,6 +972,7 @@
     </button>
 
   </div>
+
 </div>
 
 
@@ -820,241 +997,489 @@
   const translations = {
 
     ko: {
+
       room: '객실',
       roomService: 'BOTTEGA ROOM SERVICE',
       qrRequired: '객실 QR코드를 통해 접속해주세요.',
+
       all: '전체',
       loading: '메뉴를 불러오는 중입니다.',
       noMenu: '등록된 메뉴가 없습니다.',
       loadError: '메뉴를 불러오지 못했습니다.',
+
       add: '담기',
+
       cart: '장바구니',
       cartTitle: '주문 내역',
       emptyCart: '장바구니가 비어 있습니다.',
       total: '총 주문금액',
+
       payment: '결제방법',
       checkout: '체크아웃 시 결제',
       card: '카드결제',
+
       cardNotice:
         '카드결제 선택 시 직원이 객실로 방문하여 카드리더기로 결제를 도와드립니다.',
+
       guestName: '고객명',
       guestPlaceholder: '성함을 입력해주세요',
+
       phone: '전화번호',
       phonePlaceholder: '선택 입력',
+
       request: '요청사항',
+
       requestPlaceholder:
         '알레르기, 조리 요청 등 전달사항을 입력해주세요.',
+
       order: '주문하기',
       ordering: '주문 접수 중...',
-      selectMenu: '주문할 메뉴를 선택해주세요.',
-      selectPayment: '결제방법을 선택해주세요.',
+
+      selectMenu:
+        '주문할 메뉴를 선택해주세요.',
+
+      selectPayment:
+        '결제방법을 선택해주세요.',
+
       guestRequired:
         '체크아웃 시 결제를 선택한 경우 고객명을 입력해주세요.',
+
       orderError:
         '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
 
-      pendingTitle: '주문 접수 대기',
+
+      pendingTitle:
+        '주문 접수 대기',
+
       pendingDescription:
         '주문이 전달되었습니다. 직원이 주문을 확인하고 있습니다.',
 
-      cookingTitle: '주문이 접수되었습니다',
+      cookingTitle:
+        '주문이 접수되었습니다',
+
       cookingDescription:
         '현재 주문하신 메뉴를 준비하고 있습니다.',
 
-      completedTitle: '주문 준비 완료',
+      completedTitle:
+        '주문 준비 완료',
+
       completedDescription:
         '주문 준비가 완료되었습니다.',
 
-      estimateLabel: '예상 조리시간',
-      minutes: '분',
-      expectedFinish: '완료 예정',
-      orderNumber: '주문번호',
-      orderedRoom: '객실',
+      estimateLabel:
+        '예상 조리시간',
+
+      minutes:
+        '분',
+
+      expectedFinish:
+        '완료 예정',
+
+      orderNumber:
+        '주문번호',
+
+      orderedRoom:
+        '객실',
+
       autoRefresh:
         '주문 상태는 자동으로 업데이트됩니다.',
-      newOrder: '추가 주문하기'
+
+      newOrder:
+        '추가 주문하기',
+
+
+      busyTitle:
+        '현재 주문이 많습니다',
+
+      busyDescription:
+        '주문은 가능하지만 준비 시간이 평소보다 다소 지연될 수 있습니다.',
+
+      preparingTitle:
+        '현재 영업 준비 중입니다',
+
+      preparingDescription:
+        '보다 나은 서비스를 위해 준비 중입니다. 잠시 후 다시 이용해주세요.',
+
+      closedTitle:
+        '룸서비스 영업이 종료되었습니다',
+
+      closedDescription:
+        '금일 룸서비스 영업이 종료되었습니다. 이용해주셔서 감사합니다.',
+
+      soldoutTitle:
+        '재료가 소진되었습니다',
+
+      soldoutDescription:
+        '금일 준비된 재료가 모두 소진되어 현재 주문이 어렵습니다.'
+
     },
 
 
     en: {
+
       room: 'Room',
       roomService: 'BOTTEGA ROOM SERVICE',
+
       qrRequired:
         'Please access this page using the QR code in your room.',
+
       all: 'All',
       loading: 'Loading menu...',
       noMenu: 'No menu items available.',
       loadError: 'Unable to load the menu.',
+
       add: 'Add',
+
       cart: 'Cart',
       cartTitle: 'Your Order',
       emptyCart: 'Your cart is empty.',
       total: 'Total',
+
       payment: 'Payment Method',
       checkout: 'Pay at Checkout',
       card: 'Card Payment',
+
       cardNotice:
         'For card payment, our staff will visit your room with a card reader to assist you.',
+
       guestName: 'Guest Name',
       guestPlaceholder: 'Please enter your name',
+
       phone: 'Phone Number',
       phonePlaceholder: 'Optional',
+
       request: 'Special Request',
+
       requestPlaceholder:
         'Please let us know about allergies or special requests.',
+
       order: 'Place Order',
       ordering: 'Submitting order...',
-      selectMenu: 'Please select a menu item.',
+
+      selectMenu:
+        'Please select a menu item.',
+
       selectPayment:
         'Please select a payment method.',
+
       guestRequired:
         'Please enter the guest name when paying at checkout.',
+
       orderError:
         'An error occurred while submitting your order. Please try again.',
 
-      pendingTitle: 'Waiting for Confirmation',
+
+      pendingTitle:
+        'Waiting for Confirmation',
+
       pendingDescription:
         'Your order has been sent and is waiting for confirmation.',
 
-      cookingTitle: 'Order Confirmed',
+      cookingTitle:
+        'Order Confirmed',
+
       cookingDescription:
         'Your order is currently being prepared.',
 
-      completedTitle: 'Order Ready',
+      completedTitle:
+        'Order Ready',
+
       completedDescription:
         'Your order is ready.',
 
-      estimateLabel: 'Estimated Preparation Time',
-      minutes: 'min',
-      expectedFinish: 'Estimated completion',
-      orderNumber: 'Order',
-      orderedRoom: 'Room',
+      estimateLabel:
+        'Estimated Preparation Time',
+
+      minutes:
+        ' min',
+
+      expectedFinish:
+        'Estimated completion',
+
+      orderNumber:
+        'Order',
+
+      orderedRoom:
+        'Room',
+
       autoRefresh:
         'Order status updates automatically.',
-      newOrder: 'Place Another Order'
+
+      newOrder:
+        'Place Another Order',
+
+
+      busyTitle:
+        'We are currently experiencing high order volume',
+
+      busyDescription:
+        'Orders are available, but preparation may take longer than usual.',
+
+      preparingTitle:
+        'Room service is preparing to open',
+
+      preparingDescription:
+        'We are currently preparing for service. Please check again shortly.',
+
+      closedTitle:
+        'Room service is closed',
+
+      closedDescription:
+        'Room service has ended for today. Thank you for your understanding.',
+
+      soldoutTitle:
+        'Ingredients are sold out',
+
+      soldoutDescription:
+        'Today’s prepared ingredients have been exhausted and ordering is currently unavailable.'
+
     },
 
 
     ja: {
+
       room: '客室',
       roomService: 'BOTTEGA ROOM SERVICE',
+
       qrRequired:
         '客室のQRコードからアクセスしてください。',
+
       all: 'すべて',
       loading: 'メニューを読み込んでいます。',
       noMenu:
         '現在ご注文いただけるメニューがありません。',
+
       loadError:
         'メニューを読み込めませんでした。',
+
       add: '追加',
+
       cart: 'カート',
       cartTitle: 'ご注文内容',
       emptyCart: 'カートは空です。',
       total: '合計金額',
+
       payment: 'お支払い方法',
       checkout: 'チェックアウト時に支払い',
       card: 'カード決済',
+
       cardNotice:
         'カード決済を選択された場合、スタッフがカードリーダーを持って客室まで伺います。',
+
       guestName: 'お名前',
+
       guestPlaceholder:
         'お名前を入力してください',
+
       phone: '電話番号',
       phonePlaceholder: '任意',
+
       request: 'ご要望',
+
       requestPlaceholder:
         'アレルギーや調理に関するご要望をご入力ください。',
+
       order: '注文する',
       ordering: '注文受付中...',
+
       selectMenu:
         'メニューを選択してください。',
+
       selectPayment:
         'お支払い方法を選択してください。',
+
       guestRequired:
         'チェックアウト時のお支払いを選択した場合は、お名前を入力してください。',
+
       orderError:
         '注文受付中にエラーが発生しました。もう一度お試しください。',
 
-      pendingTitle: 'ご注文確認中',
+
+      pendingTitle:
+        'ご注文確認中',
+
       pendingDescription:
         'ご注文を受け付けました。スタッフが確認しております。',
 
-      cookingTitle: 'ご注文を承りました',
+      cookingTitle:
+        'ご注文を承りました',
+
       cookingDescription:
         '現在、お料理を準備しております。',
 
-      completedTitle: 'ご注文の準備ができました',
+      completedTitle:
+        'ご注文の準備ができました',
+
       completedDescription:
         'ご注文の準備が完了しました。',
 
-      estimateLabel: '予想調理時間',
-      minutes: '分',
-      expectedFinish: '完成予定',
-      orderNumber: '注文番号',
-      orderedRoom: '客室',
+      estimateLabel:
+        '予想調理時間',
+
+      minutes:
+        '分',
+
+      expectedFinish:
+        '完成予定',
+
+      orderNumber:
+        '注文番号',
+
+      orderedRoom:
+        '客室',
+
       autoRefresh:
         '注文状況は自動的に更新されます。',
-      newOrder: '追加注文'
+
+      newOrder:
+        '追加注文',
+
+
+      busyTitle:
+        '現在ご注文が集中しております',
+
+      busyDescription:
+        'ご注文は可能ですが、通常よりお時間をいただく場合がございます。',
+
+      preparingTitle:
+        '現在営業準備中です',
+
+      preparingDescription:
+        'ただいま営業準備中です。しばらくしてから再度ご利用ください。',
+
+      closedTitle:
+        'ルームサービスの営業は終了しました',
+
+      closedDescription:
+        '本日のルームサービス営業は終了いたしました。',
+
+      soldoutTitle:
+        '食材が終了しました',
+
+      soldoutDescription:
+        '本日ご用意した食材が終了したため、現在ご注文いただけません。'
+
     },
 
 
     zh: {
+
       room: '房间',
       roomService: 'BOTTEGA ROOM SERVICE',
+
       qrRequired:
         '请通过客房内的二维码进入此页面。',
+
       all: '全部',
       loading: '正在加载菜单。',
       noMenu: '暂无可点菜单。',
       loadError: '无法加载菜单。',
+
       add: '加入',
+
       cart: '购物车',
       cartTitle: '订单内容',
       emptyCart: '购物车为空。',
       total: '订单总额',
+
       payment: '付款方式',
       checkout: '退房时付款',
       card: '银行卡付款',
+
       cardNotice:
         '选择银行卡付款后，工作人员将携带刷卡机前往您的房间协助付款。',
+
       guestName: '客人姓名',
       guestPlaceholder: '请输入姓名',
+
       phone: '联系电话',
       phonePlaceholder: '选填',
+
       request: '特殊要求',
+
       requestPlaceholder:
         '如有过敏或烹饪要求，请在此填写。',
+
       order: '提交订单',
       ordering: '正在提交订单...',
+
       selectMenu:
         '请选择要点的菜品。',
+
       selectPayment:
         '请选择付款方式。',
+
       guestRequired:
         '如果选择退房时付款，请填写客人姓名。',
+
       orderError:
         '提交订单时发生错误，请稍后重试。',
 
-      pendingTitle: '等待确认订单',
+
+      pendingTitle:
+        '等待确认订单',
+
       pendingDescription:
         '您的订单已发送，工作人员正在确认。',
 
-      cookingTitle: '订单已确认',
+      cookingTitle:
+        '订单已确认',
+
       cookingDescription:
         '您的餐点正在准备中。',
 
-      completedTitle: '订单已准备完成',
+      completedTitle:
+        '订单已准备完成',
+
       completedDescription:
         '您的订单已准备完成。',
 
-      estimateLabel: '预计制作时间',
-      minutes: '分钟',
-      expectedFinish: '预计完成',
-      orderNumber: '订单号',
-      orderedRoom: '房间',
+      estimateLabel:
+        '预计制作时间',
+
+      minutes:
+        '分钟',
+
+      expectedFinish:
+        '预计完成',
+
+      orderNumber:
+        '订单号',
+
+      orderedRoom:
+        '房间',
+
       autoRefresh:
         '订单状态将自动更新。',
-      newOrder: '继续点餐'
+
+      newOrder:
+        '继续点餐',
+
+
+      busyTitle:
+        '当前订单较多',
+
+      busyDescription:
+        '目前仍可下单，但准备时间可能比平时稍长。',
+
+      preparingTitle:
+        '目前正在准备营业',
+
+      preparingDescription:
+        '我们正在准备营业，请稍后再试。',
+
+      closedTitle:
+        '客房送餐服务已结束',
+
+      closedDescription:
+        '今日客房送餐服务已经结束，感谢您的理解。',
+
+      soldoutTitle:
+        '食材已售罄',
+
+      soldoutDescription:
+        '今日准备的食材已全部用完，目前暂时无法下单。'
+
     }
 
   };
@@ -1120,7 +1545,9 @@
     ) || 'ko';
 
 
-  if (!translations[currentLanguage]) {
+  if (
+    !translations[currentLanguage]
+  ) {
     currentLanguage = 'ko';
   }
 
@@ -1128,8 +1555,12 @@
   let allMenus = [];
   let cart = [];
   let currentCategory = 'ALL';
+
   let currentOrderToken = null;
   let statusTimer = null;
+
+  let currentServiceStatus = 'open';
+  let serviceStatusTimer = null;
 
 
   const params =
@@ -1185,26 +1616,263 @@
     return (
       Date.now().toString(36) +
       '-' +
-      Math.random()
-        .toString(36)
-        .slice(2) +
+      Math.random().toString(36).slice(2) +
       '-' +
-      Math.random()
-        .toString(36)
-        .slice(2)
+      Math.random().toString(36).slice(2)
     );
+
+  }
+
+
+  function isOrderingAllowed() {
+
+    return (
+      currentServiceStatus === 'open' ||
+      currentServiceStatus === 'busy'
+    );
+
+  }
+
+
+  async function loadServiceStatus() {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('service_status')
+        .select('status')
+        .eq('id', 1)
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        'SERVICE STATUS ERROR:',
+        error
+      );
+
+      return;
+
+    }
+
+
+    if (!data) {
+      return;
+    }
+
+
+    currentServiceStatus =
+      data.status || 'open';
+
+
+    renderServiceStatus();
+
+  }
+
+
+  function renderServiceStatus() {
+
+    const bannerWrap =
+      document.getElementById(
+        'service-banner-wrap'
+      );
+
+
+    const banner =
+      document.getElementById(
+        'service-banner'
+      );
+
+
+    const bannerTitle =
+      document.getElementById(
+        'service-banner-title'
+      );
+
+
+    const bannerDescription =
+      document.getElementById(
+        'service-banner-description'
+      );
+
+
+    const blockPage =
+      document.getElementById(
+        'service-block-page'
+      );
+
+
+    const blockTitle =
+      document.getElementById(
+        'service-block-title'
+      );
+
+
+    const blockDescription =
+      document.getElementById(
+        'service-block-description'
+      );
+
+
+    const menuArea =
+      document.getElementById(
+        'menu-area'
+      );
+
+
+    if (
+      currentServiceStatus === 'open'
+    ) {
+
+      bannerWrap.classList.remove(
+        'show'
+      );
+
+      blockPage.classList.remove(
+        'show'
+      );
+
+      menuArea.style.display =
+        'block';
+
+    }
+
+
+    else if (
+      currentServiceStatus === 'busy'
+    ) {
+
+      banner.className =
+        'service-banner busy';
+
+      bannerTitle.textContent =
+        t('busyTitle');
+
+      bannerDescription.textContent =
+        t('busyDescription');
+
+      bannerWrap.classList.add(
+        'show'
+      );
+
+      blockPage.classList.remove(
+        'show'
+      );
+
+      menuArea.style.display =
+        'block';
+
+    }
+
+
+    else {
+
+      bannerWrap.classList.remove(
+        'show'
+      );
+
+      menuArea.style.display =
+        'none';
+
+      blockPage.classList.add(
+        'show'
+      );
+
+
+      if (
+        currentServiceStatus ===
+        'preparing'
+      ) {
+
+        blockTitle.textContent =
+          t('preparingTitle');
+
+        blockDescription.textContent =
+          t('preparingDescription');
+
+      }
+
+
+      else if (
+        currentServiceStatus ===
+        'closed'
+      ) {
+
+        blockTitle.textContent =
+          t('closedTitle');
+
+        blockDescription.textContent =
+          t('closedDescription');
+
+      }
+
+
+      else if (
+        currentServiceStatus ===
+        'soldout'
+      ) {
+
+        blockTitle.textContent =
+          t('soldoutTitle');
+
+        blockDescription.textContent =
+          t('soldoutDescription');
+
+      }
+
+    }
+
+
+    if (
+      !isOrderingAllowed()
+    ) {
+
+      closeCart();
+
+    }
+
+
+    updateCartBar();
+
+  }
+
+
+  function startServiceStatusPolling() {
+
+    if (
+      serviceStatusTimer
+    ) {
+
+      clearInterval(
+        serviceStatusTimer
+      );
+
+    }
+
+
+    serviceStatusTimer =
+      setInterval(
+        loadServiceStatus,
+        5000
+      );
 
   }
 
 
   function setLanguage(lang) {
 
-    if (!translations[lang]) {
+    if (
+      !translations[lang]
+    ) {
       return;
     }
 
 
-    currentLanguage = lang;
+    currentLanguage =
+      lang;
 
 
     localStorage.setItem(
@@ -1246,9 +1914,17 @@
 
     renderCart();
 
+    handlePaymentChange();
 
-    if (currentOrderToken) {
+    renderServiceStatus();
+
+
+    if (
+      currentOrderToken
+    ) {
+
       loadOrderStatus();
+
     }
 
   }
@@ -1387,12 +2063,16 @@
       );
 
 
-    if (roomNumber) {
+    if (
+      roomNumber
+    ) {
 
       roomInfo.innerHTML =
         `${t('room')} <strong>${escapeHtml(roomNumber)}</strong> · ${t('roomService')}`;
 
-    } else {
+    }
+
+    else {
 
       roomInfo.innerHTML =
         `<span class="room-error">${t('qrRequired')}</span>`;
@@ -1433,9 +2113,14 @@
         );
 
 
-    if (error) {
+    if (
+      error
+    ) {
 
-      console.error(error);
+      console.error(
+        error
+      );
+
 
       menuList.innerHTML =
         `<div class="loading">${t('loadError')}</div>`;
@@ -1480,7 +2165,9 @@
     }
 
 
-    return category || '';
+    return (
+      category || ''
+    );
 
   }
 
@@ -1561,6 +2248,7 @@
               currentCategory =
                 button.dataset.category;
 
+
               buildCategories();
 
               applyCategoryFilter();
@@ -1577,7 +2265,8 @@
   function applyCategoryFilter() {
 
     if (
-      currentCategory === 'ALL'
+      currentCategory ===
+      'ALL'
     ) {
 
       renderMenus(
@@ -1600,7 +2289,9 @@
   }
 
 
-  function getMenuName(menu) {
+  function getMenuName(
+    menu
+  ) {
 
     const fields = {
       en: 'name_en',
@@ -1612,23 +2303,33 @@
     if (
       currentLanguage === 'ko'
     ) {
-      return menu.name || '';
+
+      return (
+        menu.name || ''
+      );
+
     }
 
 
     const field =
-      fields[currentLanguage];
+      fields[
+        currentLanguage
+      ];
 
 
     if (
       field &&
       menu[field]
     ) {
+
       return menu[field];
+
     }
 
 
-    return menu.name || '';
+    return (
+      menu.name || ''
+    );
 
   }
 
@@ -1656,7 +2357,9 @@
 
 
     const field =
-      fields[currentLanguage];
+      fields[
+        currentLanguage
+      ];
 
 
     if (
@@ -1676,7 +2379,9 @@
   }
 
 
-  function renderMenus(menus) {
+  function renderMenus(
+    menus
+  ) {
 
     const menuList =
       document.getElementById(
@@ -1698,76 +2403,97 @@
 
 
     menuList.innerHTML =
-      menus.map(
-        menu => {
+      menus
+        .map(
+          menu => {
 
-          const displayName =
-            getMenuName(menu);
+            const displayName =
+              getMenuName(
+                menu
+              );
 
-          const displayDescription =
-            getMenuDescription(menu);
+
+            const displayDescription =
+              getMenuDescription(
+                menu
+              );
 
 
-          return `
+            return `
 
-            <div class="menu-card">
+              <div class="menu-card">
 
-              <div class="menu-name">
-                ${escapeHtml(displayName)}
-              </div>
-
-              ${
-                currentLanguage === 'ko' &&
-                menu.name_en
-
-                  ? `
-                    <div class="menu-name-en">
-                      ${escapeHtml(menu.name_en)}
-                    </div>
-                  `
-
-                  : ''
-              }
-
-              ${
-                displayDescription
-
-                  ? `
-                    <div class="menu-description">
-                      ${escapeHtml(displayDescription)}
-                    </div>
-                  `
-
-                  : ''
-              }
-
-              <div class="menu-bottom">
-
-                <div class="price">
-                  ${formatWon(menu.price)}
+                <div class="menu-name">
+                  ${escapeHtml(displayName)}
                 </div>
 
-                <button
-                  type="button"
-                  class="add-button"
-                  onclick="addToCart(${Number(menu.id)})"
-                >
-                  ${escapeHtml(t('add'))}
-                </button>
+                ${
+                  currentLanguage === 'ko' &&
+                  menu.name_en
+
+                    ? `
+                      <div class="menu-name-en">
+                        ${escapeHtml(menu.name_en)}
+                      </div>
+                    `
+
+                    : ''
+                }
+
+                ${
+                  displayDescription
+
+                    ? `
+                      <div class="menu-description">
+                        ${escapeHtml(displayDescription)}
+                      </div>
+                    `
+
+                    : ''
+                }
+
+                <div class="menu-bottom">
+
+                  <div class="price">
+                    ${formatWon(menu.price)}
+                  </div>
+
+                  <button
+                    type="button"
+                    class="add-button"
+                    onclick="addToCart(${Number(menu.id)})"
+                    ${
+                      isOrderingAllowed()
+                        ? ''
+                        : 'disabled'
+                    }
+                  >
+                    ${escapeHtml(t('add'))}
+                  </button>
+
+                </div>
 
               </div>
 
-            </div>
+            `;
 
-          `;
-
-        }
-      ).join('');
+          }
+        )
+        .join('');
 
   }
 
 
-  function addToCart(menuId) {
+  function addToCart(
+    menuId
+  ) {
+
+    if (
+      !isOrderingAllowed()
+    ) {
+      return;
+    }
+
 
     const menu =
       allMenus.find(
@@ -1777,7 +2503,9 @@
       );
 
 
-    if (!menu) {
+    if (
+      !menu
+    ) {
       return;
     }
 
@@ -1790,11 +2518,16 @@
       );
 
 
-    if (existing) {
+    if (
+      existing
+    ) {
 
-      existing.quantity += 1;
+      existing.quantity +=
+        1;
 
-    } else {
+    }
+
+    else {
 
       cart.push({
 
@@ -1842,12 +2575,14 @@
       return item.name_en;
     }
 
+
     if (
       currentLanguage === 'ja' &&
       item.name_ja
     ) {
       return item.name_ja;
     }
+
 
     if (
       currentLanguage === 'zh' &&
@@ -1856,7 +2591,10 @@
       return item.name_zh;
     }
 
-    return item.name || '';
+
+    return (
+      item.name || ''
+    );
 
   }
 
@@ -1865,7 +2603,10 @@
 
     const count =
       cart.reduce(
-        (sum, item) =>
+        (
+          sum,
+          item
+        ) =>
           sum +
           Number(
             item.quantity || 0
@@ -1892,7 +2633,10 @@
       'cart-bar'
     ).classList.toggle(
       'show',
-      count > 0
+      (
+        count > 0 &&
+        isOrderingAllowed()
+      )
     );
 
   }
@@ -1900,7 +2644,15 @@
 
   function openCart() {
 
+    if (
+      !isOrderingAllowed()
+    ) {
+      return;
+    }
+
+
     renderCart();
+
 
     document.getElementById(
       'cart-overlay'
@@ -1930,63 +2682,69 @@
       );
 
 
-    if (!cart.length) {
+    if (
+      !cart.length
+    ) {
 
       cartItems.innerHTML =
         `<div class="empty-cart">${t('emptyCart')}</div>`;
 
-    } else {
+    }
+
+    else {
 
       cartItems.innerHTML =
-        cart.map(
-          item => `
+        cart
+          .map(
+            item => `
 
-            <div class="cart-item">
+              <div class="cart-item">
 
-              <div>
+                <div>
 
-                <div class="cart-item-name">
-                  ${escapeHtml(
-                    getCartItemName(
-                      item
-                    )
-                  )}
+                  <div class="cart-item-name">
+                    ${escapeHtml(
+                      getCartItemName(
+                        item
+                      )
+                    )}
+                  </div>
+
+                  <div class="cart-item-price">
+                    ${formatWon(
+                      item.price
+                    )}
+                  </div>
+
                 </div>
 
-                <div class="cart-item-price">
-                  ${formatWon(
-                    item.price
-                  )}
+                <div class="quantity-control">
+
+                  <button
+                    type="button"
+                    onclick="changeQuantity(${Number(item.id)}, -1)"
+                  >
+                    −
+                  </button>
+
+                  <span>
+                    ${Number(item.quantity)}
+                  </span>
+
+                  <button
+                    type="button"
+                    onclick="changeQuantity(${Number(item.id)}, 1)"
+                  >
+                    +
+                  </button>
+
                 </div>
 
               </div>
 
-              <div class="quantity-control">
-
-                <button
-                  type="button"
-                  onclick="changeQuantity(${Number(item.id)}, -1)"
-                >
-                  −
-                </button>
-
-                <span>
-                  ${Number(item.quantity)}
-                </span>
-
-                <button
-                  type="button"
-                  onclick="changeQuantity(${Number(item.id)}, 1)"
-                >
-                  +
-                </button>
-
-              </div>
-
-            </div>
-
-          `
-        ).join('');
+            `
+          )
+          .join('');
 
     }
 
@@ -2014,7 +2772,9 @@
       );
 
 
-    if (!item) {
+    if (
+      !item
+    ) {
       return;
     }
 
@@ -2047,7 +2807,10 @@
   function getCartTotal() {
 
     return cart.reduce(
-      (sum, item) =>
+      (
+        sum,
+        item
+      ) =>
         sum +
         (
           Number(
@@ -2118,7 +2881,10 @@
         'show'
       );
 
-    } else if (
+    }
+
+
+    else if (
       paymentMethod ===
       'card'
     ) {
@@ -2137,7 +2903,10 @@
         'show'
       );
 
-    } else {
+    }
+
+
+    else {
 
       guestNameGroup.classList.add(
         'hidden'
@@ -2157,7 +2926,30 @@
 
   async function submitOrder() {
 
-    if (!roomNumber) {
+    /*
+      주문버튼을 누르는 순간에도
+      최신 영업상태 다시 확인
+    */
+
+    await loadServiceStatus();
+
+
+    if (
+      !isOrderingAllowed()
+    ) {
+
+      renderServiceStatus();
+
+      closeCart();
+
+      return;
+
+    }
+
+
+    if (
+      !roomNumber
+    ) {
 
       alert(
         t('qrRequired')
@@ -2168,7 +2960,9 @@
     }
 
 
-    if (!cart.length) {
+    if (
+      !cart.length
+    ) {
 
       alert(
         t('selectMenu')
@@ -2183,7 +2977,9 @@
       getPaymentMethod();
 
 
-    if (!paymentMethod) {
+    if (
+      !paymentMethod
+    ) {
 
       alert(
         t('selectPayment')
@@ -2210,9 +3006,11 @@
         t('guestRequired')
       );
 
+
       document.getElementById(
         'guest-name'
       ).focus();
+
 
       return;
 
@@ -2239,6 +3037,7 @@
 
     orderButton.disabled =
       true;
+
 
     orderButton.textContent =
       t('ordering');
@@ -2280,7 +3079,9 @@
     const payload = {
 
       room_number:
-        String(roomNumber),
+        String(
+          roomNumber
+        ),
 
       guest_name:
         paymentMethod ===
@@ -2320,11 +3121,17 @@
       error
     } =
       await supabaseClient
-        .from('orders')
-        .insert(payload);
+        .from(
+          'orders'
+        )
+        .insert(
+          payload
+        );
 
 
-    if (error) {
+    if (
+      error
+    ) {
 
       console.error(
         'ORDER ERROR:',
@@ -2340,8 +3147,10 @@
       orderButton.disabled =
         false;
 
+
       orderButton.textContent =
         t('order');
+
 
       return;
 
@@ -2360,7 +3169,9 @@
 
     cart = [];
 
+
     updateCartBar();
+
 
     closeCart();
 
@@ -2381,15 +3192,20 @@
 
     document.getElementById(
       'guest-name'
-    ).value = '';
+    ).value =
+      '';
+
 
     document.getElementById(
       'phone'
-    ).value = '';
+    ).value =
+      '';
+
 
     document.getElementById(
       'request-note'
-    ).value = '';
+    ).value =
+      '';
 
 
     handlePaymentChange();
@@ -2398,13 +3214,16 @@
     orderButton.disabled =
       false;
 
+
     orderButton.textContent =
       t('order');
 
 
     showStatusPage();
 
+
     await loadOrderStatus();
+
 
     startStatusPolling();
 
@@ -2460,7 +3279,9 @@
 
   async function loadOrderStatus() {
 
-    if (!currentOrderToken) {
+    if (
+      !currentOrderToken
+    ) {
       return;
     }
 
@@ -2470,7 +3291,9 @@
       error
     } =
       await supabaseClient
-        .from('orders')
+        .from(
+          'orders'
+        )
         .select(
           'id, room_number, status, created_at, ordered_at, accepted_at, completed_at, estimated_minutes'
         )
@@ -2567,17 +3390,23 @@
       statusIcon.textContent =
         '✓';
 
+
       statusTitle.textContent =
         t('completedTitle');
 
+
       statusDescription.textContent =
         t('completedDescription');
+
 
       newOrderButton.classList.add(
         'show'
       );
 
-    } else if (
+    }
+
+
+    else if (
       status ===
       'cooking'
     ) {
@@ -2585,26 +3414,35 @@
       statusIcon.textContent =
         '●';
 
+
       statusTitle.textContent =
         t('cookingTitle');
 
+
       statusDescription.textContent =
         t('cookingDescription');
+
 
       newOrderButton.classList.remove(
         'show'
       );
 
-    } else {
+    }
+
+
+    else {
 
       statusIcon.textContent =
         '···';
 
+
       statusTitle.textContent =
         t('pendingTitle');
 
+
       statusDescription.textContent =
         t('pendingDescription');
+
 
       newOrderButton.classList.remove(
         'show'
@@ -2622,7 +3460,8 @@
 
     if (
       minutes > 0 &&
-      status !== 'pending'
+      status !==
+      'pending'
     ) {
 
       estimateBox.classList.add(
@@ -2652,14 +3491,20 @@
         estimateFinish.textContent =
           `${t('expectedFinish')} · ${formatClockTime(finishDate)}`;
 
-      } else {
+      }
+
+
+      else {
 
         estimateFinish.textContent =
           '';
 
       }
 
-    } else {
+    }
+
+
+    else {
 
       estimateBox.classList.remove(
         'show'
@@ -2690,17 +3535,23 @@
   ) {
 
     return date.toLocaleTimeString(
+
       currentLanguage === 'ko'
         ? 'ko-KR'
+
         : currentLanguage === 'ja'
           ? 'ja-JP'
+
           : currentLanguage === 'zh'
             ? 'zh-CN'
+
             : 'en-US',
+
       {
         hour: '2-digit',
         minute: '2-digit'
       }
+
     );
 
   }
@@ -2708,7 +3559,9 @@
 
   function startStatusPolling() {
 
-    if (statusTimer) {
+    if (
+      statusTimer
+    ) {
 
       clearInterval(
         statusTimer
@@ -2737,11 +3590,14 @@
       null;
 
 
-    if (statusTimer) {
+    if (
+      statusTimer
+    ) {
 
       clearInterval(
         statusTimer
       );
+
 
       statusTimer =
         null;
@@ -2751,7 +3607,12 @@
 
     hideStatusPage();
 
+
+    loadServiceStatus();
+
+
     updateCartBar();
+
 
     window.scrollTo(
       0,
@@ -2761,7 +3622,9 @@
   }
 
 
-  function escapeHtml(value) {
+  function escapeHtml(
+    value
+  ) {
 
     return String(
       value ?? ''
@@ -2790,9 +3653,7 @@
   }
 
 
-  /*
-    초기 실행
-  */
+  /* 초기 실행 */
 
   document.documentElement.lang =
     currentLanguage === 'zh'
@@ -2825,10 +3686,14 @@
 
   loadMenus();
 
+  loadServiceStatus();
+
+  startServiceStatusPolling();
+
 
   /*
-    고객이 페이지를 새로고침해도
-    기존 주문상태 화면 복구
+    고객이 새로고침해도
+    기존 주문상태 복구
   */
 
   const savedOrderToken =
@@ -2844,9 +3709,12 @@
     currentOrderToken =
       savedOrderToken;
 
+
     showStatusPage();
 
+
     loadOrderStatus();
+
 
     startStatusPolling();
 
