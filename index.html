@@ -1,34 +1,1653 @@
-function getMenuName(menu) {
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOTTEGA ROOM SERVICE</title>
 
-  const languageFieldMap = {
-    en: 'name_en',
-    ja: 'name_ja',
-    zh: 'name_zh'
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f7f5f1;
+      color: #222;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+    }
+
+    header {
+      background: #111;
+      color: #fff;
+      padding: 30px 20px 22px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: 3px;
+    }
+
+    header p {
+      margin: 9px 0 0;
+      color: #bbb;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .language-bar {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px;
+      background: #111;
+    }
+
+    .language-button {
+      border: 1px solid #555;
+      background: transparent;
+      color: #aaa;
+      padding: 7px 11px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .language-button.active {
+      background: #fff;
+      color: #111;
+      border-color: #fff;
+      font-weight: bold;
+    }
+
+    .room-info {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 13px 16px;
+      background: #fff;
+      text-align: center;
+      font-size: 13px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .room-info strong {
+      font-size: 15px;
+    }
+
+    .room-error {
+      color: #b42318;
+      font-weight: bold;
+    }
+
+    .category-nav {
+      display: flex;
+      overflow-x: auto;
+      gap: 8px;
+      padding: 14px 15px;
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid #eee;
+    }
+
+    .category-nav button {
+      border: 1px solid #ddd;
+      background: white;
+      padding: 9px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .category-nav button.active {
+      background: #111;
+      color: white;
+      border-color: #111;
+    }
+
+    main {
+      max-width: 700px;
+      margin: auto;
+      padding: 18px 16px 110px;
+    }
+
+    .menu-card {
+      background: white;
+      margin-bottom: 12px;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .menu-name {
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .menu-name-en {
+      margin-top: 4px;
+      color: #888;
+      font-size: 12px;
+    }
+
+    .menu-description {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.55;
+      margin-top: 9px;
+    }
+
+    .menu-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      gap: 10px;
+    }
+
+    .price {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .add-button {
+      border: none;
+      background: #111;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px 10px;
+      color: #777;
+    }
+
+    .cart-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 670px;
+      background: #111;
+      color: white;
+      border-radius: 12px;
+      padding: 15px 18px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      z-index: 20;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.22);
+    }
+
+    .cart-bar.show {
+      display: flex;
+    }
+
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .cart-overlay.show {
+      display: flex;
+    }
+
+    .cart-modal {
+      background: white;
+      width: 100%;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .cart-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .close-button {
+      border: 0;
+      background: transparent;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 13px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cart-item-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .cart-item-price {
+      margin-top: 5px;
+      color: #777;
+      font-size: 12px;
+    }
+
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .quantity-control button {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 18px 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .section-title {
+      margin: 10px 0;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 17px;
+    }
+
+    .payment-option {
+      position: relative;
+    }
+
+    .payment-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .payment-option label {
+      display: block;
+      padding: 15px 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .payment-option input:checked + label {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .card-notice {
+      display: none;
+      margin: -5px 0 16px;
+      padding: 11px 12px;
+      background: #f6f6f6;
+      border-radius: 8px;
+      color: #666;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .card-notice.show {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group.hidden {
+      display: none;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    .required {
+      color: #b42318;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      padding: 13px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 85px;
+    }
+
+    .order-button {
+      width: 100%;
+      border: 0;
+      background: #111;
+      color: white;
+      padding: 15px;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .order-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 30px 10px;
+      color: #777;
+    }
+
+    @media (max-width: 500px) {
+      .payment-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>BOTTEGA</h1>
+  <p>ROOM SERVICE</p>
+</header>
+
+<div class="language-bar">
+  <button class="language-button active" data-lang="ko">한국어</button>
+  <button class="language-button" data-lang="en">English</button>
+  <button class="language-button" data-lang="ja">日本語</button>
+  <button class="language-button" data-lang="zh">中文</button>
+</div>
+
+<div class="room-info" id="room-info"></div>
+
+<div class="category-nav" id="category-nav"></div>
+
+<main id="menu-list">
+  <div class="loading">메뉴를 불러오는 중입니다.</div>
+</main>
+
+<div class="cart-bar" id="cart-bar" onclick="openCart()">
+  <span id="cart-count"></span>
+  <strong id="cart-total-bar">0원</strong>
+</div>
+
+<div class="cart-overlay" id="cart-overlay">
+
+  <div class="cart-modal">
+
+    <div class="cart-header">
+      <h2 id="cart-title"></h2>
+      <button class="close-button" onclick="closeCart()">×</button>
+    </div>
+
+    <div id="cart-items"></div>
+
+    <div class="cart-total">
+      <span id="total-label"></span>
+      <span id="cart-total">0원</span>
+    </div>
+
+    <div class="section-title">
+      <span id="payment-title"></span>
+      <span class="required">*</span>
+    </div>
+
+    <div class="payment-options">
+
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="payment-checkout"
+          name="payment-method"
+          value="checkout"
+          onchange="handlePaymentChange()"
+        >
+        <label id="checkout-label" for="payment-checkout"></label>
+      </div>
+
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="payment-card"
+          name="payment-method"
+          value="card"
+          onchange="handlePaymentChange()"
+        >
+        <label id="card-label" for="payment-card"></label>
+      </div>
+
+    </div>
+
+    <div class="card-notice" id="card-notice"></div>
+
+    <div class="form-group hidden" id="guest-name-group">
+      <label for="guest-name">
+        <span id="guest-name-label"></span>
+        <span class="required">*</span>
+      </label>
+
+      <input type="text" id="guest-name">
+    </div>
+
+    <div class="form-group">
+      <label id="phone-label" for="phone"></label>
+      <input type="tel" id="phone">
+    </div>
+
+    <div class="form-group">
+      <label id="request-label" for="request-note"></label>
+      <textarea id="request-note"></textarea>
+    </div>
+
+    <button
+      class="order-button"
+      id="order-button"
+      onclick="submitOrder()"
+    ></button>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+  const SUPABASE_URL =
+    'https://yookspgooyewhnkobckw.supabase.co';
+
+  const SUPABASE_KEY =
+    'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+  const translations = {
+
+    ko: {
+      room: '객실',
+      roomService: 'BOTTEGA ROOM SERVICE',
+      qrRequired: '객실 QR코드를 통해 접속해주세요.',
+      all: '전체',
+      loading: '메뉴를 불러오는 중입니다.',
+      noMenu: '등록된 메뉴가 없습니다.',
+      add: '담기',
+      cart: '장바구니',
+      cartTitle: '주문 내역',
+      emptyCart: '장바구니가 비어 있습니다.',
+      total: '총 주문금액',
+      payment: '결제방법',
+      checkout: '체크아웃 시 결제',
+      card: '카드결제',
+      cardNotice:
+        '카드결제 선택 시 직원이 객실로 방문하여 카드리더기로 결제를 도와드립니다.',
+      guestName: '고객명',
+      guestPlaceholder: '성함을 입력해주세요',
+      phone: '전화번호',
+      phonePlaceholder: '선택 입력',
+      request: '요청사항',
+      requestPlaceholder:
+        '알레르기, 조리 요청 등 전달사항을 입력해주세요.',
+      order: '주문하기',
+      ordering: '주문 접수 중...',
+      selectMenu: '주문할 메뉴를 선택해주세요.',
+      selectPayment: '결제방법을 선택해주세요.',
+      guestRequired:
+        '체크아웃 시 결제를 선택한 경우 고객명을 입력해주세요.',
+      orderSuccess: '주문이 정상적으로 접수되었습니다.',
+      orderError:
+        '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+    },
+
+    en: {
+      room: 'Room',
+      roomService: 'BOTTEGA ROOM SERVICE',
+      qrRequired: 'Please access this page using the QR code in your room.',
+      all: 'All',
+      loading: 'Loading menu...',
+      noMenu: 'No menu items available.',
+      add: 'Add',
+      cart: 'Cart',
+      cartTitle: 'Your Order',
+      emptyCart: 'Your cart is empty.',
+      total: 'Total',
+      payment: 'Payment Method',
+      checkout: 'Pay at Checkout',
+      card: 'Card Payment',
+      cardNotice:
+        'For card payment, our staff will visit your room with a card reader to assist you.',
+      guestName: 'Guest Name',
+      guestPlaceholder: 'Please enter your name',
+      phone: 'Phone Number',
+      phonePlaceholder: 'Optional',
+      request: 'Special Request',
+      requestPlaceholder:
+        'Please let us know about allergies or special requests.',
+      order: 'Place Order',
+      ordering: 'Submitting order...',
+      selectMenu: 'Please select a menu item.',
+      selectPayment: 'Please select a payment method.',
+      guestRequired:
+        'Please enter the guest name when paying at checkout.',
+      orderSuccess: 'Your order has been successfully received.',
+      orderError:
+        'An error occurred while submitting your order. Please try again.'
+    },
+
+    ja: {
+      room: '客室',
+      roomService: 'BOTTEGA ROOM SERVICE',
+      qrRequired: '客室のQRコードからアクセスしてください。',
+      all: 'すべて',
+      loading: 'メニューを読み込んでいます。',
+      noMenu: '現在ご注文いただけるメニューがありません。',
+      add: '追加',
+      cart: 'カート',
+      cartTitle: 'ご注文内容',
+      emptyCart: 'カートは空です。',
+      total: '合計金額',
+      payment: 'お支払い方法',
+      checkout: 'チェックアウト時に支払い',
+      card: 'カード決済',
+      cardNotice:
+        'カード決済を選択された場合、スタッフがカードリーダーを持って客室まで伺います。',
+      guestName: 'お名前',
+      guestPlaceholder: 'お名前を入力してください',
+      phone: '電話番号',
+      phonePlaceholder: '任意',
+      request: 'ご要望',
+      requestPlaceholder:
+        'アレルギーや調理に関するご要望をご入力ください。',
+      order: '注文する',
+      ordering: '注文受付中...',
+      selectMenu: 'メニューを選択してください。',
+      selectPayment: 'お支払い方法を選択してください。',
+      guestRequired:
+        'チェックアウト時のお支払いを選択した場合は、お名前を入力してください。',
+      orderSuccess: 'ご注文を承りました。',
+      orderError:
+        '注文受付中にエラーが発生しました。もう一度お試しください。'
+    },
+
+    zh: {
+      room: '房间',
+      roomService: 'BOTTEGA ROOM SERVICE',
+      qrRequired: '请通过客房内的二维码进入此页面。',
+      all: '全部',
+      loading: '正在加载菜单。',
+      noMenu: '暂无可点菜单。',
+      add: '加入',
+      cart: '购物车',
+      cartTitle: '订单内容',
+      emptyCart: '购物车为空。',
+      total: '订单总额',
+      payment: '付款方式',
+      checkout: '退房时付款',
+      card: '银行卡付款',
+      cardNotice:
+        '选择银行卡付款后，工作人员将携带刷卡机前往您的房间协助付款。',
+      guestName: '客人姓名',
+      guestPlaceholder: '请输入姓名',
+      phone: '联系电话',
+      phonePlaceholder: '选填',
+      request: '特殊要求',
+      requestPlaceholder:
+        '如有过敏或烹饪要求，请在此填写。',
+      order: '提交订单',
+      ordering: '正在提交订单...',
+      selectMenu: '请选择要点的菜品。',
+      selectPayment: '请选择付款方式。',
+      guestRequired:
+        '如果选择退房时付款，请填写客人姓名。',
+      orderSuccess: '您的订单已成功提交。',
+      orderError:
+        '提交订单时发生错误，请稍后重试。'
+    }
+
   };
 
-  const field = languageFieldMap[currentLanguage];
 
-  if (field && menu[field]) {
-    return menu[field];
-  }
+  const categoryTranslations = {
 
-  return menu.name || '';
-}
+    SALAD: {
+      ko: '샐러드',
+      en: 'Salad',
+      ja: 'サラダ',
+      zh: '沙拉'
+    },
 
+    APPETIZER: {
+      ko: '에피타이저',
+      en: 'Appetizer',
+      ja: '前菜',
+      zh: '前菜'
+    },
 
-function getMenuDescription(menu) {
+    PASTA: {
+      ko: '파스타',
+      en: 'Pasta',
+      ja: 'パスタ',
+      zh: '意大利面'
+    },
 
-  const languageFieldMap = {
-    en: 'description_en',
-    ja: 'description_ja',
-    zh: 'description_zh'
+    PIZZA: {
+      ko: '피자',
+      en: 'Pizza',
+      ja: 'ピザ',
+      zh: '披萨'
+    },
+
+    RISOTTO_PILAF: {
+      ko: '리조또',
+      en: 'Risotto & Pilaf',
+      ja: 'リゾット',
+      zh: '烩饭'
+    },
+
+    RISOTTO: {
+      ko: '리조또',
+      en: 'Risotto',
+      ja: 'リゾット',
+      zh: '烩饭'
+    },
+
+    SPECIAL: {
+      ko: '스페셜',
+      en: 'Special',
+      ja: 'スペシャル',
+      zh: '特色菜'
+    }
+
   };
 
-  const field = languageFieldMap[currentLanguage];
 
-  if (field && menu[field]) {
-    return menu[field];
+  let currentLanguage =
+    localStorage.getItem('bottega_language') || 'ko';
+
+  let allMenus = [];
+  let cart = [];
+  let currentCategory = 'ALL';
+
+
+  const params =
+    new URLSearchParams(window.location.search);
+
+  const roomNumber =
+    params.get('room');
+
+
+  function t(key) {
+    return translations[currentLanguage][key] || key;
   }
 
-  return menu.description || '';
-}
+
+  function setLanguage(lang) {
+
+    currentLanguage = lang;
+
+    localStorage.setItem(
+      'bottega_language',
+      lang
+    );
+
+    document.documentElement.lang =
+      lang === 'zh'
+        ? 'zh-CN'
+        : lang;
+
+
+    document
+      .querySelectorAll('.language-button')
+      .forEach(button => {
+
+        button.classList.toggle(
+          'active',
+          button.dataset.lang === lang
+        );
+
+      });
+
+
+    applyTranslations();
+
+    showRoomInfo();
+
+    buildCategories();
+
+    applyCategoryFilter();
+
+    renderCart();
+
+    handlePaymentChange();
+
+  }
+
+
+  document
+    .querySelectorAll('.language-button')
+    .forEach(button => {
+
+      button.addEventListener('click', () => {
+        setLanguage(button.dataset.lang);
+      });
+
+    });
+
+
+  function applyTranslations() {
+
+    document.getElementById('cart-title').textContent =
+      t('cartTitle');
+
+    document.getElementById('total-label').textContent =
+      t('total');
+
+    document.getElementById('payment-title').textContent =
+      t('payment');
+
+    document.getElementById('checkout-label').textContent =
+      t('checkout');
+
+    document.getElementById('card-label').textContent =
+      t('card');
+
+    document.getElementById('card-notice').textContent =
+      t('cardNotice');
+
+    document.getElementById('guest-name-label').textContent =
+      t('guestName');
+
+    document.getElementById('guest-name').placeholder =
+      t('guestPlaceholder');
+
+    document.getElementById('phone-label').textContent =
+      t('phone');
+
+    document.getElementById('phone').placeholder =
+      t('phonePlaceholder');
+
+    document.getElementById('request-label').textContent =
+      t('request');
+
+    document.getElementById('request-note').placeholder =
+      t('requestPlaceholder');
+
+    document.getElementById('order-button').textContent =
+      t('order');
+
+    updateCartBar();
+
+  }
+
+
+  function showRoomInfo() {
+
+    const roomInfo =
+      document.getElementById('room-info');
+
+    if (roomNumber) {
+
+      roomInfo.innerHTML =
+        `${t('room')} <strong>${escapeHtml(roomNumber)}</strong> · ${t('roomService')}`;
+
+    } else {
+
+      roomInfo.innerHTML =
+        `<span class="room-error">${t('qrRequired')}</span>`;
+
+    }
+
+  }
+
+
+  async function loadMenus() {
+
+    const menuList =
+      document.getElementById('menu-list');
+
+    menuList.innerHTML =
+      `<div class="loading">${t('loading')}</div>`;
+
+
+    const { data, error } =
+      await supabaseClient
+        .from('menus')
+        .select('*')
+        .eq('is_available', true)
+        .order('sort_order', {
+          ascending: true
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      menuList.innerHTML =
+        `<div class="loading">${t('noMenu')}</div>`;
+
+      return;
+
+    }
+
+
+    allMenus =
+      data || [];
+
+
+    buildCategories();
+
+    applyCategoryFilter();
+
+  }
+
+
+  function getCategoryLabel(category) {
+
+    const translation =
+      categoryTranslations[category];
+
+    if (
+      translation &&
+      translation[currentLanguage]
+    ) {
+
+      return translation[currentLanguage];
+
+    }
+
+    return category;
+
+  }
+
+
+  function buildCategories() {
+
+    const nav =
+      document.getElementById('category-nav');
+
+
+    const categories = [
+      ...new Set(
+        allMenus
+          .map(menu => menu.category)
+          .filter(Boolean)
+      )
+    ];
+
+
+    nav.innerHTML = `
+      <button
+        class="${currentCategory === 'ALL' ? 'active' : ''}"
+        data-category="ALL"
+      >
+        ${t('all')}
+      </button>
+
+      ${
+        categories.map(category => `
+          <button
+            class="${currentCategory === category ? 'active' : ''}"
+            data-category="${escapeHtml(category)}"
+          >
+            ${escapeHtml(getCategoryLabel(category))}
+          </button>
+        `).join('')
+      }
+    `;
+
+
+    nav
+      .querySelectorAll('button')
+      .forEach(button => {
+
+        button.addEventListener('click', () => {
+
+          currentCategory =
+            button.dataset.category;
+
+          buildCategories();
+
+          applyCategoryFilter();
+
+        });
+
+      });
+
+  }
+
+
+  function applyCategoryFilter() {
+
+    if (currentCategory === 'ALL') {
+
+      renderMenus(allMenus);
+
+      return;
+
+    }
+
+
+    renderMenus(
+      allMenus.filter(menu =>
+        menu.category === currentCategory
+      )
+    );
+
+  }
+
+
+  function getMenuName(menu) {
+
+    const languageFieldMap = {
+      en: 'name_en',
+      ja: 'name_ja',
+      zh: 'name_zh'
+    };
+
+    const field =
+      languageFieldMap[currentLanguage];
+
+    if (
+      field &&
+      menu[field]
+    ) {
+      return menu[field];
+    }
+
+    return menu.name || '';
+  }
+
+
+  function getMenuDescription(menu) {
+
+    const languageFieldMap = {
+      en: 'description_en',
+      ja: 'description_ja',
+      zh: 'description_zh'
+    };
+
+    const field =
+      languageFieldMap[currentLanguage];
+
+    if (
+      field &&
+      menu[field]
+    ) {
+      return menu[field];
+    }
+
+    return menu.description || '';
+  }
+
+
+  function renderMenus(menus) {
+
+    const menuList =
+      document.getElementById('menu-list');
+
+
+    if (!menus.length) {
+
+      menuList.innerHTML =
+        `<div class="loading">${t('noMenu')}</div>`;
+
+      return;
+
+    }
+
+
+    menuList.innerHTML =
+      menus.map(menu => {
+
+        const displayName =
+          getMenuName(menu);
+
+        const displayDescription =
+          getMenuDescription(menu);
+
+        return `
+
+          <div class="menu-card">
+
+            <div class="menu-name">
+              ${escapeHtml(displayName)}
+            </div>
+
+            ${
+              currentLanguage === 'ko' &&
+              menu.name_en
+
+                ? `
+                  <div class="menu-name-en">
+                    ${escapeHtml(menu.name_en)}
+                  </div>
+                `
+
+                : ''
+            }
+
+            ${
+              displayDescription
+
+                ? `
+                  <div class="menu-description">
+                    ${escapeHtml(displayDescription)}
+                  </div>
+                `
+
+                : ''
+            }
+
+            <div class="menu-bottom">
+
+              <div class="price">
+                ${Number(
+                  menu.price || 0
+                ).toLocaleString()}원
+              </div>
+
+              <button
+                class="add-button"
+                onclick="addToCart(${Number(menu.id)})"
+              >
+                ${t('add')}
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join('');
+
+  }
+
+
+  function addToCart(menuId) {
+
+    const menu =
+      allMenus.find(
+        item =>
+          Number(item.id) === Number(menuId)
+      );
+
+
+    if (!menu) return;
+
+
+    const existing =
+      cart.find(
+        item =>
+          Number(item.id) === Number(menuId)
+      );
+
+
+    if (existing) {
+
+      existing.quantity += 1;
+
+    } else {
+
+      cart.push({
+        id: menu.id,
+        name: menu.name || '',
+        name_en: menu.name_en || '',
+        name_ja: menu.name_ja || '',
+        name_zh: menu.name_zh || '',
+        price: Number(menu.price || 0),
+        quantity: 1
+      });
+
+    }
+
+
+    updateCartBar();
+
+  }
+
+
+  function getCartItemName(item) {
+
+    const languageFieldMap = {
+      en: 'name_en',
+      ja: 'name_ja',
+      zh: 'name_zh'
+    };
+
+    const field =
+      languageFieldMap[currentLanguage];
+
+    if (
+      field &&
+      item[field]
+    ) {
+      return item[field];
+    }
+
+    return item.name || '';
+  }
+
+
+  function updateCartBar() {
+
+    const count =
+      cart.reduce(
+        (sum, item) =>
+          sum + item.quantity,
+        0
+      );
+
+
+    const cartBar =
+      document.getElementById('cart-bar');
+
+
+    document.getElementById('cart-count').textContent =
+      `${t('cart')} ${count}`;
+
+
+    document.getElementById('cart-total-bar').textContent =
+      getCartTotal().toLocaleString() + '원';
+
+
+    cartBar.classList.toggle(
+      'show',
+      count > 0
+    );
+
+  }
+
+
+  function openCart() {
+
+    renderCart();
+
+    document
+      .getElementById('cart-overlay')
+      .classList
+      .add('show');
+
+  }
+
+
+  function closeCart() {
+
+    document
+      .getElementById('cart-overlay')
+      .classList
+      .remove('show');
+
+  }
+
+
+  function renderCart() {
+
+    const cartItems =
+      document.getElementById('cart-items');
+
+
+    if (!cart.length) {
+
+      cartItems.innerHTML =
+        `<div class="empty-cart">${t('emptyCart')}</div>`;
+
+    } else {
+
+      cartItems.innerHTML =
+        cart.map(item => `
+
+          <div class="cart-item">
+
+            <div>
+
+              <div class="cart-item-name">
+                ${escapeHtml(getCartItemName(item))}
+              </div>
+
+              <div class="cart-item-price">
+                ${Number(item.price).toLocaleString()}원
+              </div>
+
+            </div>
+
+            <div class="quantity-control">
+
+              <button onclick="changeQuantity(${Number(item.id)}, -1)">
+                −
+              </button>
+
+              <span>
+                ${item.quantity}
+              </span>
+
+              <button onclick="changeQuantity(${Number(item.id)}, 1)">
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        `).join('');
+
+    }
+
+
+    document.getElementById('cart-total').textContent =
+      getCartTotal().toLocaleString() + '원';
+
+  }
+
+
+  function changeQuantity(menuId, amount) {
+
+    const item =
+      cart.find(
+        item =>
+          Number(item.id) === Number(menuId)
+      );
+
+
+    if (!item) return;
+
+
+    item.quantity += amount;
+
+
+    if (item.quantity <= 0) {
+
+      cart =
+        cart.filter(
+          item =>
+            Number(item.id) !== Number(menuId)
+        );
+
+    }
+
+
+    updateCartBar();
+
+    renderCart();
+
+  }
+
+
+  function getCartTotal() {
+
+    return cart.reduce(
+      (sum, item) =>
+        sum +
+        Number(item.price) *
+        Number(item.quantity),
+      0
+    );
+
+  }
+
+
+  function getPaymentMethod() {
+
+    const selected =
+      document.querySelector(
+        'input[name="payment-method"]:checked'
+      );
+
+    return selected
+      ? selected.value
+      : '';
+
+  }
+
+
+  function handlePaymentChange() {
+
+    const paymentMethod =
+      getPaymentMethod();
+
+
+    const guestNameGroup =
+      document.getElementById('guest-name-group');
+
+    const guestNameInput =
+      document.getElementById('guest-name');
+
+    const cardNotice =
+      document.getElementById('card-notice');
+
+
+    if (paymentMethod === 'checkout') {
+
+      guestNameGroup.classList.remove('hidden');
+
+      guestNameInput.required = true;
+
+      cardNotice.classList.remove('show');
+
+    } else if (paymentMethod === 'card') {
+
+      guestNameGroup.classList.add('hidden');
+
+      guestNameInput.required = false;
+
+      guestNameInput.value = '';
+
+      cardNotice.classList.add('show');
+
+    } else {
+
+      guestNameGroup.classList.add('hidden');
+
+      cardNotice.classList.remove('show');
+
+    }
+
+  }
+
+
+  async function submitOrder() {
+
+    if (!roomNumber) {
+
+      alert(t('qrRequired'));
+
+      return;
+
+    }
+
+
+    if (!cart.length) {
+
+      alert(t('selectMenu'));
+
+      return;
+
+    }
+
+
+    const paymentMethod =
+      getPaymentMethod();
+
+
+    if (!paymentMethod) {
+
+      alert(t('selectPayment'));
+
+      return;
+
+    }
+
+
+    const guestName =
+      document
+        .getElementById('guest-name')
+        .value
+        .trim();
+
+
+    if (
+      paymentMethod === 'checkout' &&
+      !guestName
+    ) {
+
+      alert(t('guestRequired'));
+
+      document
+        .getElementById('guest-name')
+        .focus();
+
+      return;
+
+    }
+
+
+    const phone =
+      document
+        .getElementById('phone')
+        .value
+        .trim();
+
+
+    const requestNote =
+      document
+        .getElementById('request-note')
+        .value
+        .trim();
+
+
+    const paymentText =
+      paymentMethod === 'checkout'
+        ? t('checkout')
+        : t('card');
+
+
+    const orderButton =
+      document.getElementById('order-button');
+
+
+    orderButton.disabled = true;
+
+    orderButton.textContent =
+      t('ordering');
+
+
+    const orderItems =
+      cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        name_en: item.name_en,
+        name_ja: item.name_ja,
+        name_zh: item.name_zh,
+        price: item.price,
+        quantity: item.quantity
+      }));
+
+
+    const payload = {
+
+      room_number:
+        String(roomNumber),
+
+      guest_name:
+        paymentMethod === 'checkout'
+          ? guestName
+          : '',
+
+      phone:
+        phone,
+
+      status:
+        'pending',
+
+      total_amount:
+        getCartTotal(),
+
+      request_note:
+        requestNote,
+
+      order_items:
+        orderItems,
+
+      ordered_at:
+        new Date().toISOString(),
+
+      payment_method:
+        paymentMethod
+
+    };
+
+
+    let result =
+      await supabaseClient
+        .from('orders')
+        .insert(payload);
+
+
+    if (
+      result.error &&
+      String(
+        result.error.message || ''
+      )
+        .toLowerCase()
+        .includes('payment_method')
+    ) {
+
+      const fallbackPayload =
+        { ...payload };
+
+
+      delete fallbackPayload.payment_method;
+
+
+      const paymentInfo =
+        `[결제방법] ${paymentText}`;
+
+
+      fallbackPayload.request_note =
+        requestNote
+          ? paymentInfo + '\n' + requestNote
+          : paymentInfo;
+
+
+      result =
+        await supabaseClient
+          .from('orders')
+          .insert(fallbackPayload);
+
+    }
+
+
+    if (result.error) {
+
+      console.error(result.error);
+
+      alert(t('orderError'));
+
+      orderButton.disabled = false;
+
+      orderButton.textContent =
+        t('order');
+
+      return;
+
+    }
+
+
+    alert(t('orderSuccess'));
+
+
+    cart = [];
+
+    updateCartBar();
+
+    closeCart();
+
+
+    document
+      .querySelectorAll(
+        'input[name="payment-method"]'
+      )
+      .forEach(input => {
+        input.checked = false;
+      });
+
+
+    document.getElementById('guest-name').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('request-note').value = '';
+
+
+    handlePaymentChange();
+
+
+    orderButton.disabled = false;
+
+    orderButton.textContent =
+      t('order');
+
+  }
+
+
+  function escapeHtml(value) {
+
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+  }
+
+
+  applyTranslations();
+
+  showRoomInfo();
+
+  setLanguage(currentLanguage);
+
+  loadMenus();
+
+</script>
+
+</body>
+</html>
