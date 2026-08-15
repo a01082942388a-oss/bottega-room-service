@@ -43,6 +43,7 @@
       gap: 6px;
       padding: 12px;
       background: #111;
+      overflow-x: auto;
     }
 
     .language-button {
@@ -53,6 +54,7 @@
       border-radius: 16px;
       cursor: pointer;
       font-size: 11px;
+      white-space: nowrap;
     }
 
     .language-button.active {
@@ -414,7 +416,9 @@
   <button class="language-button" data-lang="zh">中文</button>
 </div>
 
-<div class="room-info" id="room-info"></div>
+<div class="room-info" id="room-info">
+  객실 정보를 확인하는 중입니다.
+</div>
 
 <div class="category-nav" id="category-nav"></div>
 
@@ -423,7 +427,7 @@
 </main>
 
 <div class="cart-bar" id="cart-bar" onclick="openCart()">
-  <span id="cart-count"></span>
+  <span id="cart-count">장바구니 0</span>
   <strong id="cart-total-bar">0원</strong>
 </div>
 
@@ -432,19 +436,26 @@
   <div class="cart-modal">
 
     <div class="cart-header">
-      <h2 id="cart-title"></h2>
-      <button class="close-button" onclick="closeCart()">×</button>
+      <h2 id="cart-title">주문 내역</h2>
+
+      <button
+        class="close-button"
+        type="button"
+        onclick="closeCart()"
+      >
+        ×
+      </button>
     </div>
 
     <div id="cart-items"></div>
 
     <div class="cart-total">
-      <span id="total-label"></span>
+      <span id="total-label">총 주문금액</span>
       <span id="cart-total">0원</span>
     </div>
 
     <div class="section-title">
-      <span id="payment-title"></span>
+      <span id="payment-title">결제방법</span>
       <span class="required">*</span>
     </div>
 
@@ -458,7 +469,13 @@
           value="checkout"
           onchange="handlePaymentChange()"
         >
-        <label id="checkout-label" for="payment-checkout"></label>
+
+        <label
+          id="checkout-label"
+          for="payment-checkout"
+        >
+          체크아웃 시 결제
+        </label>
       </div>
 
       <div class="payment-option">
@@ -469,40 +486,87 @@
           value="card"
           onchange="handlePaymentChange()"
         >
-        <label id="card-label" for="payment-card"></label>
+
+        <label
+          id="card-label"
+          for="payment-card"
+        >
+          카드결제
+        </label>
       </div>
 
     </div>
 
-    <div class="card-notice" id="card-notice"></div>
+    <div
+      class="card-notice"
+      id="card-notice"
+    >
+      카드결제 선택 시 직원이 객실로 방문하여 카드리더기로 결제를 도와드립니다.
+    </div>
 
-    <div class="form-group hidden" id="guest-name-group">
+    <div
+      class="form-group hidden"
+      id="guest-name-group"
+    >
+
       <label for="guest-name">
-        <span id="guest-name-label"></span>
+        <span id="guest-name-label">고객명</span>
         <span class="required">*</span>
       </label>
 
-      <input type="text" id="guest-name">
+      <input
+        type="text"
+        id="guest-name"
+        placeholder="성함을 입력해주세요"
+      >
+
     </div>
 
     <div class="form-group">
-      <label id="phone-label" for="phone"></label>
-      <input type="tel" id="phone">
+
+      <label
+        id="phone-label"
+        for="phone"
+      >
+        전화번호
+      </label>
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="선택 입력"
+      >
+
     </div>
 
     <div class="form-group">
-      <label id="request-label" for="request-note"></label>
-      <textarea id="request-note"></textarea>
+
+      <label
+        id="request-label"
+        for="request-note"
+      >
+        요청사항
+      </label>
+
+      <textarea
+        id="request-note"
+        placeholder="알레르기, 조리 요청 등 전달사항을 입력해주세요."
+      ></textarea>
+
     </div>
 
     <button
       class="order-button"
       id="order-button"
+      type="button"
       onclick="submitOrder()"
-    ></button>
+    >
+      주문하기
+    </button>
 
   </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -514,11 +578,13 @@
   const SUPABASE_KEY =
     'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
 
+
   const supabaseClient =
     supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
+
 
   const translations = {
 
@@ -529,6 +595,7 @@
       all: '전체',
       loading: '메뉴를 불러오는 중입니다.',
       noMenu: '등록된 메뉴가 없습니다.',
+      loadError: '메뉴를 불러오지 못했습니다.',
       add: '담기',
       cart: '장바구니',
       cartTitle: '주문 내역',
@@ -552,18 +619,22 @@
       selectPayment: '결제방법을 선택해주세요.',
       guestRequired:
         '체크아웃 시 결제를 선택한 경우 고객명을 입력해주세요.',
-      orderSuccess: '주문이 정상적으로 접수되었습니다.',
+      orderSuccess:
+        '주문이 정상적으로 접수되었습니다.',
       orderError:
         '주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
     },
 
+
     en: {
       room: 'Room',
       roomService: 'BOTTEGA ROOM SERVICE',
-      qrRequired: 'Please access this page using the QR code in your room.',
+      qrRequired:
+        'Please access this page using the QR code in your room.',
       all: 'All',
       loading: 'Loading menu...',
       noMenu: 'No menu items available.',
+      loadError: 'Unable to load the menu.',
       add: 'Add',
       cart: 'Cart',
       cartTitle: 'Your Order',
@@ -584,21 +655,28 @@
       order: 'Place Order',
       ordering: 'Submitting order...',
       selectMenu: 'Please select a menu item.',
-      selectPayment: 'Please select a payment method.',
+      selectPayment:
+        'Please select a payment method.',
       guestRequired:
         'Please enter the guest name when paying at checkout.',
-      orderSuccess: 'Your order has been successfully received.',
+      orderSuccess:
+        'Your order has been successfully received.',
       orderError:
         'An error occurred while submitting your order. Please try again.'
     },
 
+
     ja: {
       room: '客室',
       roomService: 'BOTTEGA ROOM SERVICE',
-      qrRequired: '客室のQRコードからアクセスしてください。',
+      qrRequired:
+        '客室のQRコードからアクセスしてください。',
       all: 'すべて',
       loading: 'メニューを読み込んでいます。',
-      noMenu: '現在ご注文いただけるメニューがありません。',
+      noMenu:
+        '現在ご注文いただけるメニューがありません。',
+      loadError:
+        'メニューを読み込めませんでした。',
       add: '追加',
       cart: 'カート',
       cartTitle: 'ご注文内容',
@@ -610,7 +688,8 @@
       cardNotice:
         'カード決済を選択された場合、スタッフがカードリーダーを持って客室まで伺います。',
       guestName: 'お名前',
-      guestPlaceholder: 'お名前を入力してください',
+      guestPlaceholder:
+        'お名前を入力してください',
       phone: '電話番号',
       phonePlaceholder: '任意',
       request: 'ご要望',
@@ -618,22 +697,28 @@
         'アレルギーや調理に関するご要望をご入力ください。',
       order: '注文する',
       ordering: '注文受付中...',
-      selectMenu: 'メニューを選択してください。',
-      selectPayment: 'お支払い方法を選択してください。',
+      selectMenu:
+        'メニューを選択してください。',
+      selectPayment:
+        'お支払い方法を選択してください。',
       guestRequired:
         'チェックアウト時のお支払いを選択した場合は、お名前を入力してください。',
-      orderSuccess: 'ご注文を承りました。',
+      orderSuccess:
+        'ご注文を承りました。',
       orderError:
         '注文受付中にエラーが発生しました。もう一度お試しください。'
     },
 
+
     zh: {
       room: '房间',
       roomService: 'BOTTEGA ROOM SERVICE',
-      qrRequired: '请通过客房内的二维码进入此页面。',
+      qrRequired:
+        '请通过客房内的二维码进入此页面。',
       all: '全部',
       loading: '正在加载菜单。',
       noMenu: '暂无可点菜单。',
+      loadError: '无法加载菜单。',
       add: '加入',
       cart: '购物车',
       cartTitle: '订单内容',
@@ -653,11 +738,14 @@
         '如有过敏或烹饪要求，请在此填写。',
       order: '提交订单',
       ordering: '正在提交订单...',
-      selectMenu: '请选择要点的菜品。',
-      selectPayment: '请选择付款方式。',
+      selectMenu:
+        '请选择要点的菜品。',
+      selectPayment:
+        '请选择付款方式。',
       guestRequired:
         '如果选择退房时付款，请填写客人姓名。',
-      orderSuccess: '您的订单已成功提交。',
+      orderSuccess:
+        '您的订单已成功提交。',
       orderError:
         '提交订单时发生错误，请稍后重试。'
     }
@@ -696,10 +784,10 @@
     },
 
     RISOTTO_PILAF: {
-      ko: '리조또',
+      ko: '리조또 / 필라프',
       en: 'Risotto & Pilaf',
-      ja: 'リゾット',
-      zh: '烩饭'
+      ja: 'リゾット・ピラフ',
+      zh: '烩饭 / 抓饭'
     },
 
     RISOTTO: {
@@ -720,7 +808,17 @@
 
 
   let currentLanguage =
-    localStorage.getItem('bottega_language') || 'ko';
+    localStorage.getItem(
+      'bottega_language'
+    ) || 'ko';
+
+
+  if (
+    !translations[currentLanguage]
+  ) {
+    currentLanguage = 'ko';
+  }
+
 
   let allMenus = [];
   let cart = [];
@@ -728,25 +826,50 @@
 
 
   const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+      window.location.search
+    );
+
 
   const roomNumber =
     params.get('room');
 
 
   function t(key) {
-    return translations[currentLanguage][key] || key;
+
+    return (
+      translations[currentLanguage]?.[key] ||
+      translations.ko[key] ||
+      key
+    );
+
+  }
+
+
+  function formatWon(value) {
+
+    return Number(
+      value || 0
+    ).toLocaleString() + '원';
+
   }
 
 
   function setLanguage(lang) {
 
+    if (!translations[lang]) {
+      return;
+    }
+
+
     currentLanguage = lang;
+
 
     localStorage.setItem(
       'bottega_language',
       lang
     );
+
 
     document.documentElement.lang =
       lang === 'zh'
@@ -755,7 +878,9 @@
 
 
     document
-      .querySelectorAll('.language-button')
+      .querySelectorAll(
+        '.language-button'
+      )
       .forEach(button => {
 
         button.classList.toggle(
@@ -782,56 +907,130 @@
 
 
   document
-    .querySelectorAll('.language-button')
+    .querySelectorAll(
+      '.language-button'
+    )
     .forEach(button => {
 
-      button.addEventListener('click', () => {
-        setLanguage(button.dataset.lang);
-      });
+      button.addEventListener(
+        'click',
+        () => {
+
+          setLanguage(
+            button.dataset.lang
+          );
+
+        }
+      );
 
     });
 
 
   function applyTranslations() {
 
-    document.getElementById('cart-title').textContent =
+    document
+      .getElementById(
+        'cart-title'
+      )
+      .textContent =
       t('cartTitle');
 
-    document.getElementById('total-label').textContent =
+
+    document
+      .getElementById(
+        'total-label'
+      )
+      .textContent =
       t('total');
 
-    document.getElementById('payment-title').textContent =
+
+    document
+      .getElementById(
+        'payment-title'
+      )
+      .textContent =
       t('payment');
 
-    document.getElementById('checkout-label').textContent =
+
+    document
+      .getElementById(
+        'checkout-label'
+      )
+      .textContent =
       t('checkout');
 
-    document.getElementById('card-label').textContent =
+
+    document
+      .getElementById(
+        'card-label'
+      )
+      .textContent =
       t('card');
 
-    document.getElementById('card-notice').textContent =
+
+    document
+      .getElementById(
+        'card-notice'
+      )
+      .textContent =
       t('cardNotice');
 
-    document.getElementById('guest-name-label').textContent =
+
+    document
+      .getElementById(
+        'guest-name-label'
+      )
+      .textContent =
       t('guestName');
 
-    document.getElementById('guest-name').placeholder =
+
+    document
+      .getElementById(
+        'guest-name'
+      )
+      .placeholder =
       t('guestPlaceholder');
 
-    document.getElementById('phone-label').textContent =
+
+    document
+      .getElementById(
+        'phone-label'
+      )
+      .textContent =
       t('phone');
 
-    document.getElementById('phone').placeholder =
+
+    document
+      .getElementById(
+        'phone'
+      )
+      .placeholder =
       t('phonePlaceholder');
 
-    document.getElementById('request-label').textContent =
+
+    document
+      .getElementById(
+        'request-label'
+      )
+      .textContent =
       t('request');
 
-    document.getElementById('request-note').placeholder =
+
+    document
+      .getElementById(
+        'request-note'
+      )
+      .placeholder =
       t('requestPlaceholder');
 
-    document.getElementById('order-button').textContent =
+
+    document
+      .getElementById(
+        'order-button'
+      )
+      .textContent =
       t('order');
+
 
     updateCartBar();
 
@@ -841,7 +1040,10 @@
   function showRoomInfo() {
 
     const roomInfo =
-      document.getElementById('room-info');
+      document.getElementById(
+        'room-info'
+      );
+
 
     if (roomNumber) {
 
@@ -861,28 +1063,44 @@
   async function loadMenus() {
 
     const menuList =
-      document.getElementById('menu-list');
+      document.getElementById(
+        'menu-list'
+      );
+
 
     menuList.innerHTML =
       `<div class="loading">${t('loading')}</div>`;
 
 
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await supabaseClient
         .from('menus')
         .select('*')
-        .eq('is_available', true)
-        .order('sort_order', {
-          ascending: true
-        });
+        .eq(
+          'is_available',
+          true
+        )
+        .order(
+          'sort_order',
+          {
+            ascending: true
+          }
+        );
 
 
     if (error) {
 
-      console.error(error);
+      console.error(
+        'MENU LOAD ERROR:',
+        error
+      );
+
 
       menuList.innerHTML =
-        `<div class="loading">${t('noMenu')}</div>`;
+        `<div class="loading">${t('loadError')}</div>`;
 
       return;
 
@@ -900,21 +1118,31 @@
   }
 
 
-  function getCategoryLabel(category) {
+  function getCategoryLabel(
+    category
+  ) {
 
     const translation =
-      categoryTranslations[category];
+      categoryTranslations[
+        category
+      ];
+
 
     if (
       translation &&
-      translation[currentLanguage]
+      translation[
+        currentLanguage
+      ]
     ) {
 
-      return translation[currentLanguage];
+      return translation[
+        currentLanguage
+      ];
 
     }
 
-    return category;
+
+    return category || '';
 
   }
 
@@ -922,74 +1150,129 @@
   function buildCategories() {
 
     const nav =
-      document.getElementById('category-nav');
+      document.getElementById(
+        'category-nav'
+      );
 
 
     const categories = [
       ...new Set(
         allMenus
-          .map(menu => menu.category)
+          .map(
+            menu =>
+              menu.category
+          )
           .filter(Boolean)
       )
     ];
 
 
+    if (
+      currentCategory !== 'ALL' &&
+      !categories.includes(
+        currentCategory
+      )
+    ) {
+
+      currentCategory = 'ALL';
+
+    }
+
+
     nav.innerHTML = `
+
       <button
-        class="${currentCategory === 'ALL' ? 'active' : ''}"
+        class="${
+          currentCategory === 'ALL'
+            ? 'active'
+            : ''
+        }"
         data-category="ALL"
       >
-        ${t('all')}
+        ${escapeHtml(t('all'))}
       </button>
 
       ${
-        categories.map(category => `
-          <button
-            class="${currentCategory === category ? 'active' : ''}"
-            data-category="${escapeHtml(category)}"
-          >
-            ${escapeHtml(getCategoryLabel(category))}
-          </button>
-        `).join('')
+        categories
+          .map(
+            category => `
+
+              <button
+                class="${
+                  currentCategory === category
+                    ? 'active'
+                    : ''
+                }"
+                data-category="${escapeHtml(category)}"
+              >
+                ${escapeHtml(
+                  getCategoryLabel(
+                    category
+                  )
+                )}
+              </button>
+
+            `
+          )
+          .join('')
       }
+
     `;
 
 
     nav
-      .querySelectorAll('button')
-      .forEach(button => {
+      .querySelectorAll(
+        'button'
+      )
+      .forEach(
+        button => {
 
-        button.addEventListener('click', () => {
+          button.addEventListener(
+            'click',
+            () => {
 
-          currentCategory =
-            button.dataset.category;
+              currentCategory =
+                button.dataset.category;
 
-          buildCategories();
 
-          applyCategoryFilter();
+              buildCategories();
 
-        });
+              applyCategoryFilter();
 
-      });
+            }
+          );
+
+        }
+      );
 
   }
 
 
   function applyCategoryFilter() {
 
-    if (currentCategory === 'ALL') {
+    if (
+      currentCategory === 'ALL'
+    ) {
 
-      renderMenus(allMenus);
+      renderMenus(
+        allMenus
+      );
 
       return;
 
     }
 
 
+    const filtered =
+      allMenus.filter(
+        menu =>
+          menu.category ===
+          currentCategory
+      );
+
+
     renderMenus(
-      allMenus.filter(menu =>
-        menu.category === currentCategory
-      )
+      filtered
     );
 
   }
@@ -997,55 +1280,106 @@
 
   function getMenuName(menu) {
 
-    const languageFieldMap = {
+    const fields = {
       en: 'name_en',
       ja: 'name_ja',
       zh: 'name_zh'
     };
 
+
+    if (
+      currentLanguage === 'ko'
+    ) {
+
+      return (
+        menu.name || ''
+      );
+
+    }
+
+
     const field =
-      languageFieldMap[currentLanguage];
+      fields[
+        currentLanguage
+      ];
+
 
     if (
       field &&
       menu[field]
     ) {
+
       return menu[field];
+
     }
 
-    return menu.name || '';
+
+    return (
+      menu.name || ''
+    );
+
   }
 
 
-  function getMenuDescription(menu) {
+  function getMenuDescription(
+    menu
+  ) {
 
-    const languageFieldMap = {
+    const fields = {
       en: 'description_en',
       ja: 'description_ja',
       zh: 'description_zh'
     };
 
+
+    if (
+      currentLanguage === 'ko'
+    ) {
+
+      return (
+        menu.description || ''
+      );
+
+    }
+
+
     const field =
-      languageFieldMap[currentLanguage];
+      fields[
+        currentLanguage
+      ];
+
 
     if (
       field &&
       menu[field]
     ) {
+
       return menu[field];
+
     }
 
-    return menu.description || '';
+
+    return (
+      menu.description || ''
+    );
+
   }
 
 
-  function renderMenus(menus) {
+  function renderMenus(
+    menus
+  ) {
 
     const menuList =
-      document.getElementById('menu-list');
+      document.getElementById(
+        'menu-list'
+      );
 
 
-    if (!menus.length) {
+    if (
+      !menus ||
+      !menus.length
+    ) {
 
       menuList.innerHTML =
         `<div class="loading">${t('noMenu')}</div>`;
@@ -1056,89 +1390,106 @@
 
 
     menuList.innerHTML =
-      menus.map(menu => {
+      menus
+        .map(
+          menu => {
 
-        const displayName =
-          getMenuName(menu);
+            const displayName =
+              getMenuName(
+                menu
+              );
 
-        const displayDescription =
-          getMenuDescription(menu);
 
-        return `
+            const displayDescription =
+              getMenuDescription(
+                menu
+              );
 
-          <div class="menu-card">
 
-            <div class="menu-name">
-              ${escapeHtml(displayName)}
-            </div>
-
-            ${
-              currentLanguage === 'ko' &&
-              menu.name_en
-
+            const koreanEnglishName =
+              (
+                currentLanguage === 'ko' &&
+                menu.name_en
+              )
                 ? `
                   <div class="menu-name-en">
                     ${escapeHtml(menu.name_en)}
                   </div>
                 `
+                : '';
 
-                : ''
-            }
 
-            ${
+            const descriptionHtml =
               displayDescription
-
                 ? `
                   <div class="menu-description">
                     ${escapeHtml(displayDescription)}
                   </div>
                 `
+                : '';
 
-                : ''
-            }
 
-            <div class="menu-bottom">
+            return `
 
-              <div class="price">
-                ${Number(
-                  menu.price || 0
-                ).toLocaleString()}원
+              <div class="menu-card">
+
+                <div class="menu-name">
+                  ${escapeHtml(displayName)}
+                </div>
+
+                ${koreanEnglishName}
+
+                ${descriptionHtml}
+
+                <div class="menu-bottom">
+
+                  <div class="price">
+                    ${formatWon(menu.price)}
+                  </div>
+
+                  <button
+                    type="button"
+                    class="add-button"
+                    onclick="addToCart(${Number(menu.id)})"
+                  >
+                    ${escapeHtml(t('add'))}
+                  </button>
+
+                </div>
+
               </div>
 
-              <button
-                class="add-button"
-                onclick="addToCart(${Number(menu.id)})"
-              >
-                ${t('add')}
-              </button>
+            `;
 
-            </div>
-
-          </div>
-
-        `;
-
-      }).join('');
+          }
+        )
+        .join('');
 
   }
 
 
-  function addToCart(menuId) {
+  function addToCart(
+    menuId
+  ) {
 
     const menu =
       allMenus.find(
         item =>
-          Number(item.id) === Number(menuId)
+          Number(item.id) ===
+          Number(menuId)
       );
 
 
-    if (!menu) return;
+    if (!menu) {
+      return;
+    }
 
 
     const existing =
       cart.find(
         item =>
-          Number(item.id) === Number(menuId)
+          Number(item.id) ===
+          Number(menuId)
       );
 
 
@@ -1149,13 +1500,30 @@
     } else {
 
       cart.push({
-        id: menu.id,
-        name: menu.name || '',
-        name_en: menu.name_en || '',
-        name_ja: menu.name_ja || '',
-        name_zh: menu.name_zh || '',
-        price: Number(menu.price || 0),
-        quantity: 1
+
+        id:
+          menu.id,
+
+        name:
+          menu.name || '',
+
+        name_en:
+          menu.name_en || '',
+
+        name_ja:
+          menu.name_ja || '',
+
+        name_zh:
+          menu.name_zh || '',
+
+        price:
+          Number(
+            menu.price || 0
+          ),
+
+        quantity:
+          1
+
       });
 
     }
@@ -1166,25 +1534,42 @@
   }
 
 
-  function getCartItemName(item) {
-
-    const languageFieldMap = {
-      en: 'name_en',
-      ja: 'name_ja',
-      zh: 'name_zh'
-    };
-
-    const field =
-      languageFieldMap[currentLanguage];
+  function getCartItemName(
+    item
+  ) {
 
     if (
-      field &&
-      item[field]
+      currentLanguage === 'en' &&
+      item.name_en
     ) {
-      return item[field];
+
+      return item.name_en;
+
     }
 
+
+    if (
+      currentLanguage === 'ja' &&
+      item.name_ja
+    ) {
+
+      return item.name_ja;
+
+    }
+
+
+    if (
+      currentLanguage === 'zh' &&
+      item.name_zh
+    ) {
+
+      return item.name_zh;
+
+    }
+
+
     return item.name || '';
+
   }
 
 
@@ -1192,28 +1577,47 @@
 
     const count =
       cart.reduce(
-        (sum, item) =>
-          sum + item.quantity,
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          Number(
+            item.quantity || 0
+          ),
         0
       );
 
 
-    const cartBar =
-      document.getElementById('cart-bar');
+    const total =
+      getCartTotal();
 
 
-    document.getElementById('cart-count').textContent =
+    document
+      .getElementById(
+        'cart-count'
+      )
+      .textContent =
       `${t('cart')} ${count}`;
 
 
-    document.getElementById('cart-total-bar').textContent =
-      getCartTotal().toLocaleString() + '원';
+    document
+      .getElementById(
+        'cart-total-bar'
+      )
+      .textContent =
+      formatWon(total);
 
 
-    cartBar.classList.toggle(
-      'show',
-      count > 0
-    );
+    document
+      .getElementById(
+        'cart-bar'
+      )
+      .classList
+      .toggle(
+        'show',
+        count > 0
+      );
 
   }
 
@@ -1222,10 +1626,15 @@
 
     renderCart();
 
+
     document
-      .getElementById('cart-overlay')
+      .getElementById(
+        'cart-overlay'
+      )
       .classList
-      .add('show');
+      .add(
+        'show'
+      );
 
   }
 
@@ -1233,9 +1642,13 @@
   function closeCart() {
 
     document
-      .getElementById('cart-overlay')
+      .getElementById(
+        'cart-overlay'
+      )
       .classList
-      .remove('show');
+      .remove(
+        'show'
+      );
 
   }
 
@@ -1243,7 +1656,9 @@
   function renderCart() {
 
     const cartItems =
-      document.getElementById('cart-items');
+      document.getElementById(
+        'cart-items'
+      );
 
 
     if (!cart.length) {
@@ -1254,72 +1669,104 @@
     } else {
 
       cartItems.innerHTML =
-        cart.map(item => `
+        cart
+          .map(
+            item => `
 
-          <div class="cart-item">
+              <div class="cart-item">
 
-            <div>
+                <div>
 
-              <div class="cart-item-name">
-                ${escapeHtml(getCartItemName(item))}
+                  <div class="cart-item-name">
+                    ${escapeHtml(
+                      getCartItemName(
+                        item
+                      )
+                    )}
+                  </div>
+
+                  <div class="cart-item-price">
+                    ${formatWon(
+                      item.price
+                    )}
+                  </div>
+
+                </div>
+
+                <div class="quantity-control">
+
+                  <button
+                    type="button"
+                    onclick="changeQuantity(${Number(item.id)}, -1)"
+                  >
+                    −
+                  </button>
+
+                  <span>
+                    ${Number(item.quantity)}
+                  </span>
+
+                  <button
+                    type="button"
+                    onclick="changeQuantity(${Number(item.id)}, 1)"
+                  >
+                    +
+                  </button>
+
+                </div>
+
               </div>
 
-              <div class="cart-item-price">
-                ${Number(item.price).toLocaleString()}원
-              </div>
-
-            </div>
-
-            <div class="quantity-control">
-
-              <button onclick="changeQuantity(${Number(item.id)}, -1)">
-                −
-              </button>
-
-              <span>
-                ${item.quantity}
-              </span>
-
-              <button onclick="changeQuantity(${Number(item.id)}, 1)">
-                +
-              </button>
-
-            </div>
-
-          </div>
-
-        `).join('');
+            `
+          )
+          .join('');
 
     }
 
 
-    document.getElementById('cart-total').textContent =
-      getCartTotal().toLocaleString() + '원';
+    document
+      .getElementById(
+        'cart-total'
+      )
+      .textContent =
+      formatWon(
+        getCartTotal()
+      );
 
   }
 
 
-  function changeQuantity(menuId, amount) {
+  function changeQuantity(
+    menuId,
+    amount
+  ) {
 
     const item =
       cart.find(
         item =>
-          Number(item.id) === Number(menuId)
+          Number(item.id) ===
+          Number(menuId)
       );
 
 
-    if (!item) return;
+    if (!item) {
+      return;
+    }
 
 
-    item.quantity += amount;
+    item.quantity +=
+      amount;
 
 
-    if (item.quantity <= 0) {
+    if (
+      item.quantity <= 0
+    ) {
 
       cart =
         cart.filter(
           item =>
-            Number(item.id) !== Number(menuId)
+            Number(item.id) !==
+            Number(menuId)
         );
 
     }
@@ -1335,10 +1782,19 @@
   function getCartTotal() {
 
     return cart.reduce(
-      (sum, item) =>
+      (
+        sum,
+        item
+      ) =>
         sum +
-        Number(item.price) *
-        Number(item.quantity),
+        (
+          Number(
+            item.price || 0
+          ) *
+          Number(
+            item.quantity || 0
+          )
+        ),
       0
     );
 
@@ -1351,6 +1807,7 @@
       document.querySelector(
         'input[name="payment-method"]:checked'
       );
+
 
     return selected
       ? selected.value
@@ -1366,38 +1823,89 @@
 
 
     const guestNameGroup =
-      document.getElementById('guest-name-group');
+      document.getElementById(
+        'guest-name-group'
+      );
+
 
     const guestNameInput =
-      document.getElementById('guest-name');
+      document.getElementById(
+        'guest-name'
+      );
+
 
     const cardNotice =
-      document.getElementById('card-notice');
+      document.getElementById(
+        'card-notice'
+      );
 
 
-    if (paymentMethod === 'checkout') {
+    if (
+      paymentMethod ===
+      'checkout'
+    ) {
 
-      guestNameGroup.classList.remove('hidden');
+      guestNameGroup
+        .classList
+        .remove(
+          'hidden'
+        );
 
-      guestNameInput.required = true;
 
-      cardNotice.classList.remove('show');
+      guestNameInput.required =
+        true;
 
-    } else if (paymentMethod === 'card') {
 
-      guestNameGroup.classList.add('hidden');
+      cardNotice
+        .classList
+        .remove(
+          'show'
+        );
 
-      guestNameInput.required = false;
+    } else if (
+      paymentMethod ===
+      'card'
+    ) {
 
-      guestNameInput.value = '';
+      guestNameGroup
+        .classList
+        .add(
+          'hidden'
+        );
 
-      cardNotice.classList.add('show');
+
+      guestNameInput.required =
+        false;
+
+
+      guestNameInput.value =
+        '';
+
+
+      cardNotice
+        .classList
+        .add(
+          'show'
+        );
 
     } else {
 
-      guestNameGroup.classList.add('hidden');
+      guestNameGroup
+        .classList
+        .add(
+          'hidden'
+        );
 
-      cardNotice.classList.remove('show');
+
+      guestNameInput.required =
+        false;
+
+
+      cardNotice
+        .classList
+        .remove(
+          'show'
+        );
 
     }
 
@@ -1408,7 +1916,9 @@
 
     if (!roomNumber) {
 
-      alert(t('qrRequired'));
+      alert(
+        t('qrRequired')
+      );
 
       return;
 
@@ -1417,7 +1927,9 @@
 
     if (!cart.length) {
 
-      alert(t('selectMenu'));
+      alert(
+        t('selectMenu')
+      );
 
       return;
 
@@ -1430,7 +1942,9 @@
 
     if (!paymentMethod) {
 
-      alert(t('selectPayment'));
+      alert(
+        t('selectPayment')
+      );
 
       return;
 
@@ -1439,21 +1953,30 @@
 
     const guestName =
       document
-        .getElementById('guest-name')
+        .getElementById(
+          'guest-name'
+        )
         .value
         .trim();
 
 
     if (
-      paymentMethod === 'checkout' &&
+      paymentMethod ===
+        'checkout' &&
       !guestName
     ) {
 
-      alert(t('guestRequired'));
+      alert(
+        t('guestRequired')
+      );
+
 
       document
-        .getElementById('guest-name')
+        .getElementById(
+          'guest-name'
+        )
         .focus();
+
 
       return;
 
@@ -1462,53 +1985,82 @@
 
     const phone =
       document
-        .getElementById('phone')
+        .getElementById(
+          'phone'
+        )
         .value
         .trim();
 
 
     const requestNote =
       document
-        .getElementById('request-note')
+        .getElementById(
+          'request-note'
+        )
         .value
         .trim();
 
 
     const paymentText =
-      paymentMethod === 'checkout'
+      paymentMethod ===
+      'checkout'
         ? t('checkout')
         : t('card');
 
 
     const orderButton =
-      document.getElementById('order-button');
+      document.getElementById(
+        'order-button'
+      );
 
 
-    orderButton.disabled = true;
+    orderButton.disabled =
+      true;
+
 
     orderButton.textContent =
       t('ordering');
 
 
     const orderItems =
-      cart.map(item => ({
-        id: item.id,
-        name: item.name,
-        name_en: item.name_en,
-        name_ja: item.name_ja,
-        name_zh: item.name_zh,
-        price: item.price,
-        quantity: item.quantity
-      }));
+      cart.map(
+        item => ({
+
+          id:
+            item.id,
+
+          name:
+            item.name,
+
+          name_en:
+            item.name_en || '',
+
+          name_ja:
+            item.name_ja || '',
+
+          name_zh:
+            item.name_zh || '',
+
+          price:
+            item.price,
+
+          quantity:
+            item.quantity
+
+        })
+      );
 
 
     const payload = {
 
       room_number:
-        String(roomNumber),
+        String(
+          roomNumber
+        ),
 
       guest_name:
-        paymentMethod === 'checkout'
+        paymentMethod ===
+        'checkout'
           ? guestName
           : '',
 
@@ -1528,7 +2080,8 @@
         orderItems,
 
       ordered_at:
-        new Date().toISOString(),
+        new Date()
+          .toISOString(),
 
       payment_method:
         paymentMethod
@@ -1538,24 +2091,39 @@
 
     let result =
       await supabaseClient
-        .from('orders')
-        .insert(payload);
+        .from(
+          'orders'
+        )
+        .insert(
+          payload
+        );
 
+
+    /*
+      payment_method 컬럼이 없는 경우
+      기존 구조로 자동 재시도
+    */
 
     if (
       result.error &&
       String(
-        result.error.message || ''
+        result.error.message ||
+        ''
       )
         .toLowerCase()
-        .includes('payment_method')
+        .includes(
+          'payment_method'
+        )
     ) {
 
       const fallbackPayload =
-        { ...payload };
+        {
+          ...payload
+        };
 
 
-      delete fallbackPayload.payment_method;
+      delete fallbackPayload
+        .payment_method;
 
 
       const paymentInfo =
@@ -1564,40 +2132,62 @@
 
       fallbackPayload.request_note =
         requestNote
-          ? paymentInfo + '\n' + requestNote
+          ? paymentInfo +
+            '\n' +
+            requestNote
           : paymentInfo;
 
 
       result =
         await supabaseClient
-          .from('orders')
-          .insert(fallbackPayload);
+          .from(
+            'orders'
+          )
+          .insert(
+            fallbackPayload
+          );
 
     }
 
 
-    if (result.error) {
+    if (
+      result.error
+    ) {
 
-      console.error(result.error);
+      console.error(
+        'ORDER ERROR:',
+        result.error
+      );
 
-      alert(t('orderError'));
 
-      orderButton.disabled = false;
+      alert(
+        t('orderError')
+      );
+
+
+      orderButton.disabled =
+        false;
+
 
       orderButton.textContent =
         t('order');
+
 
       return;
 
     }
 
 
-    alert(t('orderSuccess'));
+    alert(
+      t('orderSuccess')
+    );
 
 
     cart = [];
 
+
     updateCartBar();
+
 
     closeCart();
 
@@ -1606,20 +2196,46 @@
       .querySelectorAll(
         'input[name="payment-method"]'
       )
-      .forEach(input => {
-        input.checked = false;
-      });
+      .forEach(
+        input => {
+
+          input.checked =
+            false;
+
+        }
+      );
 
 
-    document.getElementById('guest-name').value = '';
-    document.getElementById('phone').value = '';
-    document.getElementById('request-note').value = '';
+    document
+      .getElementById(
+        'guest-name'
+      )
+      .value =
+      '';
+
+
+    document
+      .getElementById(
+        'phone'
+      )
+      .value =
+      '';
+
+
+    document
+      .getElementById(
+        'request-note'
+      )
+      .value =
+      '';
 
 
     handlePaymentChange();
 
 
-    orderButton.disabled = false;
+    orderButton.disabled =
+      false;
+
 
     orderButton.textContent =
       t('order');
@@ -1629,21 +2245,65 @@
 
   function escapeHtml(value) {
 
-    return String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    return String(
+      value ?? ''
+    )
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
 
   }
+
+
+  /*
+    초기 실행
+  */
+
+  document.documentElement.lang =
+    currentLanguage === 'zh'
+      ? 'zh-CN'
+      : currentLanguage;
+
+
+  document
+    .querySelectorAll(
+      '.language-button'
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          'active',
+          button.dataset.lang ===
+          currentLanguage
+        );
+
+      }
+    );
 
 
   applyTranslations();
 
   showRoomInfo();
 
-  setLanguage(currentLanguage);
+  handlePaymentChange();
 
   loadMenus();
 
