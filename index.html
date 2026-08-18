@@ -468,6 +468,13 @@
       min-height: 85px;
     }
 
+    .phone-notice {
+      margin: 7px 2px 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #888;
+    }
+
     .order-button {
       width: 100%;
       border: 0;
@@ -942,6 +949,13 @@
         placeholder="선택 입력"
       >
 
+      <p
+        class="phone-notice"
+        id="phone-notice"
+      >
+        원활한 서비스 제공을 위해 연락 가능한 전화번호를 남겨주세요. 객실 부재 등 전달이 어려운 경우에 한해 연락드릴 수 있습니다.
+      </p>
+
     </div>
 
 
@@ -1026,6 +1040,8 @@
 
       phone: '전화번호',
       phonePlaceholder: '선택 입력',
+      phoneNotice:
+        '원활한 서비스 제공을 위해 연락 가능한 전화번호를 남겨주세요. 객실 부재 등 전달이 어려운 경우에 한해 연락드릴 수 있습니다.',
 
       request: '요청사항',
 
@@ -1147,6 +1163,8 @@
 
       phone: 'Phone Number',
       phonePlaceholder: 'Optional',
+      phoneNotice:
+        'Please provide a contact number for smooth room service delivery. We will contact you only if delivery is difficult, such as when you are away from your room.',
 
       request: 'Special Request',
 
@@ -1273,6 +1291,8 @@
 
       phone: '電話番号',
       phonePlaceholder: '任意',
+      phoneNotice:
+        'スムーズなルームサービスのため、連絡可能な電話番号をご入力ください。客室を不在にされている場合など、お届けが難しい場合に限りご連絡いたします。',
 
       request: 'ご要望',
 
@@ -1394,6 +1414,8 @@
 
       phone: '联系电话',
       phonePlaceholder: '选填',
+      phoneNotice:
+        '为确保客房送餐服务顺利进行，请留下可联系的电话号码。仅在您不在客房等无法顺利送达的情况下与您联系。',
 
       request: '特殊要求',
 
@@ -2012,6 +2034,12 @@
       'phone'
     ).placeholder =
       t('phonePlaceholder');
+
+
+    document.getElementById(
+      'phone-notice'
+    ).textContent =
+      t('phoneNotice');
 
 
     document.getElementById(
