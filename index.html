@@ -3956,6 +3956,17 @@ function changeCutleryQty(change) {
 
   loadMenus();
 
+
+
+  /* 메뉴 상태 3초 자동 갱신 */
+
+  setInterval(
+
+    loadMenus,
+
+    3000
+
+  );
   loadServiceStatus();
 
   startServiceStatusPolling();
