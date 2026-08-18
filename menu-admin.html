@@ -659,6 +659,30 @@
       min-width: 0;
     }
 
+    .menu-workspace.preview-hidden {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .menu-workspace.preview-hidden .preview-panel {
+      display: none;
+    }
+
+    .preview-toggle-button {
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #222;
+      padding: 12px 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .preview-toggle-button:hover {
+      background: #f5f5f5;
+    }
+
     .preview-panel {
       position: sticky;
       top: 18px;
@@ -1184,6 +1208,14 @@
             새로고침
           </button>
 
+          <button
+            class="preview-toggle-button"
+            id="preview-toggle-button"
+            onclick="togglePreviewPanel()"
+          >
+            미리보기 숨기기
+          </button>
+
 
         </div>
 
@@ -1312,7 +1344,7 @@
       </div>
 
 
-      <div class="menu-workspace">
+      <div class="menu-workspace" id="menu-workspace">
 
         <div class="menu-editor-column">
 
@@ -2447,6 +2479,67 @@
         : '-'
     );
 
+  }
+
+
+  function applyPreviewVisibility() {
+
+    const workspace =
+      document.getElementById(
+        'menu-workspace'
+      );
+
+    const button =
+      document.getElementById(
+        'preview-toggle-button'
+      );
+
+    if (
+      !workspace ||
+      !button
+    ) {
+      return;
+    }
+
+    const isHidden =
+      localStorage.getItem(
+        'bottega_menu_preview_hidden'
+      ) === 'true';
+
+    workspace.classList.toggle(
+      'preview-hidden',
+      isHidden
+    );
+
+    button.textContent =
+      isHidden
+        ? '미리보기 보기'
+        : '미리보기 숨기기';
+  }
+
+
+  function togglePreviewPanel() {
+
+    const workspace =
+      document.getElementById(
+        'menu-workspace'
+      );
+
+    if (!workspace) {
+      return;
+    }
+
+    const willHide =
+      !workspace.classList.contains(
+        'preview-hidden'
+      );
+
+    localStorage.setItem(
+      'bottega_menu_preview_hidden',
+      String(willHide)
+    );
+
+    applyPreviewVisibility();
   }
 
 
@@ -3672,6 +3765,8 @@
   /* =========================================
      최초 실행
   ========================================= */
+
+  applyPreviewVisibility();
 
   loadMenus();
 
