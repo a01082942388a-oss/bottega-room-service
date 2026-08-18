@@ -626,7 +626,66 @@
         grid-template-columns: 1fr;
       }
     }
-  </style>
+
+    @media (max-width: 500px) {
+  .payment-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* 일회용 식기 수량 */
+.cutlery-box {
+  margin-top: 16px;
+  padding: 15px 16px;
+  background: #f8f8f8;
+  border-radius: 10px;
+}
+
+.cutlery-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.cutlery-description {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.cutlery-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 140px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.cutlery-button {
+  width: 42px;
+  height: 40px;
+  border: 0;
+  background: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cutlery-button:active {
+  background: #eee;
+}
+
+.cutlery-qty {
+  min-width: 45px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+</style>
 </head>
 
 <body>
@@ -975,7 +1034,50 @@
 
     </div>
 
+<div class="cutlery-box">
 
+  <div
+    class="cutlery-title"
+    id="cutlery-title"
+  >
+    일회용 식기 수량
+  </div>
+
+  <div
+    class="cutlery-description"
+    id="cutlery-description"
+  >
+    이용하실 인원에 맞게 수량을 선택해주세요.
+  </div>
+
+  <div class="cutlery-counter">
+
+    <button
+      type="button"
+      class="cutlery-button"
+      onclick="changeCutleryQty(-1)"
+    >
+      −
+    </button>
+
+    <span
+      class="cutlery-qty"
+      id="cutlery-qty"
+    >
+      1
+    </span>
+
+    <button
+      type="button"
+      class="cutlery-button"
+      onclick="changeCutleryQty(1)"
+    >
+      +
+    </button>
+
+  </div>
+
+</div>
     <button
       class="order-button"
       id="order-button"
@@ -1047,6 +1149,9 @@
 
       requestPlaceholder:
         '알레르기, 조리 요청 등 전달사항을 입력해주세요.',
+
+      cutleryTitle: '일회용 식기 수량',
+      cutleryDescription: '이용하실 인원에 맞게 수량을 선택해주세요.',
 
       order: '주문하기',
       ordering: '주문 접수 중...',
@@ -1170,6 +1275,9 @@
 
       requestPlaceholder:
         'Please let us know about allergies or special requests.',
+
+      cutleryTitle: 'Disposable Cutlery',
+      cutleryDescription: 'Please select the quantity you need.',
 
       order: 'Place Order',
       ordering: 'Submitting order...',
@@ -1299,6 +1407,9 @@
       requestPlaceholder:
         'アレルギーや調理に関するご要望をご入力ください。',
 
+      cutleryTitle: '使い捨てカトラリー',
+      cutleryDescription: '必要な数量を選択してください。',
+
       order: '注文する',
       ordering: '注文受付中...',
 
@@ -1421,6 +1532,9 @@
 
       requestPlaceholder:
         '如有过敏或烹饪要求，请在此填写。',
+
+      cutleryTitle: '一次性餐具数量',
+      cutleryDescription: '请选择所需数量。',
 
       order: '提交订单',
       ordering: '正在提交订单...',
@@ -2052,6 +2166,18 @@
       'request-note'
     ).placeholder =
       t('requestPlaceholder');
+
+
+    document.getElementById(
+      'cutlery-title'
+    ).textContent =
+      t('cutleryTitle');
+
+
+    document.getElementById(
+      'cutlery-description'
+    ).textContent =
+      t('cutleryDescription');
 
 
     document.getElementById(
@@ -2950,7 +3076,29 @@
     }
 
   }
+let cutleryQty = 1;
 
+function changeCutleryQty(change) {
+
+  cutleryQty += change;
+
+  if (cutleryQty < 0) {
+    cutleryQty = 0;
+  }
+
+  if (cutleryQty > 10) {
+    cutleryQty = 10;
+  }
+
+  const qtyElement =
+    document.getElementById('cutlery-qty');
+
+  if (qtyElement) {
+    qtyElement.textContent =
+      cutleryQty;
+  }
+
+}
 
   async function submitOrder() {
 
@@ -3129,6 +3277,9 @@
       request_note:
         requestNote,
 
+      disposable_cutlery_qty:
+        cutleryQty,
+
       order_items:
         orderItems,
 
@@ -3234,6 +3385,26 @@
       'request-note'
     ).value =
       '';
+
+
+    cutleryQty =
+      1;
+
+
+    const cutleryQtyElement =
+      document.getElementById(
+        'cutlery-qty'
+      );
+
+
+    if (
+      cutleryQtyElement
+    ) {
+
+      cutleryQtyElement.textContent =
+        cutleryQty;
+
+    }
 
 
     handlePaymentChange();
@@ -3634,6 +3805,26 @@
 
 
     hideStatusPage();
+
+
+    cutleryQty =
+      1;
+
+
+    const cutleryQtyElement =
+      document.getElementById(
+        'cutlery-qty'
+      );
+
+
+    if (
+      cutleryQtyElement
+    ) {
+
+      cutleryQtyElement.textContent =
+        cutleryQty;
+
+    }
 
 
     loadServiceStatus();
