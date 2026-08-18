@@ -38,6 +38,107 @@
     }
 
     /* =========================
+       관리자 사이드바
+    ========================= */
+
+    .admin-layout {
+      display: flex;
+      min-height: calc(100vh - 92px);
+    }
+
+    .sidebar {
+      width: 220px;
+      background: #161616;
+      color: #fff;
+      padding: 22px 14px;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      height: 100vh;
+    }
+
+    .sidebar-title {
+      padding: 0 10px 18px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #2f2f2f;
+    }
+
+    .sidebar-title strong {
+      display: block;
+      font-size: 15px;
+      letter-spacing: 1.5px;
+    }
+
+    .sidebar-title span {
+      display: block;
+      margin-top: 5px;
+      color: #888;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .sidebar-link {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #aaa;
+      text-align: left;
+      padding: 12px 13px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .sidebar-link:hover {
+      background: #222;
+      color: #fff;
+    }
+
+    .sidebar-link.active {
+      background: #fff;
+      color: #111;
+    }
+
+    .content-area {
+      flex: 1;
+      min-width: 0;
+      padding-bottom: 80px;
+    }
+
+    /* =========================
+       영업상태 드롭다운
+    ========================= */
+
+    .service-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .service-select {
+      min-width: 190px;
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 10px 36px 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .service-select:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* =========================
        영업상태
     ========================= */
 
@@ -536,12 +637,45 @@
     }
 
     @media (max-width: 700px) {
+      .admin-layout {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 10px 12px;
+      }
+
+      .sidebar-title {
+        display: none;
+      }
+
+      .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+
+      .sidebar-link {
+        width: auto;
+        min-width: 110px;
+        text-align: center;
+        white-space: nowrap;
+      }
+
       .summary {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .service-buttons {
-        grid-template-columns: repeat(2, 1fr);
+      .service-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .service-select-wrap,
+      .service-select {
+        width: 100%;
       }
 
       .order-top {
@@ -558,6 +692,25 @@
   <p>ROOM SERVICE · ORDER MANAGEMENT</p>
 </header>
 
+<div class="admin-layout">
+
+  <aside class="sidebar">
+
+    <div class="sidebar-title">
+      <strong>BOTTEGA ADMIN</strong>
+      <span>ROOM SERVICE</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-link active">주문관리</button>
+      <button class="sidebar-link" onclick="location.href='menu-admin.html'">메뉴관리</button>
+      <button class="sidebar-link" onclick="alert('매출관리 기능은 다음 단계에서 연결합니다.')">매출관리</button>
+      <button class="sidebar-link" onclick="alert('운영설정 기능은 다음 단계에서 연결합니다.')">운영설정</button>
+    </nav>
+
+  </aside>
+
+  <div class="content-area">
 
 <!-- 영업 상태 -->
 <div class="service-panel">
@@ -570,56 +723,26 @@
         영업상태
       </div>
 
-      <div
-        class="current-service-status"
-        id="current-service-status"
-      >
-        확인 중
+      <div class="service-select-wrap">
+        <select
+          class="service-select"
+          id="service-status-select"
+          onchange="handleServiceStatusSelect(this.value)"
+        >
+          <option value="open">정상영업</option>
+          <option value="busy">주문폭주</option>
+          <option value="preparing">영업준비중</option>
+          <option value="closed">영업마감</option>
+          <option value="soldout">재료소진</option>
+        </select>
+
+        <div
+          class="current-service-status"
+          id="current-service-status"
+        >
+          확인 중
+        </div>
       </div>
-
-    </div>
-
-    <div class="service-buttons">
-
-      <button
-        class="service-button"
-        data-status="open"
-        onclick="changeServiceStatus('open')"
-      >
-        정상영업
-      </button>
-
-      <button
-        class="service-button"
-        data-status="busy"
-        onclick="changeServiceStatus('busy')"
-      >
-        주문폭주
-      </button>
-
-      <button
-        class="service-button"
-        data-status="preparing"
-        onclick="changeServiceStatus('preparing')"
-      >
-        영업준비중
-      </button>
-
-      <button
-        class="service-button"
-        data-status="closed"
-        onclick="changeServiceStatus('closed')"
-      >
-        영업마감
-      </button>
-
-      <button
-        class="service-button"
-        data-status="soldout"
-        onclick="changeServiceStatus('soldout')"
-      >
-        재료소진
-      </button>
 
     </div>
 
@@ -796,6 +919,8 @@
 
 </div>
 
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -982,144 +1107,118 @@
       info.description;
 
 
-    document
-      .querySelectorAll(
-        '.service-button'
-      )
-      .forEach(
-        button => {
-
-          button
-            .classList
-            .toggle(
-              'active',
-              button.dataset.status ===
-              status
-            );
-
-        }
+    const select =
+      document.getElementById(
+        'service-status-select'
       );
+
+    if (select) {
+      select.value =
+        serviceStatusInfo[status]
+          ? status
+          : 'open';
+    }
 
   }
 
 
-  async function changeServiceStatus(
+  async function handleServiceStatusSelect(
     newStatus
   ) {
 
     if (
       serviceStatusUpdating
     ) {
-
       return;
-
     }
-
 
     const info =
       serviceStatusInfo[
         newStatus
       ];
 
-
-    if (
-      !info
-    ) {
-
+    if (!info) {
       return;
-
     }
 
+    const select =
+      document.getElementById(
+        'service-status-select'
+      );
+
+    const previousStatus =
+      Object.keys(
+        serviceStatusInfo
+      ).find(
+        key =>
+          serviceStatusInfo[key].label ===
+          document.getElementById(
+            'current-service-status'
+          ).textContent
+      ) || 'open';
 
     if (
       !confirm(
         `영업상태를 "${info.label}" 상태로 변경하시겠습니까?`
       )
     ) {
-
+      if (select) {
+        select.value =
+          previousStatus;
+      }
       return;
-
     }
-
 
     serviceStatusUpdating =
       true;
 
+    if (select) {
+      select.disabled =
+        true;
+    }
 
-    document
-      .querySelectorAll(
-        '.service-button'
-      )
-      .forEach(
-        button => {
-
-          button.disabled =
-            true;
-
-        }
-      );
-
-
-    const {
-      error
-    } =
+    const { error } =
       await supabaseClient
         .from(
           'service_status'
         )
         .update({
-
           status:
             newStatus,
-
           updated_at:
             new Date()
               .toISOString()
-
         })
         .eq(
           'id',
           1
         );
 
-
-    document
-      .querySelectorAll(
-        '.service-button'
-      )
-      .forEach(
-        button => {
-
-          button.disabled =
-            false;
-
-        }
-      );
-
-
     serviceStatusUpdating =
       false;
 
+    if (select) {
+      select.disabled =
+        false;
+    }
 
-    if (
-      error
-    ) {
-
+    if (error) {
       console.error(
         'SERVICE UPDATE ERROR:',
         error
       );
 
-
       alert(
         '영업상태 변경에 실패했습니다.'
       );
 
+      if (select) {
+        select.value =
+          previousStatus;
+      }
 
       return;
-
     }
-
 
     renderServiceStatus(
       newStatus
