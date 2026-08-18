@@ -178,6 +178,33 @@ header p {
   font-size: 16px;
 }
 
+.category-delete {
+  border: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eee;
+  color: #777;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-delete:hover {
+  background: #fff0f0;
+  color: #a33;
+}
+
+.modal-danger-zone {
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
 .category-tabs {
   display: flex;
   gap: 8px;
@@ -471,7 +498,7 @@ header p {
       </div>
 
       <button class="btn btn-black" onclick="saveAllOrder()">
-        전체 순서 저장
+        카테고리 변경 내용 저장
       </button>
     </div>
 
@@ -485,7 +512,7 @@ header p {
 
     <div class="save-bar">
       <button class="btn btn-black" onclick="saveAllOrder()">
-        전체 순서 저장
+        메뉴변경 내용 저장
       </button>
     </div>
 
@@ -538,6 +565,16 @@ header p {
       <button class="btn btn-yellow" onclick="setModalSoldOut(1)">1일</button>
       <button class="btn btn-yellow" onclick="setModalSoldOut(3)">3일</button>
       <button class="btn btn-yellow" onclick="setModalSoldOut(7)">1주</button>
+    </div>
+
+    <div class="modal-danger-zone">
+      <button
+        class="btn btn-red"
+        style="width:100%"
+        onclick="deleteModalMenu()"
+      >
+        메뉴 삭제
+      </button>
     </div>
 
     <button class="btn btn-gray modal-close" onclick="closeMenuModal()">
@@ -917,6 +954,16 @@ function buildCategoryOrderList() {
           >
             <span class="category-handle">☰</span>
             <strong>${escapeHtml(category)}</strong>
+
+            <button
+              type="button"
+              class="category-delete"
+              title="카테고리 삭제"
+              onmousedown="event.stopPropagation()"
+              onclick="event.stopPropagation(); deleteCategory('${escapeJs(category)}')"
+            >
+              ×
+            </button>
           </div>
 
         `
@@ -1731,7 +1778,23 @@ async function toggleModalHidden() {
 
 async function setModalSoldOut(days) {
 
-  if (modalMenuId === null) {
+  if (
+    modalMenuId === null ||
+    modalMenuId === undefined
+  ) {
+    alert('메뉴를 다시 선택해주세요.');
+    return;
+  }
+
+  const targetMenuId =
+    Number(modalMenuId);
+
+  if (
+    !Number.isFinite(
+      targetMenuId
+    )
+  ) {
+    alert('메뉴 ID를 확인할 수 없습니다.');
     return;
   }
 
@@ -1751,9 +1814,16 @@ async function setModalSoldOut(days) {
   const until =
     new Date(
       Date.now() +
-      days *
-      86400000
+      Number(days) *
+      24 *
+      60 *
+      60 *
+      1000
     );
+
+  showSaving(
+    '품절 처리 중...'
+  );
 
   const {
     error
@@ -1768,16 +1838,37 @@ async function setModalSoldOut(days) {
       })
       .eq(
         'id',
-        modalMenuId
+        targetMenuId
       );
 
   if (error) {
-    console.error(error);
-    alert('품절 처리에 실패했습니다.');
+
+    console.error(
+      'SOLDOUT UPDATE ERROR:',
+      error
+    );
+
+    hideSaving();
+
+    alert(
+      '품절 처리에 실패했습니다.\n' +
+      (error.message || 'Supabase 업데이트 오류')
+    );
+
     return;
   }
 
+  showSaving(
+    '품절 처리 완료'
+  );
+
   closeMenuModal();
+
+  setTimeout(
+    hideSaving,
+    700
+  );
+
   await loadMenus();
 
 }
@@ -1812,6 +1903,238 @@ async function clearModalSoldOut() {
   }
 
   closeMenuModal();
+  await loadMenus();
+
+}
+
+
+/* =========================
+   메뉴 / 카테고리 삭제
+========================= */
+
+async function deleteModalMenu() {
+
+  if (
+    modalMenuId === null ||
+    modalMenuId === undefined
+  ) {
+    return;
+  }
+
+  const menu =
+    getMenu(
+      modalMenuId
+    );
+
+  if (!menu) {
+    return;
+  }
+
+  if (
+    !confirm(
+      `"${menu.name || '메뉴'}" 메뉴를 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.`
+    )
+  ) {
+    return;
+  }
+
+  if (
+    !confirm(
+      '한 번 더 확인합니다.\n정말 삭제하시겠습니까?'
+    )
+  ) {
+    return;
+  }
+
+  const targetMenuId =
+    Number(
+      modalMenuId
+    );
+
+  showSaving(
+    '메뉴 삭제 중...'
+  );
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from('menus')
+      .delete()
+      .eq(
+        'id',
+        targetMenuId
+      );
+
+  if (error) {
+
+    console.error(
+      'DELETE MENU ERROR:',
+      error
+    );
+
+    hideSaving();
+
+    alert(
+      '메뉴 삭제에 실패했습니다.\n' +
+      (error.message || 'Supabase DELETE 오류')
+    );
+
+    return;
+  }
+
+  closeMenuModal();
+
+  showSaving(
+    '메뉴 삭제 완료'
+  );
+
+  setTimeout(
+    hideSaving,
+    700
+  );
+
+  await loadMenus();
+
+}
+
+
+async function deleteCategory(
+  category
+) {
+
+  const categoryName =
+    String(
+      category ||
+      ''
+    );
+
+  if (!categoryName) {
+    return;
+  }
+
+  const categoryMenus =
+    allMenus.filter(
+      menu =>
+        (menu.category || 'ETC') ===
+        categoryName
+    );
+
+  /* 아직 메뉴가 없는 새 카테고리 */
+  if (
+    !categoryMenus.length
+  ) {
+
+    tempCategories =
+      tempCategories.filter(
+        item =>
+          item !==
+          categoryName
+      );
+
+    categoryDraft =
+      categoryDraft.filter(
+        item =>
+          item !==
+          categoryName
+      );
+
+    if (
+      currentCategory ===
+      categoryName
+    ) {
+      currentCategory =
+        'all';
+    }
+
+    buildCategoryOrderList();
+    buildCategoryTabs();
+    renderSortList();
+    fillCategorySelect();
+
+    return;
+  }
+
+  if (
+    !confirm(
+      `"${categoryName}" 카테고리를 삭제하시겠습니까?\n\n이 카테고리에 포함된 메뉴 ${categoryMenus.length}개도 함께 삭제됩니다.`
+    )
+  ) {
+    return;
+  }
+
+  if (
+    !confirm(
+      '카테고리와 포함된 메뉴를 모두 삭제합니다.\n정말 진행하시겠습니까?'
+    )
+  ) {
+    return;
+  }
+
+  const menuIds =
+    categoryMenus.map(
+      menu =>
+        Number(
+          menu.id
+        )
+    );
+
+  showSaving(
+    '카테고리 삭제 중...'
+  );
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from('menus')
+      .delete()
+      .in(
+        'id',
+        menuIds
+      );
+
+  if (error) {
+
+    console.error(
+      'DELETE CATEGORY ERROR:',
+      error
+    );
+
+    hideSaving();
+
+    alert(
+      '카테고리 삭제에 실패했습니다.\n' +
+      (error.message || 'Supabase DELETE 오류')
+    );
+
+    return;
+  }
+
+  tempCategories =
+    tempCategories.filter(
+      item =>
+        item !==
+        categoryName
+    );
+
+  if (
+    currentCategory ===
+    categoryName
+  ) {
+    currentCategory =
+      'all';
+  }
+
+  showSaving(
+    '카테고리 삭제 완료'
+  );
+
+  setTimeout(
+    hideSaving,
+    700
+  );
+
   await loadMenus();
 
 }
