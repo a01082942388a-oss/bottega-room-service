@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>BOTTEGA 메뉴관리</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -17,124 +19,284 @@
       font-family: Arial, "Noto Sans KR", sans-serif;
     }
 
+    /* =========================================
+       전체 관리자 레이아웃
+    ========================================= */
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* =========================================
+       왼쪽 사이드바
+    ========================================= */
+
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: #161616;
+      color: #fff;
+
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+
+      padding: 28px 14px;
+
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 0 12px 26px;
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo h1 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 3px;
+    }
+
+    .sidebar-logo p {
+      margin: 7px 0 0;
+      color: #888;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .sidebar-section-title {
+      padding: 0 12px;
+      margin: 18px 0 8px;
+
+      color: #666;
+
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .sidebar-item {
+      width: 100%;
+
+      border: 0;
+      background: transparent;
+      color: #aaa;
+
+      padding: 12px 14px;
+
+      border-radius: 8px;
+
+      text-align: left;
+
+      font-size: 14px;
+      font-weight: bold;
+
+      cursor: pointer;
+
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .sidebar-item:hover {
+      background: #242424;
+      color: #fff;
+    }
+
+    .sidebar-item.active {
+      background: #fff;
+      color: #111;
+    }
+
+    .sidebar-dot {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: currentColor;
+
+      flex-shrink: 0;
+    }
+
+    .sidebar-coming {
+      margin-left: auto;
+
+      font-size: 9px;
+      font-weight: normal;
+
+      color: #777;
+    }
+
+    /* =========================================
+       오른쪽 본문
+    ========================================= */
+
+    .main-area {
+      flex: 1;
+
+      margin-left: 220px;
+
+      min-width: 0;
+    }
+
     header {
       background: #111;
       color: #fff;
-      padding: 28px 20px;
-      text-align: center;
+
+      padding: 28px 25px;
     }
 
     header h1 {
       margin: 0;
-      font-size: 24px;
-      letter-spacing: 3px;
+
+      font-size: 23px;
+
+      letter-spacing: 1px;
     }
 
     header p {
-      margin: 8px 0 0;
+      margin: 7px 0 0;
+
       color: #aaa;
-      font-size: 12px;
-      letter-spacing: 2px;
+
+      font-size: 11px;
+
+      letter-spacing: 1.5px;
     }
 
-    .top-nav {
-      max-width: 1100px;
-      margin: 18px auto 0;
-      padding: 0 16px;
-      display: flex;
-      gap: 8px;
-    }
-
-    .nav-button {
-      flex: 1;
-      border: 1px solid #ddd;
-      background: #fff;
-      border-radius: 10px;
-      padding: 13px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .nav-button.active {
-      background: #111;
-      color: #fff;
-      border-color: #111;
-    }
+    /* =========================================
+       본문
+    ========================================= */
 
     .container {
       max-width: 1100px;
-      margin: 15px auto 80px;
-      padding: 0 16px;
+
+      margin: 20px auto 80px;
+
+      padding: 0 18px;
     }
+
+    /* =========================================
+       요약
+    ========================================= */
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
       gap: 10px;
+
       margin-bottom: 15px;
     }
 
     .summary-box {
       background: #fff;
+
       border-radius: 10px;
+
       padding: 16px;
+
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.05);
     }
 
     .summary-number {
       display: block;
+
       font-size: 24px;
+
       font-weight: bold;
     }
 
     .summary-label {
       display: block;
+
       color: #777;
+
       font-size: 12px;
+
       margin-top: 5px;
     }
 
+    /* =========================================
+       검색 / 메뉴추가
+    ========================================= */
+
     .tool-box {
       background: #fff;
+
       border-radius: 12px;
+
       padding: 16px;
+
       margin-bottom: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.05);
     }
 
     .tool-row {
       display: flex;
+
       gap: 10px;
+
       flex-wrap: wrap;
     }
 
     .search-input {
       flex: 1;
+
       min-width: 220px;
+
       border: 1px solid #ddd;
+
       border-radius: 9px;
+
       padding: 12px;
+
       font-size: 14px;
     }
 
     .category-select {
       min-width: 170px;
+
       border: 1px solid #ddd;
+
       border-radius: 9px;
+
       padding: 12px;
+
       background: #fff;
+
       font-size: 14px;
     }
 
     .refresh-button,
     .add-menu-button {
       border: 0;
+
       color: #fff;
+
       padding: 12px 18px;
+
       border-radius: 9px;
+
       font-weight: bold;
+
       cursor: pointer;
     }
 
@@ -146,12 +308,55 @@
       background: #24753d;
     }
 
+    /* =========================================
+       신규 메뉴
+    ========================================= */
+
+    .new-menu-box {
+      display: none;
+
+      background: #fff;
+
+      border-radius: 12px;
+
+      padding: 18px;
+
+      margin-bottom: 15px;
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.05);
+
+      border: 2px solid #dcecdf;
+    }
+
+    .new-menu-box.show {
+      display: block;
+    }
+
+    .new-menu-title {
+      font-size: 18px;
+
+      font-weight: bold;
+
+      margin-bottom: 15px;
+    }
+
+    /* =========================================
+       메뉴카드
+    ========================================= */
+
     .menu-card {
       background: #fff;
+
       border-radius: 12px;
+
       padding: 18px;
+
       margin-bottom: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+
+      box-shadow:
+        0 2px 10px rgba(0,0,0,0.05);
+
       border: 2px solid transparent;
     }
 
@@ -161,63 +366,90 @@
 
     .menu-card.hidden-menu {
       opacity: 0.65;
+
       border-color: #bbb;
     }
 
     .menu-top {
       display: flex;
+
       justify-content: space-between;
+
       gap: 15px;
+
       align-items: flex-start;
+
       padding-bottom: 14px;
+
       border-bottom: 1px solid #eee;
+
       margin-bottom: 15px;
     }
 
     .menu-title {
       font-size: 18px;
+
       font-weight: bold;
     }
 
     .menu-id {
       font-size: 11px;
+
       color: #999;
+
       margin-top: 5px;
     }
 
     .status-wrap {
       display: flex;
+
       gap: 6px;
+
       flex-wrap: wrap;
+
       justify-content: flex-end;
     }
 
     .status-badge {
       padding: 7px 11px;
+
       border-radius: 20px;
+
       font-size: 12px;
+
       font-weight: bold;
+
       white-space: nowrap;
     }
 
     .available {
       background: #e8f7ed;
+
       color: #24753d;
     }
 
     .unavailable {
       background: #fff1d6;
+
       color: #8a5900;
     }
 
     .hidden-badge {
       background: #eee;
+
       color: #555;
     }
 
+    /* =========================================
+       수정폼
+    ========================================= */
+
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr 180px 180px;
+
+      grid-template-columns:
+        1fr 180px 180px;
+
       gap: 12px;
     }
 
@@ -231,45 +463,72 @@
 
     .form-group label {
       display: block;
+
       font-size: 12px;
+
       font-weight: bold;
+
       margin-bottom: 6px;
+
       color: #555;
     }
 
     .form-group input,
     .form-group textarea {
       width: 100%;
+
       border: 1px solid #ddd;
+
       border-radius: 8px;
+
       padding: 11px;
+
       font-size: 14px;
+
       font-family: inherit;
+
       background: #fff;
     }
 
     .form-group textarea {
       resize: vertical;
+
       min-height: 75px;
     }
 
+    /* =========================================
+       번역 수정
+    ========================================= */
+
     .translation-toggle {
       width: 100%;
+
       margin-top: 13px;
+
       padding: 11px;
+
       border: 1px solid #ddd;
+
       background: #fafafa;
+
       border-radius: 8px;
+
       cursor: pointer;
+
       font-weight: bold;
+
       font-size: 13px;
     }
 
     .translation-area {
       display: none;
+
       margin-top: 13px;
+
       padding: 15px;
+
       background: #f8f8f8;
+
       border-radius: 9px;
     }
 
@@ -279,7 +538,9 @@
 
     .language-title {
       margin: 15px 0 9px;
+
       font-size: 13px;
+
       font-weight: bold;
     }
 
@@ -287,114 +548,206 @@
       margin-top: 0;
     }
 
+    /* =========================================
+       품절
+    ========================================= */
+
     .soldout-info {
-      margin-top: 12px;
+      margin-bottom: 14px;
+
       padding: 11px 12px;
+
       border-radius: 8px;
+
       background: #fff8e8;
+
       color: #805500;
+
       font-size: 12px;
+
       line-height: 1.6;
     }
 
+    /* =========================================
+       버튼
+    ========================================= */
+
     .button-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
       gap: 8px;
+
       margin-top: 12px;
     }
 
     .button-grid-3 {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
       gap: 8px;
+
       margin-top: 8px;
     }
 
     .action-button {
       border: 0;
+
       border-radius: 9px;
+
       padding: 12px;
+
       font-size: 13px;
+
       font-weight: bold;
+
       cursor: pointer;
     }
 
     .save-button {
       background: #111;
+
       color: #fff;
     }
 
     .hide-button {
       background: #eee;
+
       color: #333;
     }
 
     .delete-button {
       background: #fff0f0;
+
       color: #a33;
     }
 
     .soldout-button {
       background: #fff4da;
+
       color: #805500;
     }
 
     .resume-button {
       background: #e8f7ed;
+
       color: #24753d;
     }
 
-    .new-menu-box {
-      display: none;
-      background: #fff;
-      border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 2px solid #dcecdf;
+    button:disabled {
+      opacity: 0.5;
+
+      cursor: not-allowed;
     }
 
-    .new-menu-box.show {
-      display: block;
-    }
-
-    .new-menu-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
+    /* =========================================
+       기타
+    ========================================= */
 
     .empty {
       background: #fff;
+
       padding: 60px 20px;
+
       text-align: center;
+
       border-radius: 12px;
+
       color: #777;
     }
 
     .saving {
       position: fixed;
-      left: 50%;
+
+      left: calc(50% + 110px);
+
       bottom: 20px;
+
       transform: translateX(-50%);
+
       background: #111;
+
       color: #fff;
+
       padding: 12px 18px;
+
       border-radius: 30px;
+
       font-size: 13px;
+
       display: none;
+
       z-index: 999;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.25);
     }
 
     .saving.show {
       display: block;
     }
 
-    @media (max-width: 700px) {
+    /* =========================================
+       모바일
+    ========================================= */
+
+    @media (
+      max-width: 800px
+    ) {
+
+      .admin-layout {
+        display: block;
+      }
+
+      .sidebar {
+        position: relative;
+
+        width: 100%;
+        min-width: 0;
+
+        padding: 15px;
+
+        bottom: auto;
+      }
+
+      .sidebar-logo {
+        padding:
+          3px 6px 13px;
+
+        margin-bottom: 10px;
+      }
+
+      .sidebar-menu {
+        flex-direction: row;
+
+        overflow-x: auto;
+      }
+
+      .sidebar-item {
+        width: auto;
+
+        white-space: nowrap;
+      }
+
+      .sidebar-section-title {
+        display: none;
+      }
+
+      .main-area {
+        margin-left: 0;
+      }
+
+      .saving {
+        left: 50%;
+      }
+
       .summary {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+          repeat(2, 1fr);
       }
 
       .form-grid {
@@ -409,179 +762,389 @@
       .button-grid-3 {
         grid-template-columns: 1fr;
       }
+
     }
+
   </style>
+
 </head>
 
 <body>
 
-<header>
-  <h1>BOTTEGA</h1>
-  <p>ROOM SERVICE · MENU MANAGEMENT</p>
-</header>
+<div class="admin-layout">
 
-<div class="top-nav">
-  <button
-    class="nav-button"
-    onclick="location.href='admin.html'"
-  >
-    주문관리
-  </button>
 
-  <button class="nav-button active">
-    메뉴관리
-  </button>
+  <!-- =====================================
+       왼쪽 관리자 메뉴
+  ====================================== -->
+
+  <aside class="sidebar">
+
+    <div class="sidebar-logo">
+
+      <h1>
+        BOTTEGA
+      </h1>
+
+      <p>
+        ADMIN
+      </p>
+
+    </div>
+
+
+    <div class="sidebar-section-title">
+      MANAGEMENT
+    </div>
+
+
+    <div class="sidebar-menu">
+
+      <button
+        class="sidebar-item"
+        onclick="window.location.href='./admin.html?v=2'"
+      >
+
+        <span class="sidebar-dot"></span>
+
+        주문관리
+
+      </button>
+
+
+      <button
+        class="sidebar-item active"
+      >
+
+        <span class="sidebar-dot"></span>
+
+        메뉴관리
+
+      </button>
+
+
+      <button
+        class="sidebar-item"
+        onclick="alert('매출관리 기능은 다음 단계에서 추가합니다.')"
+      >
+
+        <span class="sidebar-dot"></span>
+
+        매출관리
+
+        <span class="sidebar-coming">
+          예정
+        </span>
+
+      </button>
+
+
+      <button
+        class="sidebar-item"
+        onclick="alert('운영설정 기능은 다음 단계에서 추가합니다.')"
+      >
+
+        <span class="sidebar-dot"></span>
+
+        운영설정
+
+        <span class="sidebar-coming">
+          예정
+        </span>
+
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =====================================
+       오른쪽 영역
+  ====================================== -->
+
+  <div class="main-area">
+
+
+    <header>
+
+      <h1>
+        메뉴관리
+      </h1>
+
+      <p>
+        ROOM SERVICE · MENU MANAGEMENT
+      </p>
+
+    </header>
+
+
+    <div class="container">
+
+
+      <!-- =================================
+           요약
+      ================================== -->
+
+      <div class="summary">
+
+
+        <div class="summary-box">
+
+          <span
+            class="summary-number"
+            id="total-count"
+          >
+            0
+          </span>
+
+          <span class="summary-label">
+            전체 메뉴
+          </span>
+
+        </div>
+
+
+        <div class="summary-box">
+
+          <span
+            class="summary-number"
+            id="available-count"
+          >
+            0
+          </span>
+
+          <span class="summary-label">
+            판매 가능
+          </span>
+
+        </div>
+
+
+        <div class="summary-box">
+
+          <span
+            class="summary-number"
+            id="soldout-count"
+          >
+            0
+          </span>
+
+          <span class="summary-label">
+            품절
+          </span>
+
+        </div>
+
+
+        <div class="summary-box">
+
+          <span
+            class="summary-number"
+            id="hidden-count"
+          >
+            0
+          </span>
+
+          <span class="summary-label">
+            숨김
+          </span>
+
+        </div>
+
+
+      </div>
+
+
+      <!-- =================================
+           검색
+      ================================== -->
+
+      <div class="tool-box">
+
+        <div class="tool-row">
+
+
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="메뉴명 검색"
+          >
+
+
+          <select
+            id="category-filter"
+            class="category-select"
+          >
+
+            <option value="all">
+              전체 카테고리
+            </option>
+
+          </select>
+
+
+          <button
+            class="add-menu-button"
+            onclick="toggleNewMenuBox()"
+          >
+            + 새 메뉴 추가
+          </button>
+
+
+          <button
+            class="refresh-button"
+            onclick="loadMenus()"
+          >
+            새로고침
+          </button>
+
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================
+           신규 메뉴 추가
+      ================================== -->
+
+      <div
+        class="new-menu-box"
+        id="new-menu-box"
+      >
+
+        <div class="new-menu-title">
+          새 메뉴 추가
+        </div>
+
+
+        <div class="form-grid">
+
+
+          <div class="form-group">
+
+            <label>
+              메뉴명
+            </label>
+
+            <input
+              type="text"
+              id="new-name"
+              placeholder="메뉴명"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              가격
+            </label>
+
+            <input
+              type="number"
+              id="new-price"
+              min="0"
+              step="100"
+              placeholder="0"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              카테고리
+            </label>
+
+            <input
+              type="text"
+              id="new-category"
+              placeholder="PASTA"
+            >
+
+          </div>
+
+
+          <div class="form-group full">
+
+            <label>
+              설명
+            </label>
+
+            <textarea
+              id="new-description"
+              placeholder="메뉴 설명"
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              표시 순서
+            </label>
+
+            <input
+              type="number"
+              id="new-sort-order"
+              min="0"
+              value="0"
+            >
+
+          </div>
+
+
+        </div>
+
+
+        <div class="button-grid">
+
+
+          <button
+            class="action-button save-button"
+            onclick="addNewMenu()"
+          >
+            메뉴 추가
+          </button>
+
+
+          <button
+            class="action-button hide-button"
+            onclick="toggleNewMenuBox()"
+          >
+            취소
+          </button>
+
+
+        </div>
+
+
+      </div>
+
+
+      <div id="menu-list">
+
+        <div class="empty">
+          메뉴를 불러오는 중입니다.
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
 </div>
 
-<div class="container">
-
-  <div class="summary">
-
-    <div class="summary-box">
-      <span class="summary-number" id="total-count">0</span>
-      <span class="summary-label">전체 메뉴</span>
-    </div>
-
-    <div class="summary-box">
-      <span class="summary-number" id="available-count">0</span>
-      <span class="summary-label">판매 가능</span>
-    </div>
-
-    <div class="summary-box">
-      <span class="summary-number" id="soldout-count">0</span>
-      <span class="summary-label">품절</span>
-    </div>
-
-    <div class="summary-box">
-      <span class="summary-number" id="hidden-count">0</span>
-      <span class="summary-label">숨김</span>
-    </div>
-
-  </div>
-
-  <div class="tool-box">
-
-    <div class="tool-row">
-
-      <input
-        type="text"
-        id="search-input"
-        class="search-input"
-        placeholder="메뉴명 검색"
-      >
-
-      <select
-        id="category-filter"
-        class="category-select"
-      >
-        <option value="all">전체 카테고리</option>
-      </select>
-
-      <button
-        class="add-menu-button"
-        onclick="toggleNewMenuBox()"
-      >
-        + 새 메뉴 추가
-      </button>
-
-      <button
-        class="refresh-button"
-        onclick="loadMenus()"
-      >
-        새로고침
-      </button>
-
-    </div>
-
-  </div>
-
-  <div
-    class="new-menu-box"
-    id="new-menu-box"
-  >
-
-    <div class="new-menu-title">
-      새 메뉴 추가
-    </div>
-
-    <div class="form-grid">
-
-      <div class="form-group">
-        <label>메뉴명</label>
-        <input
-          type="text"
-          id="new-name"
-          placeholder="메뉴명"
-        >
-      </div>
-
-      <div class="form-group">
-        <label>가격</label>
-        <input
-          type="number"
-          id="new-price"
-          min="0"
-          step="100"
-          placeholder="0"
-        >
-      </div>
-
-      <div class="form-group">
-        <label>카테고리</label>
-        <input
-          type="text"
-          id="new-category"
-          placeholder="PASTA"
-        >
-      </div>
-
-      <div class="form-group full">
-        <label>설명</label>
-        <textarea
-          id="new-description"
-          placeholder="메뉴 설명"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>표시 순서</label>
-        <input
-          type="number"
-          id="new-sort-order"
-          min="0"
-          value="0"
-        >
-      </div>
-
-    </div>
-
-    <div class="button-grid">
-
-      <button
-        class="action-button save-button"
-        onclick="addNewMenu()"
-      >
-        메뉴 추가
-      </button>
-
-      <button
-        class="action-button hide-button"
-        onclick="toggleNewMenuBox()"
-      >
-        취소
-      </button>
-
-    </div>
-
-  </div>
-
-  <div id="menu-list">
-    <div class="empty">
-      메뉴를 불러오는 중입니다.
-    </div>
-  </div>
-
-</div>
 
 <div
   class="saving"
@@ -590,15 +1153,19 @@
   저장 중...
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <script>
 
   const SUPABASE_URL =
     'https://yookspgooyewhnkobckw.supabase.co';
 
+
   const SUPABASE_KEY =
     'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
 
   const supabaseClient =
     supabase.createClient(
@@ -606,43 +1173,89 @@
       SUPABASE_KEY
     );
 
-  let allMenus = [];
-  let isSaving = false;
+
+  let allMenus =
+    [];
 
 
-  function isTimedSoldOut(menu) {
+  let isSaving =
+    false;
 
-    if (!menu.sold_out_until) {
+
+  /* =========================================
+     기간제 품절 확인
+  ========================================= */
+
+  function isTimedSoldOut(
+    menu
+  ) {
+
+    if (
+      !menu.sold_out_until
+    ) {
+
       return false;
+
     }
+
 
     const until =
       new Date(
         menu.sold_out_until
       ).getTime();
 
+
     return (
-      Number.isFinite(until) &&
-      until > Date.now()
+      Number.isFinite(
+        until
+      ) &&
+      until >
+      Date.now()
     );
+
   }
 
 
-  function isMenuAvailable(menu) {
+  /* =========================================
+     판매가능 여부
+  ========================================= */
 
-    if (menu.is_hidden === true) {
+  function isMenuAvailable(
+    menu
+  ) {
+
+    if (
+      menu.is_hidden ===
+      true
+    ) {
+
       return false;
+
     }
 
-    if (isTimedSoldOut(menu)) {
+
+    if (
+      isTimedSoldOut(
+        menu
+      )
+    ) {
+
       return false;
+
     }
+
 
     return (
-      menu.is_available !== false
+      menu.is_available !==
+      false
     );
+
   }
 
+
+  /* =========================================
+     기간 지난 품절 자동해제
+  ========================================= */
 
   async function clearExpiredSoldOut() {
 
@@ -651,163 +1264,272 @@
         .filter(
           menu => {
 
-            if (!menu.sold_out_until) {
+
+            if (
+              !menu.sold_out_until
+            ) {
+
               return false;
+
             }
+
 
             const until =
               new Date(
                 menu.sold_out_until
               ).getTime();
 
+
             return (
-              Number.isFinite(until) &&
-              until <= Date.now()
+              Number.isFinite(
+                until
+              ) &&
+              until <=
+              Date.now()
             );
+
           }
         )
         .map(
           menu =>
-            Number(menu.id)
+            Number(
+              menu.id
+            )
         );
 
-    if (!expiredIds.length) {
+
+    if (
+      !expiredIds.length
+    ) {
+
       return;
+
     }
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .update({
-          is_available: true,
-          sold_out_until: null
+
+          is_available:
+            true,
+
+          sold_out_until:
+            null
+
         })
         .in(
           'id',
           expiredIds
         );
 
-    if (error) {
+
+    if (
+      error
+    ) {
+
       console.error(
         'EXPIRED SOLDOUT CLEAR ERROR:',
         error
       );
+
     }
+
   }
 
+
+  /* =========================================
+     메뉴 불러오기
+  ========================================= */
 
   async function loadMenus() {
 
     document
-      .getElementById('menu-list')
+      .getElementById(
+        'menu-list'
+      )
       .innerHTML =
       '<div class="empty">메뉴를 불러오는 중입니다.</div>';
 
-    const { data, error } =
+
+    const {
+      data,
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .select('*')
         .order(
           'sort_order',
           {
-            ascending: true
+            ascending:
+              true
           }
         );
 
-    if (error) {
 
-      console.error(error);
+    if (
+      error
+    ) {
+
+      console.error(
+        error
+      );
+
 
       document
-        .getElementById('menu-list')
+        .getElementById(
+          'menu-list'
+        )
         .innerHTML =
         '<div class="empty">메뉴를 불러오지 못했습니다.</div>';
 
+
       return;
+
     }
 
+
     allMenus =
-      data || [];
+      data ||
+      [];
+
 
     await clearExpiredSoldOut();
 
-    const { data: refreshedData } =
+
+    const {
+      data:
+        refreshedData
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .select('*')
         .order(
           'sort_order',
           {
-            ascending: true
+            ascending:
+              true
           }
         );
 
-    if (refreshedData) {
+
+    if (
+      refreshedData
+    ) {
+
       allMenus =
         refreshedData;
+
     }
 
+
     updateSummary();
+
     buildCategoryFilter();
+
     applyFilters();
+
   }
 
+
+  /* =========================================
+     요약
+  ========================================= */
 
   function updateSummary() {
 
     const total =
       allMenus.length;
 
+
     const hidden =
       allMenus.filter(
         menu =>
-          menu.is_hidden === true
+          menu.is_hidden ===
+          true
       ).length;
+
 
     const soldout =
       allMenus.filter(
         menu =>
-          menu.is_hidden !== true &&
-          !isMenuAvailable(menu)
+          menu.is_hidden !==
+          true &&
+          !isMenuAvailable(
+            menu
+          )
       ).length;
+
 
     const available =
       allMenus.filter(
         menu =>
-          isMenuAvailable(menu)
+          isMenuAvailable(
+            menu
+          )
       ).length;
 
+
     document
-      .getElementById('total-count')
+      .getElementById(
+        'total-count'
+      )
       .textContent =
       total;
 
+
     document
-      .getElementById('available-count')
+      .getElementById(
+        'available-count'
+      )
       .textContent =
       available;
 
+
     document
-      .getElementById('soldout-count')
+      .getElementById(
+        'soldout-count'
+      )
       .textContent =
       soldout;
 
+
     document
-      .getElementById('hidden-count')
+      .getElementById(
+        'hidden-count'
+      )
       .textContent =
       hidden;
+
   }
 
+
+  /* =========================================
+     카테고리
+  ========================================= */
 
   function buildCategoryFilter() {
 
     const select =
-      document.getElementById(
-        'category-filter'
-      );
+      document
+        .getElementById(
+          'category-filter'
+        );
+
 
     const current =
       select.value;
+
 
     const categories =
       [
@@ -817,9 +1539,12 @@
               menu =>
                 menu.category
             )
-            .filter(Boolean)
+            .filter(
+              Boolean
+            )
         )
       ];
+
 
     select.innerHTML = `
 
@@ -845,16 +1570,24 @@
 
     `;
 
+
     if (
       categories.includes(
         current
       )
     ) {
+
       select.value =
         current;
+
     }
+
   }
 
+
+  /* =========================================
+     검색/필터
+  ========================================= */
 
   function applyFilters() {
 
@@ -867,6 +1600,7 @@
         .trim()
         .toLowerCase();
 
+
     const category =
       document
         .getElementById(
@@ -874,120 +1608,188 @@
         )
         .value;
 
+
     const filtered =
       allMenus.filter(
         menu => {
 
+
           const name =
             String(
-              menu.name || ''
-            ).toLowerCase();
+              menu.name ||
+              ''
+            )
+              .toLowerCase();
+
 
           const nameEn =
             String(
-              menu.name_en || ''
-            ).toLowerCase();
+              menu.name_en ||
+              ''
+            )
+              .toLowerCase();
+
 
           const matchKeyword =
             !keyword ||
-            name.includes(keyword) ||
-            nameEn.includes(keyword);
+            name.includes(
+              keyword
+            ) ||
+            nameEn.includes(
+              keyword
+            );
+
 
           const matchCategory =
-            category === 'all' ||
-            menu.category === category;
+            category ===
+            'all' ||
+            menu.category ===
+            category;
+
 
           return (
             matchKeyword &&
             matchCategory
           );
+
         }
       );
+
 
     renderMenus(
       filtered
     );
+
   }
 
 
-  function renderMenus(menus) {
+  /* =========================================
+     메뉴카드
+  ========================================= */
+
+  function renderMenus(
+    menus
+  ) {
 
     const menuList =
-      document.getElementById(
-        'menu-list'
-      );
+      document
+        .getElementById(
+          'menu-list'
+        );
 
-    if (!menus.length) {
+
+    if (
+      !menus.length
+    ) {
 
       menuList.innerHTML =
         '<div class="empty">해당 메뉴가 없습니다.</div>';
 
       return;
+
     }
+
 
     menuList.innerHTML =
       menus
         .map(
           menu => {
 
+
             const hidden =
-              menu.is_hidden === true;
+              menu.is_hidden ===
+              true;
+
 
             const timedSoldOut =
-              isTimedSoldOut(menu);
+              isTimedSoldOut(
+                menu
+              );
+
 
             const available =
-              isMenuAvailable(menu);
+              isMenuAvailable(
+                menu
+              );
+
 
             const cardClass =
               hidden
+
                 ? 'hidden-menu'
+
                 : (
                     available
+
                       ? ''
+
                       : 'soldout'
                   );
+
 
             let soldOutText =
               '';
 
-            if (timedSoldOut) {
+
+            if (
+              timedSoldOut
+            ) {
 
               soldOutText =
                 `품절 해제 예정 · ${formatDateTime(menu.sold_out_until)}`;
+
             }
+
 
             return `
 
               <div class="menu-card ${cardClass}">
 
+
                 <div class="menu-top">
 
+
                   <div>
+
 
                     <div class="menu-title">
                       ${escapeHtml(menu.name || '메뉴')}
                     </div>
 
+
                     <div class="menu-id">
+
                       ID ${Number(menu.id)}
+
                       ·
+
                       ${escapeHtml(menu.category || '-')}
+
                     </div>
+
 
                   </div>
 
+
                   <div class="status-wrap">
+
 
                     ${
                       hidden
+
                         ? `
-                          <span class="status-badge hidden-badge">
+
+                          <span
+                            class="status-badge hidden-badge"
+                          >
                             숨김
                           </span>
+
                         `
+
                         : ''
                     }
+
 
                     <span
                       class="status-badge ${
@@ -996,42 +1798,61 @@
                           : 'unavailable'
                       }"
                     >
+
                       ${
                         available
                           ? '판매중'
                           : '품절'
                       }
+
                     </span>
 
+
                   </div>
+
 
                 </div>
 
 
                 ${
                   soldOutText
+
                     ? `
+
                       <div class="soldout-info">
                         ${escapeHtml(soldOutText)}
                       </div>
+
                     `
+
                     : ''
                 }
 
 
                 <div class="form-grid">
 
+
                   <div class="form-group">
-                    <label>메뉴명</label>
+
+                    <label>
+                      메뉴명
+                    </label>
+
                     <input
                       type="text"
                       id="name-${Number(menu.id)}"
                       value="${escapeAttribute(menu.name || '')}"
                     >
+
                   </div>
 
+
                   <div class="form-group">
-                    <label>가격</label>
+
+                    <label>
+                      가격
+                    </label>
+
                     <input
                       type="number"
                       id="price-${Number(menu.id)}"
@@ -1039,33 +1860,53 @@
                       min="0"
                       step="100"
                     >
+
                   </div>
 
+
                   <div class="form-group">
-                    <label>카테고리</label>
+
+                    <label>
+                      카테고리
+                    </label>
+
                     <input
                       type="text"
                       id="category-${Number(menu.id)}"
                       value="${escapeAttribute(menu.category || '')}"
                     >
+
                   </div>
 
+
                   <div class="form-group full">
-                    <label>메뉴 설명</label>
+
+                    <label>
+                      메뉴 설명
+                    </label>
+
                     <textarea
                       id="description-${Number(menu.id)}"
                     >${escapeHtml(menu.description || '')}</textarea>
+
                   </div>
 
+
                   <div class="form-group">
-                    <label>표시 순서</label>
+
+                    <label>
+                      표시 순서
+                    </label>
+
                     <input
                       type="number"
                       id="sort-${Number(menu.id)}"
                       value="${Number(menu.sort_order || 0)}"
                       min="0"
                     >
+
                   </div>
+
 
                 </div>
 
@@ -1083,24 +1924,37 @@
                   id="translation-${Number(menu.id)}"
                 >
 
+
                   <div class="language-title">
                     English
                   </div>
 
+
                   <div class="form-group">
-                    <label>메뉴명</label>
+
+                    <label>
+                      메뉴명
+                    </label>
+
                     <input
                       type="text"
                       id="name-en-${Number(menu.id)}"
                       value="${escapeAttribute(menu.name_en || '')}"
                     >
+
                   </div>
 
+
                   <div class="form-group">
-                    <label>설명</label>
+
+                    <label>
+                      설명
+                    </label>
+
                     <textarea
                       id="description-en-${Number(menu.id)}"
                     >${escapeHtml(menu.description_en || '')}</textarea>
+
                   </div>
 
 
@@ -1108,20 +1962,32 @@
                     日本語
                   </div>
 
+
                   <div class="form-group">
-                    <label>메뉴명</label>
+
+                    <label>
+                      메뉴명
+                    </label>
+
                     <input
                       type="text"
                       id="name-ja-${Number(menu.id)}"
                       value="${escapeAttribute(menu.name_ja || '')}"
                     >
+
                   </div>
 
+
                   <div class="form-group">
-                    <label>설명</label>
+
+                    <label>
+                      설명
+                    </label>
+
                     <textarea
                       id="description-ja-${Number(menu.id)}"
                     >${escapeHtml(menu.description_ja || '')}</textarea>
+
                   </div>
 
 
@@ -1129,26 +1995,40 @@
                     中文
                   </div>
 
+
                   <div class="form-group">
-                    <label>메뉴명</label>
+
+                    <label>
+                      메뉴명
+                    </label>
+
                     <input
                       type="text"
                       id="name-zh-${Number(menu.id)}"
                       value="${escapeAttribute(menu.name_zh || '')}"
                     >
+
                   </div>
 
+
                   <div class="form-group">
-                    <label>설명</label>
+
+                    <label>
+                      설명
+                    </label>
+
                     <textarea
                       id="description-zh-${Number(menu.id)}"
                     >${escapeHtml(menu.description_zh || '')}</textarea>
+
                   </div>
+
 
                 </div>
 
 
                 <div class="button-grid">
+
 
                   <button
                     class="action-button save-button"
@@ -1157,6 +2037,7 @@
                     수정내용 저장
                   </button>
 
+
                   <button
                     class="action-button hide-button"
                     onclick="toggleHidden(
@@ -1164,20 +2045,26 @@
                       ${hidden ? 'false' : 'true'}
                     )"
                   >
+
                     ${
                       hidden
                         ? '숨김 해제'
                         : '숨김'
                     }
+
                   </button>
+
 
                 </div>
 
 
                 ${
                   available
+
                     ? `
+
                       <div class="button-grid-3">
+
 
                         <button
                           class="action-button soldout-button"
@@ -1186,12 +2073,14 @@
                           품절 1일
                         </button>
 
+
                         <button
                           class="action-button soldout-button"
                           onclick="setTimedSoldOut(${Number(menu.id)}, 3)"
                         >
                           품절 3일
                         </button>
+
 
                         <button
                           class="action-button soldout-button"
@@ -1200,10 +2089,15 @@
                           품절 1주
                         </button>
 
+
                       </div>
+
                     `
+
                     : `
+
                       <div class="button-grid">
+
 
                         <button
                           class="action-button resume-button"
@@ -1212,6 +2106,7 @@
                           품절 해제
                         </button>
 
+
                         <button
                           class="action-button delete-button"
                           onclick="deleteMenu(${Number(menu.id)})"
@@ -1219,25 +2114,34 @@
                           메뉴 삭제
                         </button>
 
+
                       </div>
+
                     `
                 }
 
 
                 ${
                   available
+
                     ? `
+
                       <div class="button-grid">
+
                         <button
                           class="action-button delete-button"
                           onclick="deleteMenu(${Number(menu.id)})"
                         >
                           메뉴 삭제
                         </button>
+
                       </div>
+
                     `
+
                     : ''
                 }
+
 
               </div>
 
@@ -1246,19 +2150,33 @@
           }
         )
         .join('');
+
   }
 
 
-  function toggleTranslations(menuId) {
+  /* =========================================
+     번역창
+  ========================================= */
+
+  function toggleTranslations(
+    menuId
+  ) {
 
     document
       .getElementById(
         `translation-${menuId}`
       )
       .classList
-      .toggle('show');
+      .toggle(
+        'show'
+      );
+
   }
 
+
+  /* =========================================
+     신규메뉴창
+  ========================================= */
 
   function toggleNewMenuBox() {
 
@@ -1267,15 +2185,27 @@
         'new-menu-box'
       )
       .classList
-      .toggle('show');
+      .toggle(
+        'show'
+      );
+
   }
 
 
+  /* =========================================
+     메뉴 추가
+  ========================================= */
+
   async function addNewMenu() {
 
-    if (isSaving) {
+    if (
+      isSaving
+    ) {
+
       return;
+
     }
+
 
     const name =
       document
@@ -1284,6 +2214,7 @@
         )
         .value
         .trim();
+
 
     const price =
       Number(
@@ -1294,6 +2225,7 @@
           .value
       );
 
+
     const category =
       document
         .getElementById(
@@ -1302,6 +2234,7 @@
         .value
         .trim();
 
+
     const description =
       document
         .getElementById(
@@ -1309,6 +2242,7 @@
         )
         .value
         .trim();
+
 
     const sortOrder =
       Number(
@@ -1319,115 +2253,204 @@
           .value
       );
 
-    if (!name) {
-      alert('메뉴명을 입력해주세요.');
-      return;
-    }
 
     if (
-      !Number.isFinite(price) ||
-      price < 0
+      !name
     ) {
-      alert('가격을 확인해주세요.');
+
+      alert(
+        '메뉴명을 입력해주세요.'
+      );
+
       return;
+
     }
+
+
+    if (
+      !Number.isFinite(
+        price
+      ) ||
+      price <
+      0
+    ) {
+
+      alert(
+        '가격을 확인해주세요.'
+      );
+
+      return;
+
+    }
+
 
     isSaving =
       true;
+
 
     showSaving(
       '메뉴 추가 중...'
     );
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .insert({
-          name: name,
-          price: price,
-          category: category,
-          description: description,
+
+          name:
+            name,
+
+          price:
+            price,
+
+          category:
+            category,
+
+          description:
+            description,
+
           sort_order:
-            Number.isFinite(sortOrder)
+            Number.isFinite(
+              sortOrder
+            )
+
               ? sortOrder
+
               : 0,
-          is_available: true,
-          is_hidden: false,
-          sold_out_until: null
+
+          is_available:
+            true,
+
+          is_hidden:
+            false,
+
+          sold_out_until:
+            null
+
         });
 
-    if (error) {
+
+    if (
+      error
+    ) {
 
       console.error(
         'ADD MENU ERROR:',
         error
       );
 
+
       hideSaving();
-      isSaving = false;
+
+
+      isSaving =
+        false;
+
 
       alert(
         '메뉴 추가에 실패했습니다.'
       );
 
+
       return;
+
     }
+
 
     showSaving(
       '메뉴 추가 완료'
     );
 
+
     document
       .getElementById(
         'new-name'
-      ).value = '';
+      )
+      .value =
+      '';
+
 
     document
       .getElementById(
         'new-price'
-      ).value = '';
+      )
+      .value =
+      '';
+
 
     document
       .getElementById(
         'new-category'
-      ).value = '';
+      )
+      .value =
+      '';
+
 
     document
       .getElementById(
         'new-description'
-      ).value = '';
+      )
+      .value =
+      '';
+
 
     document
       .getElementById(
         'new-sort-order'
-      ).value = '0';
+      )
+      .value =
+      '0';
+
 
     document
       .getElementById(
         'new-menu-box'
       )
       .classList
-      .remove('show');
+      .remove(
+        'show'
+      );
+
 
     isSaving =
       false;
+
 
     setTimeout(
       hideSaving,
       800
     );
 
+
     await loadMenus();
+
   }
 
 
-  async function saveMenu(menuId) {
+  /* =========================================
+     메뉴 저장
+  ========================================= */
 
-    if (isSaving) {
+  async function saveMenu(
+    menuId
+  ) {
+
+    if (
+      isSaving
+    ) {
+
       return;
+
     }
 
+
     const updateData = {
+
 
       name:
         document
@@ -1436,6 +2459,7 @@
           )
           .value
           .trim(),
+
 
       price:
         Number(
@@ -1446,6 +2470,7 @@
             .value
         ),
 
+
       category:
         document
           .getElementById(
@@ -1454,6 +2479,7 @@
           .value
           .trim(),
 
+
       description:
         document
           .getElementById(
@@ -1461,6 +2487,7 @@
           )
           .value
           .trim(),
+
 
       sort_order:
         Number(
@@ -1471,6 +2498,7 @@
             .value
         ),
 
+
       name_en:
         document
           .getElementById(
@@ -1478,6 +2506,7 @@
           )
           .value
           .trim(),
+
 
       description_en:
         document
@@ -1487,6 +2516,7 @@
           .value
           .trim(),
 
+
       name_ja:
         document
           .getElementById(
@@ -1494,6 +2524,7 @@
           )
           .value
           .trim(),
+
 
       description_ja:
         document
@@ -1503,6 +2534,7 @@
           .value
           .trim(),
 
+
       name_zh:
         document
           .getElementById(
@@ -1510,6 +2542,7 @@
           )
           .value
           .trim(),
+
 
       description_zh:
         document
@@ -1521,30 +2554,53 @@
 
     };
 
-    if (!updateData.name) {
-      alert('메뉴명을 입력해주세요.');
+
+    if (
+      !updateData.name
+    ) {
+
+      alert(
+        '메뉴명을 입력해주세요.'
+      );
+
       return;
+
     }
+
 
     if (
       !Number.isFinite(
         updateData.price
       ) ||
-      updateData.price < 0
+      updateData.price <
+      0
     ) {
-      alert('가격을 확인해주세요.');
+
+      alert(
+        '가격을 확인해주세요.'
+      );
+
       return;
+
     }
 
-    isSaving = true;
+
+    isSaving =
+      true;
+
 
     showSaving(
       '저장 중...'
     );
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .update(
           updateData
         )
@@ -1553,272 +2609,448 @@
           menuId
         );
 
-    if (error) {
+
+    if (
+      error
+    ) {
 
       console.error(
         'MENU UPDATE ERROR:',
         error
       );
 
+
       hideSaving();
-      isSaving = false;
+
+
+      isSaving =
+        false;
+
 
       alert(
         '메뉴 수정에 실패했습니다.'
       );
 
+
       return;
+
     }
+
 
     showSaving(
       '저장 완료'
     );
 
-    isSaving = false;
+
+    isSaving =
+      false;
+
 
     setTimeout(
       hideSaving,
       800
     );
 
+
     await loadMenus();
+
   }
 
+
+  /* =========================================
+     숨김
+  ========================================= */
 
   async function toggleHidden(
     menuId,
     newValue
   ) {
 
+
     const message =
       newValue
+
         ? '이 메뉴를 고객 주문페이지에서 숨기시겠습니까?'
+
         : '이 메뉴의 숨김을 해제하시겠습니까?';
 
-    if (!confirm(message)) {
+
+    if (
+      !confirm(
+        message
+      )
+    ) {
+
       return;
+
     }
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .update({
-          is_hidden: newValue
+
+          is_hidden:
+            newValue
+
         })
         .eq(
           'id',
           menuId
         );
 
-    if (error) {
+
+    if (
+      error
+    ) {
 
       console.error(
         'HIDDEN UPDATE ERROR:',
         error
       );
 
+
       alert(
         '숨김 상태 변경에 실패했습니다.'
       );
 
+
       return;
+
     }
 
+
     await loadMenus();
+
   }
 
+
+  /* =========================================
+     기간제 품절
+  ========================================= */
 
   async function setTimedSoldOut(
     menuId,
     days
   ) {
 
+
     const until =
       new Date(
+
         Date.now() +
+
         days *
         24 *
         60 *
         60 *
         1000
+
       );
+
+
+    const text =
+      days ===
+      7
+
+        ? '1주일'
+
+        : days +
+          '일';
+
 
     if (
       !confirm(
-        `${days === 7 ? '1주일' : days + '일'} 동안 품절 처리하시겠습니까?`
+        `${text} 동안 품절 처리하시겠습니까?`
       )
     ) {
+
       return;
+
     }
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .update({
-          is_available: false,
+
+          is_available:
+            false,
+
           sold_out_until:
             until.toISOString()
+
         })
         .eq(
           'id',
           menuId
         );
 
-    if (error) {
+
+    if (
+      error
+    ) {
 
       console.error(
         'SOLDOUT ERROR:',
         error
       );
 
+
       alert(
         '품절 처리에 실패했습니다.'
       );
 
+
       return;
+
     }
 
+
     await loadMenus();
+
   }
 
+
+  /* =========================================
+     품절해제
+  ========================================= */
 
   async function clearSoldOut(
     menuId
   ) {
+
 
     if (
       !confirm(
         '이 메뉴의 품절을 해제하시겠습니까?'
       )
     ) {
+
       return;
+
     }
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .update({
-          is_available: true,
-          sold_out_until: null
+
+          is_available:
+            true,
+
+          sold_out_until:
+            null
+
         })
         .eq(
           'id',
           menuId
         );
 
-    if (error) {
+
+    if (
+      error
+    ) {
 
       console.error(
         'SOLDOUT CLEAR ERROR:',
         error
       );
 
+
       alert(
         '품절 해제에 실패했습니다.'
       );
 
+
       return;
+
     }
 
+
     await loadMenus();
+
   }
 
+
+  /* =========================================
+     삭제
+  ========================================= */
 
   async function deleteMenu(
     menuId
   ) {
+
 
     if (
       !confirm(
         '정말 이 메뉴를 삭제하시겠습니까?\n삭제한 메뉴는 복구할 수 없습니다.'
       )
     ) {
+
       return;
+
     }
 
-    const secondConfirm =
-      confirm(
+
+    if (
+      !confirm(
         '한 번 더 확인합니다.\n정말 삭제하시겠습니까?'
-      );
+      )
+    ) {
 
-    if (!secondConfirm) {
       return;
+
     }
 
-    const { error } =
+
+    const {
+      error
+    } =
       await supabaseClient
-        .from('menus')
+        .from(
+          'menus'
+        )
         .delete()
         .eq(
           'id',
           menuId
         );
 
-    if (error) {
+
+    if (
+      error
+    ) {
 
       console.error(
         'DELETE MENU ERROR:',
         error
       );
 
+
       alert(
-        '메뉴 삭제에 실패했습니다.\nDELETE 권한을 확인해주세요.'
+        '메뉴 삭제에 실패했습니다.\nSupabase DELETE 권한을 확인해주세요.'
       );
 
+
       return;
+
     }
 
+
     await loadMenus();
+
   }
 
 
-  function formatDateTime(value) {
+  /* =========================================
+     날짜
+  ========================================= */
 
-    if (!value) {
+  function formatDateTime(
+    value
+  ) {
+
+
+    if (
+      !value
+    ) {
+
       return '-';
+
     }
 
+
     const date =
-      new Date(value);
+      new Date(
+        value
+      );
+
 
     if (
       Number.isNaN(
         date.getTime()
       )
     ) {
+
       return '-';
+
     }
 
-    return date.toLocaleString(
-      'ko-KR',
-      {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      }
-    );
+
+    return date
+      .toLocaleString(
+        'ko-KR',
+        {
+
+          year:
+            'numeric',
+
+          month:
+            '2-digit',
+
+          day:
+            '2-digit',
+
+          hour:
+            '2-digit',
+
+          minute:
+            '2-digit'
+
+        }
+      );
+
   }
 
 
-  function showSaving(text) {
+  /* =========================================
+     저장 알림
+  ========================================= */
+
+  function showSaving(
+    text
+  ) {
+
 
     const saving =
-      document.getElementById(
-        'saving'
-      );
+      document
+        .getElementById(
+          'saving'
+        );
+
 
     saving.textContent =
       text;
 
-    saving.classList.add(
-      'show'
-    );
+
+    saving
+      .classList
+      .add(
+        'show'
+      );
+
   }
 
 
   function hideSaving() {
+
 
     document
       .getElementById(
@@ -1828,29 +3060,62 @@
       .remove(
         'show'
       );
+
   }
 
 
-  function escapeHtml(value) {
+  /* =========================================
+     HTML 보호
+  ========================================= */
+
+  function escapeHtml(
+    value
+  ) {
+
 
     return String(
-      value ?? ''
+      value ??
+      ''
     )
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+
   }
 
 
-  function escapeAttribute(value) {
+  function escapeAttribute(
+    value
+  ) {
+
 
     return escapeHtml(
       value
     );
+
   }
 
+
+  /* =========================================
+     검색 이벤트
+  ========================================= */
 
   document
     .getElementById(
@@ -1872,15 +3137,20 @@
     );
 
 
+  /* =========================================
+     최초 실행
+  ========================================= */
+
   loadMenus();
 
 
-  /* 관리자페이지가 열려 있는 동안
-     기간 만료 품절을 1분마다 확인 */
+  /* 1분마다 품절기간 확인 */
+
   setInterval(
     loadMenus,
     60000
   );
+
 
 </script>
 
