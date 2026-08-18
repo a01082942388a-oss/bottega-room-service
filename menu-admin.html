@@ -645,6 +645,178 @@
     }
 
     /* =========================================
+       순서 변경 / 실시간 미리보기
+    ========================================= */
+
+    .menu-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .menu-editor-column {
+      min-width: 0;
+    }
+
+    .preview-panel {
+      position: sticky;
+      top: 18px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 15px 16px;
+      background: #111;
+      color: #fff;
+    }
+
+    .preview-header strong {
+      display: block;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .preview-header span {
+      display: block;
+      margin-top: 4px;
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .preview-phone {
+      padding: 12px;
+      background: #f7f5f1;
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+    }
+
+    .preview-category-title {
+      margin: 10px 2px 7px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #777;
+      letter-spacing: 0.6px;
+    }
+
+    .preview-category-title:first-child {
+      margin-top: 0;
+    }
+
+    .preview-menu-card {
+      position: relative;
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+    }
+
+    .preview-menu-card.soldout-preview {
+      opacity: 0.58;
+    }
+
+    .preview-menu-name {
+      padding-right: 58px;
+      font-size: 13px;
+      font-weight: bold;
+      line-height: 1.35;
+    }
+
+    .preview-menu-description {
+      margin-top: 5px;
+      color: #777;
+      font-size: 10px;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .preview-menu-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 9px;
+    }
+
+    .preview-price {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .preview-order-number {
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .preview-soldout-badge {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      padding: 4px 7px;
+      border-radius: 12px;
+      background: #fff1d6;
+      color: #8a5900;
+      font-size: 9px;
+      font-weight: bold;
+    }
+
+    .preview-empty {
+      padding: 35px 15px;
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+    }
+
+    .order-control {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 14px;
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 8px;
+    }
+
+    .order-control-label {
+      margin-right: auto;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .order-control-label strong {
+      color: #111;
+    }
+
+    .move-button {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 8px 11px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .move-button:hover {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .move-button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* =========================================
        기타
     ========================================= */
 
@@ -761,6 +933,18 @@
       .button-grid,
       .button-grid-3 {
         grid-template-columns: 1fr;
+      }
+
+      .menu-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        position: static;
+      }
+
+      .preview-phone {
+        max-height: 440px;
       }
 
     }
@@ -1128,11 +1312,37 @@
       </div>
 
 
-      <div id="menu-list">
+      <div class="menu-workspace">
 
-        <div class="empty">
-          메뉴를 불러오는 중입니다.
+        <div class="menu-editor-column">
+
+          <div id="menu-list">
+
+            <div class="empty">
+              메뉴를 불러오는 중입니다.
+            </div>
+
+          </div>
+
         </div>
+
+        <aside class="preview-panel">
+
+          <div class="preview-header">
+            <strong>고객화면 실시간 미리보기</strong>
+            <span>순서 변경 시 즉시 반영됩니다.</span>
+          </div>
+
+          <div
+            class="preview-phone"
+            id="menu-preview"
+          >
+            <div class="preview-empty">
+              메뉴를 불러오는 중입니다.
+            </div>
+          </div>
+
+        </aside>
 
       </div>
 
@@ -1660,6 +1870,8 @@
       filtered
     );
 
+    renderPreview();
+
   }
 
 
@@ -1810,6 +2022,36 @@
 
                   </div>
 
+
+                </div>
+
+
+                <div class="order-control">
+
+                  <div class="order-control-label">
+                    고객 노출 순서
+                    <strong>
+                      ${getMenuPosition(menu.id)}
+                    </strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="move-button"
+                    onclick="moveMenu(${Number(menu.id)}, -1)"
+                    ${getMenuPosition(menu.id) <= 1 ? 'disabled' : ''}
+                  >
+                    ↑ 위로
+                  </button>
+
+                  <button
+                    type="button"
+                    class="move-button"
+                    onclick="moveMenu(${Number(menu.id)}, 1)"
+                    ${getMenuPosition(menu.id) >= allMenus.length ? 'disabled' : ''}
+                  >
+                    ↓ 아래로
+                  </button>
 
                 </div>
 
@@ -2150,6 +2392,296 @@
           }
         )
         .join('');
+
+  }
+
+
+  /* =========================================
+     실시간 미리보기 / 순서 변경
+  ========================================= */
+
+  function getSortedMenus() {
+
+    return [...allMenus]
+      .sort(
+        (a, b) => {
+
+          const aSort =
+            Number(a.sort_order || 0);
+
+          const bSort =
+            Number(b.sort_order || 0);
+
+          if (
+            aSort !== bSort
+          ) {
+            return aSort - bSort;
+          }
+
+          return (
+            Number(a.id) -
+            Number(b.id)
+          );
+
+        }
+      );
+
+  }
+
+
+  function getMenuPosition(menuId) {
+
+    const sorted =
+      getSortedMenus();
+
+    const index =
+      sorted.findIndex(
+        menu =>
+          Number(menu.id) ===
+          Number(menuId)
+      );
+
+    return (
+      index >= 0
+        ? index + 1
+        : '-'
+    );
+
+  }
+
+
+  function renderPreview() {
+
+    const preview =
+      document.getElementById(
+        'menu-preview'
+      );
+
+    if (!preview) {
+      return;
+    }
+
+    const visibleMenus =
+      getSortedMenus()
+        .filter(
+          menu =>
+            menu.is_hidden !== true
+        );
+
+    if (!visibleMenus.length) {
+
+      preview.innerHTML =
+        '<div class="preview-empty">고객에게 표시될 메뉴가 없습니다.</div>';
+
+      return;
+    }
+
+    let lastCategory =
+      null;
+
+    let html =
+      '';
+
+    visibleMenus.forEach(
+      (menu, index) => {
+
+        const category =
+          String(
+            menu.category ||
+            'ETC'
+          );
+
+        if (
+          category !== lastCategory
+        ) {
+
+          html += `
+            <div class="preview-category-title">
+              ${escapeHtml(category)}
+            </div>
+          `;
+
+          lastCategory =
+            category;
+        }
+
+        const soldOut =
+          !isMenuAvailable(menu);
+
+        html += `
+          <div class="preview-menu-card ${soldOut ? 'soldout-preview' : ''}">
+
+            ${
+              soldOut
+                ? '<span class="preview-soldout-badge">품절</span>'
+                : ''
+            }
+
+            <div class="preview-menu-name">
+              ${escapeHtml(menu.name || '메뉴')}
+            </div>
+
+            ${
+              menu.description
+                ? `
+                  <div class="preview-menu-description">
+                    ${escapeHtml(menu.description)}
+                  </div>
+                `
+                : ''
+            }
+
+            <div class="preview-menu-bottom">
+              <span class="preview-price">
+                ${Number(menu.price || 0).toLocaleString()}원
+              </span>
+
+              <span class="preview-order-number">
+                #${index + 1}
+              </span>
+            </div>
+
+          </div>
+        `;
+
+      }
+    );
+
+    preview.innerHTML =
+      html;
+
+  }
+
+
+  async function moveMenu(
+    menuId,
+    direction
+  ) {
+
+    if (isSaving) {
+      return;
+    }
+
+    const sorted =
+      getSortedMenus();
+
+    const currentIndex =
+      sorted.findIndex(
+        menu =>
+          Number(menu.id) ===
+          Number(menuId)
+      );
+
+    if (
+      currentIndex < 0
+    ) {
+      return;
+    }
+
+    const targetIndex =
+      currentIndex +
+      Number(direction);
+
+    if (
+      targetIndex < 0 ||
+      targetIndex >= sorted.length
+    ) {
+      return;
+    }
+
+    const movedMenu =
+      sorted[currentIndex];
+
+    sorted.splice(
+      currentIndex,
+      1
+    );
+
+    sorted.splice(
+      targetIndex,
+      0,
+      movedMenu
+    );
+
+    /* 화면에는 먼저 즉시 반영 */
+    sorted.forEach(
+      (menu, index) => {
+        menu.sort_order =
+          (index + 1) * 10;
+      }
+    );
+
+    allMenus =
+      sorted;
+
+    updateSummary();
+    buildCategoryFilter();
+    applyFilters();
+
+    isSaving =
+      true;
+
+    showSaving(
+      '메뉴 순서 저장 중...'
+    );
+
+    const results =
+      await Promise.all(
+        sorted.map(
+          menu =>
+            supabaseClient
+              .from('menus')
+              .update({
+                sort_order:
+                  Number(menu.sort_order)
+              })
+              .eq(
+                'id',
+                Number(menu.id)
+              )
+        )
+      );
+
+    const failed =
+      results.find(
+        result =>
+          result.error
+      );
+
+    if (failed) {
+
+      console.error(
+        'MENU ORDER UPDATE ERROR:',
+        failed.error
+      );
+
+      alert(
+        '메뉴 순서 저장에 실패했습니다. 다시 시도해주세요.'
+      );
+
+      isSaving =
+        false;
+
+      hideSaving();
+
+      await loadMenus();
+
+      return;
+    }
+
+    showSaving(
+      '순서 저장 완료'
+    );
+
+    isSaving =
+      false;
+
+    setTimeout(
+      hideSaving,
+      700
+    );
+
+    await loadMenus();
 
   }
 
