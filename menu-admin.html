@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOTTEGA 메뉴관리</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f4f4;
+      color: #222;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+    }
+
+    header {
+      background: #111;
+      color: #fff;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 3px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #aaa;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .top-nav {
+      max-width: 1100px;
+      margin: 18px auto 0;
+      padding: 0 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-button {
+      flex: 1;
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .nav-button.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 15px auto 80px;
+      padding: 0 16px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .summary-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .summary-number {
+      display: block;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .summary-label {
+      display: block;
+      color: #777;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .tool-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .tool-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 220px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      padding: 12px;
+      font-size: 14px;
+    }
+
+    .category-select {
+      min-width: 170px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      padding: 12px;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .refresh-button {
+      border: 0;
+      background: #111;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 9px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .menu-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 2px solid transparent;
+    }
+
+    .menu-card.soldout {
+      opacity: 0.72;
+      border-color: #efcccc;
+    }
+
+    .menu-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: flex-start;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 15px;
+    }
+
+    .menu-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .menu-id {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .availability {
+      padding: 7px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .available {
+      background: #e8f7ed;
+      color: #24753d;
+    }
+
+    .unavailable {
+      background: #fff0f0;
+      color: #a33;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 180px 180px;
+      gap: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 13px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 75px;
+    }
+
+    .translation-toggle {
+      width: 100%;
+      margin-top: 13px;
+      padding: 11px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .translation-area {
+      display: none;
+      margin-top: 13px;
+      padding: 15px;
+      background: #f8f8f8;
+      border-radius: 9px;
+    }
+
+    .translation-area.show {
+      display: block;
+    }
+
+    .language-title {
+      margin: 15px 0 9px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .language-title:first-child {
+      margin-top: 0;
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .save-button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px;
+      background: #111;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .availability-button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .soldout-button {
+      background: #fff0f0;
+      color: #a33;
+    }
+
+    .resume-button {
+      background: #e8f7ed;
+      color: #24753d;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .empty {
+      background: #fff;
+      padding: 60px 20px;
+      text-align: center;
+      border-radius: 12px;
+      color: #777;
+    }
+
+    .saving {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: #111;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      display: none;
+      z-index: 999;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+    }
+
+    .saving.show {
+      display: block;
+    }
+
+    @media (max-width: 700px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: auto;
+      }
+
+      .action-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>BOTTEGA</h1>
+  <p>ROOM SERVICE · MENU MANAGEMENT</p>
+</header>
+
+<div class="top-nav">
+  <button
+    class="nav-button"
+    onclick="location.href='admin.html'"
+  >
+    주문관리
+  </button>
+
+  <button
+    class="nav-button active"
+  >
+    메뉴관리
+  </button>
+</div>
+
+<div class="container">
+
+  <div class="summary">
+
+    <div class="summary-box">
+      <span class="summary-number" id="total-count">0</span>
+      <span class="summary-label">전체 메뉴</span>
+    </div>
+
+    <div class="summary-box">
+      <span class="summary-number" id="available-count">0</span>
+      <span class="summary-label">판매중</span>
+    </div>
+
+    <div class="summary-box">
+      <span class="summary-number" id="soldout-count">0</span>
+      <span class="summary-label">품절</span>
+    </div>
+
+  </div>
+
+  <div class="tool-box">
+
+    <div class="tool-row">
+
+      <input
+        type="text"
+        id="search-input"
+        class="search-input"
+        placeholder="메뉴명 검색"
+      >
+
+      <select
+        id="category-filter"
+        class="category-select"
+      >
+        <option value="all">전체 카테고리</option>
+      </select>
+
+      <button
+        class="refresh-button"
+        onclick="loadMenus()"
+      >
+        새로고침
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="menu-list">
+    <div class="empty">메뉴를 불러오는 중입니다.</div>
+  </div>
+
+</div>
+
+<div
+  class="saving"
+  id="saving"
+>
+  저장 중...
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+  const SUPABASE_URL =
+    'https://yookspgooyewhnkobckw.supabase.co';
+
+  const SUPABASE_KEY =
+    'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+  let allMenus = [];
+  let isSaving = false;
+
+
+  async function loadMenus() {
+
+    document
+      .getElementById('menu-list')
+      .innerHTML =
+      '<div class="empty">메뉴를 불러오는 중입니다.</div>';
+
+    const { data, error } =
+      await supabaseClient
+        .from('menus')
+        .select('*')
+        .order(
+          'sort_order',
+          {
+            ascending: true
+          }
+        );
+
+    if (error) {
+
+      console.error(error);
+
+      document
+        .getElementById('menu-list')
+        .innerHTML =
+        '<div class="empty">메뉴를 불러오지 못했습니다.</div>';
+
+      return;
+    }
+
+    allMenus =
+      data || [];
+
+    updateSummary();
+
+    buildCategoryFilter();
+
+    applyFilters();
+  }
+
+
+  function updateSummary() {
+
+    const total =
+      allMenus.length;
+
+    const available =
+      allMenus.filter(
+        menu =>
+          menu.is_available === true
+      ).length;
+
+    const soldout =
+      total - available;
+
+    document
+      .getElementById('total-count')
+      .textContent =
+      total;
+
+    document
+      .getElementById('available-count')
+      .textContent =
+      available;
+
+    document
+      .getElementById('soldout-count')
+      .textContent =
+      soldout;
+  }
+
+
+  function buildCategoryFilter() {
+
+    const select =
+      document.getElementById(
+        'category-filter'
+      );
+
+    const current =
+      select.value;
+
+    const categories =
+      [
+        ...new Set(
+          allMenus
+            .map(
+              menu =>
+                menu.category
+            )
+            .filter(Boolean)
+        )
+      ];
+
+    select.innerHTML = `
+
+      <option value="all">
+        전체 카테고리
+      </option>
+
+      ${
+        categories
+          .map(
+            category => `
+
+              <option
+                value="${escapeAttribute(category)}"
+              >
+                ${escapeHtml(category)}
+              </option>
+
+            `
+          )
+          .join('')
+      }
+
+    `;
+
+    if (
+      categories.includes(
+        current
+      )
+    ) {
+      select.value =
+        current;
+    }
+  }
+
+
+  function applyFilters() {
+
+    const keyword =
+      document
+        .getElementById(
+          'search-input'
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+    const category =
+      document
+        .getElementById(
+          'category-filter'
+        )
+        .value;
+
+    const filtered =
+      allMenus.filter(
+        menu => {
+
+          const name =
+            String(
+              menu.name || ''
+            ).toLowerCase();
+
+          const nameEn =
+            String(
+              menu.name_en || ''
+            ).toLowerCase();
+
+          const matchKeyword =
+            !keyword ||
+            name.includes(keyword) ||
+            nameEn.includes(keyword);
+
+          const matchCategory =
+            category === 'all' ||
+            menu.category === category;
+
+          return (
+            matchKeyword &&
+            matchCategory
+          );
+        }
+      );
+
+    renderMenus(
+      filtered
+    );
+  }
+
+
+  function renderMenus(
+    menus
+  ) {
+
+    const menuList =
+      document.getElementById(
+        'menu-list'
+      );
+
+    if (
+      !menus.length
+    ) {
+
+      menuList.innerHTML =
+        '<div class="empty">해당 메뉴가 없습니다.</div>';
+
+      return;
+    }
+
+    menuList.innerHTML =
+      menus
+        .map(
+          menu => {
+
+            const available =
+              menu.is_available === true;
+
+            return `
+
+              <div
+                class="menu-card ${
+                  available
+                    ? ''
+                    : 'soldout'
+                }"
+              >
+
+                <div class="menu-top">
+
+                  <div>
+
+                    <div class="menu-title">
+                      ${escapeHtml(menu.name || '메뉴')}
+                    </div>
+
+                    <div class="menu-id">
+                      ID ${Number(menu.id)}
+                      ·
+                      ${escapeHtml(menu.category || '-')}
+                    </div>
+
+                  </div>
+
+                  <span
+                    class="availability ${
+                      available
+                        ? 'available'
+                        : 'unavailable'
+                    }"
+                  >
+                    ${
+                      available
+                        ? '판매중'
+                        : '품절'
+                    }
+                  </span>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                  <div class="form-group">
+
+                    <label>
+                      메뉴명
+                    </label>
+
+                    <input
+                      type="text"
+                      id="name-${Number(menu.id)}"
+                      value="${escapeAttribute(menu.name || '')}"
+                    >
+
+                  </div>
+
+
+                  <div class="form-group">
+
+                    <label>
+                      가격
+                    </label>
+
+                    <input
+                      type="number"
+                      id="price-${Number(menu.id)}"
+                      value="${Number(menu.price || 0)}"
+                      min="0"
+                      step="100"
+                    >
+
+                  </div>
+
+
+                  <div class="form-group">
+
+                    <label>
+                      카테고리
+                    </label>
+
+                    <input
+                      type="text"
+                      id="category-${Number(menu.id)}"
+                      value="${escapeAttribute(menu.category || '')}"
+                    >
+
+                  </div>
+
+
+                  <div class="form-group full">
+
+                    <label>
+                      메뉴 설명
+                    </label>
+
+                    <textarea
+                      id="description-${Number(menu.id)}"
+                    >${escapeHtml(menu.description || '')}</textarea>
+
+                  </div>
+
+
+                  <div class="form-group">
+
+                    <label>
+                      표시 순서
+                    </label>
+
+                    <input
+                      type="number"
+                      id="sort-${Number(menu.id)}"
+                      value="${Number(menu.sort_order || 0)}"
+                      min="0"
+                    >
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  class="translation-toggle"
+                  onclick="toggleTranslations(${Number(menu.id)})"
+                >
+                  번역 수정 펼치기
+                </button>
+
+
+                <div
+                  class="translation-area"
+                  id="translation-${Number(menu.id)}"
+                >
+
+                  <div class="language-title">
+                    English
+                  </div>
+
+                  <div class="form-group">
+
+                    <label>
+                      메뉴명
+                    </label>
+
+                    <input
+                      type="text"
+                      id="name-en-${Number(menu.id)}"
+                      value="${escapeAttribute(menu.name_en || '')}"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label>
+                      설명
+                    </label>
+
+                    <textarea
+                      id="description-en-${Number(menu.id)}"
+                    >${escapeHtml(menu.description_en || '')}</textarea>
+
+                  </div>
+
+
+                  <div class="language-title">
+                    日本語
+                  </div>
+
+                  <div class="form-group">
+
+                    <label>
+                      메뉴명
+                    </label>
+
+                    <input
+                      type="text"
+                      id="name-ja-${Number(menu.id)}"
+                      value="${escapeAttribute(menu.name_ja || '')}"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label>
+                      설명
+                    </label>
+
+                    <textarea
+                      id="description-ja-${Number(menu.id)}"
+                    >${escapeHtml(menu.description_ja || '')}</textarea>
+
+                  </div>
+
+
+                  <div class="language-title">
+                    中文
+                  </div>
+
+                  <div class="form-group">
+
+                    <label>
+                      메뉴명
+                    </label>
+
+                    <input
+                      type="text"
+                      id="name-zh-${Number(menu.id)}"
+                      value="${escapeAttribute(menu.name_zh || '')}"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label>
+                      설명
+                    </label>
+
+                    <textarea
+                      id="description-zh-${Number(menu.id)}"
+                    >${escapeHtml(menu.description_zh || '')}</textarea>
+
+                  </div>
+
+                </div>
+
+
+                <div class="action-row">
+
+                  <button
+                    class="save-button"
+                    onclick="saveMenu(${Number(menu.id)})"
+                  >
+                    수정내용 저장
+                  </button>
+
+                  <button
+                    class="availability-button ${
+                      available
+                        ? 'soldout-button'
+                        : 'resume-button'
+                    }"
+                    onclick="toggleAvailability(
+                      ${Number(menu.id)},
+                      ${available ? 'false' : 'true'}
+                    )"
+                  >
+                    ${
+                      available
+                        ? '품절 처리'
+                        : '판매 재개'
+                    }
+                  </button>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+  }
+
+
+  function toggleTranslations(
+    menuId
+  ) {
+
+    const area =
+      document.getElementById(
+        `translation-${menuId}`
+      );
+
+    area.classList.toggle(
+      'show'
+    );
+  }
+
+
+  async function saveMenu(
+    menuId
+  ) {
+
+    if (
+      isSaving
+    ) {
+      return;
+    }
+
+    const name =
+      document
+        .getElementById(
+          `name-${menuId}`
+        )
+        .value
+        .trim();
+
+    const price =
+      Number(
+        document
+          .getElementById(
+            `price-${menuId}`
+          )
+          .value
+      );
+
+    const category =
+      document
+        .getElementById(
+          `category-${menuId}`
+        )
+        .value
+        .trim();
+
+    const description =
+      document
+        .getElementById(
+          `description-${menuId}`
+        )
+        .value
+        .trim();
+
+    const sortOrder =
+      Number(
+        document
+          .getElementById(
+            `sort-${menuId}`
+          )
+          .value
+      );
+
+    if (
+      !name
+    ) {
+
+      alert(
+        '메뉴명을 입력해주세요.'
+      );
+
+      return;
+    }
+
+    if (
+      !Number.isFinite(price) ||
+      price < 0
+    ) {
+
+      alert(
+        '가격을 확인해주세요.'
+      );
+
+      return;
+    }
+
+    const updateData = {
+
+      name:
+        name,
+
+      price:
+        price,
+
+      category:
+        category,
+
+      description:
+        description,
+
+      sort_order:
+        Number.isFinite(
+          sortOrder
+        )
+          ? sortOrder
+          : 0,
+
+      name_en:
+        document
+          .getElementById(
+            `name-en-${menuId}`
+          )
+          .value
+          .trim(),
+
+      description_en:
+        document
+          .getElementById(
+            `description-en-${menuId}`
+          )
+          .value
+          .trim(),
+
+      name_ja:
+        document
+          .getElementById(
+            `name-ja-${menuId}`
+          )
+          .value
+          .trim(),
+
+      description_ja:
+        document
+          .getElementById(
+            `description-ja-${menuId}`
+          )
+          .value
+          .trim(),
+
+      name_zh:
+        document
+          .getElementById(
+            `name-zh-${menuId}`
+          )
+          .value
+          .trim(),
+
+      description_zh:
+        document
+          .getElementById(
+            `description-zh-${menuId}`
+          )
+          .value
+          .trim()
+
+    };
+
+    isSaving =
+      true;
+
+    showSaving(
+      '저장 중...'
+    );
+
+    const { error } =
+      await supabaseClient
+        .from('menus')
+        .update(
+          updateData
+        )
+        .eq(
+          'id',
+          menuId
+        );
+
+    if (
+      error
+    ) {
+
+      console.error(
+        'MENU UPDATE ERROR:',
+        error
+      );
+
+      hideSaving();
+
+      isSaving =
+        false;
+
+      alert(
+        '메뉴 수정에 실패했습니다.'
+      );
+
+      return;
+    }
+
+    showSaving(
+      '저장 완료'
+    );
+
+    setTimeout(
+      hideSaving,
+      1000
+    );
+
+    isSaving =
+      false;
+
+    await loadMenus();
+  }
+
+
+  async function toggleAvailability(
+    menuId,
+    newValue
+  ) {
+
+    if (
+      isSaving
+    ) {
+      return;
+    }
+
+    const message =
+      newValue
+        ? '이 메뉴를 다시 판매하시겠습니까?'
+        : '이 메뉴를 품절 처리하시겠습니까?';
+
+    if (
+      !confirm(
+        message
+      )
+    ) {
+      return;
+    }
+
+    isSaving =
+      true;
+
+    showSaving(
+      newValue
+        ? '판매 재개 중...'
+        : '품절 처리 중...'
+    );
+
+    const { error } =
+      await supabaseClient
+        .from('menus')
+        .update({
+          is_available:
+            newValue
+        })
+        .eq(
+          'id',
+          menuId
+        );
+
+    if (
+      error
+    ) {
+
+      console.error(
+        'AVAILABILITY ERROR:',
+        error
+      );
+
+      hideSaving();
+
+      isSaving =
+        false;
+
+      alert(
+        '판매상태 변경에 실패했습니다.'
+      );
+
+      return;
+    }
+
+    showSaving(
+      newValue
+        ? '판매 재개 완료'
+        : '품절 처리 완료'
+    );
+
+    setTimeout(
+      hideSaving,
+      900
+    );
+
+    isSaving =
+      false;
+
+    await loadMenus();
+  }
+
+
+  function showSaving(
+    text
+  ) {
+
+    const saving =
+      document.getElementById(
+        'saving'
+      );
+
+    saving.textContent =
+      text;
+
+    saving.classList.add(
+      'show'
+    );
+  }
+
+
+  function hideSaving() {
+
+    document
+      .getElementById(
+        'saving'
+      )
+      .classList
+      .remove(
+        'show'
+      );
+  }
+
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value ?? ''
+    )
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+  }
+
+
+  function escapeAttribute(
+    value
+  ) {
+
+    return escapeHtml(
+      value
+    );
+  }
+
+
+  document
+    .getElementById(
+      'search-input'
+    )
+    .addEventListener(
+      'input',
+      applyFilters
+    );
+
+
+  document
+    .getElementById(
+      'category-filter'
+    )
+    .addEventListener(
+      'change',
+      applyFilters
+    );
+
+
+  loadMenus();
+
+</script>
+
+</body>
+</html>
