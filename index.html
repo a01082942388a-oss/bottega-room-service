@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOTTEGA ROOM SERVICE</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
+
+
   <style>
     * {
       box-sizing: border-box;
@@ -14,7 +19,7 @@
       margin: 0;
       background: #f7f5f1;
       color: #222;
-      font-family: Arial, "Noto Sans KR", sans-serif;
+      font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
     }
 
     header {
@@ -689,7 +694,7 @@
 :root{--wine:#7d1118;--wine2:#631015;--cream:#fbf7f1;--line:#e5ddd2;--text:#241f1d}
 body{background:linear-gradient(180deg,#fffdf9 0%,#fbf7f1 40%,#f8f2ea 100%);color:var(--text)}
 header{background:#fffdf9;color:var(--wine);padding:30px 20px 19px;border-bottom:1px solid var(--line)}
-header h1{font-family:"Times New Roman","Noto Serif KR",Georgia,serif;font-size:36px;font-weight:500;letter-spacing:4px}
+header h1{font-family:"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:37px;font-weight:700;letter-spacing:5px}
 header p{color:#2d2825;font-size:11px;letter-spacing:4px;margin-top:7px}
 .language-bar{background:#fffdf9;border-bottom:1px solid var(--line);padding:8px 12px 12px}
 .language-button{color:#8b7f79;border-color:transparent}
@@ -700,7 +705,7 @@ header p{color:#2d2825;font-size:11px;letter-spacing:4px;margin-top:7px}
 .category-nav button.active{background:transparent;color:var(--wine);border:0;font-weight:700}
 .category-nav button.active::after{content:"";position:absolute;left:10px;right:10px;bottom:2px;height:2px;background:var(--wine)}
 main{max-width:760px;padding:22px 16px 120px}
-.menu-section-title{display:flex;align-items:center;gap:14px;margin:28px 0 15px;color:var(--wine);font-family:"Times New Roman","Noto Serif KR",Georgia,serif;font-size:24px;letter-spacing:.6px;text-transform:uppercase}
+.menu-section-title{display:flex;align-items:center;gap:14px;margin:30px 0 17px;color:var(--wine);font-family:"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:25px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
 .menu-section-title::before,.menu-section-title::after{content:"";height:1px;background:var(--wine);opacity:.75;flex:1}
 .menu-section-title span{white-space:nowrap}
 .menu-card{display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px;background:rgba(255,255,255,.92);border:1px solid #eadfd3;padding:12px;border-radius:15px;box-shadow:0 4px 16px rgba(87,52,35,.07);margin-bottom:12px}
@@ -709,34 +714,455 @@ main{max-width:760px;padding:22px 16px 120px}
 .menu-image-placeholder::before{content:"PHOTO";font-size:10px;letter-spacing:1.8px;color:#b5aaa1}
 .menu-content{min-width:0;display:flex;flex-direction:column}
 .menu-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.menu-name{font-family:"Noto Serif KR","Times New Roman",Georgia,serif;font-size:18px;font-weight:700;color:#241f1d}
-.menu-name-en{margin-top:5px;color:#6e645f;font-size:12px}
-.menu-description{color:#6d625d;font-size:12.5px;line-height:1.65;margin-top:10px}
+.menu-name{font-family:"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:20px;font-weight:700;letter-spacing:-.25px;color:#241f1d}
+.menu-name-en{margin-top:6px;color:#6e645f;font-size:13px;letter-spacing:.1px}
+.menu-description{color:#6d625d;font-size:14px;line-height:1.7;margin-top:10px;letter-spacing:-.1px}
 .menu-bottom{margin-top:auto;padding-top:14px}
-.price{color:var(--wine);font-family:"Times New Roman","Noto Serif KR",Georgia,serif;font-size:18px;font-weight:700}
+.price{color:var(--wine);font-family:"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:20px;font-weight:700}
 .add-button{min-width:72px;background:linear-gradient(180deg,#94151d 0%,#7d1118 100%);color:#fff;padding:10px 16px;border-radius:9px}
 .add-button:disabled{opacity:1;background:#f4f0eb;border:1px solid #b8aea7;color:#928781}
 .menu-soldout-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:5px;background:#9a8f88;color:#fff;font-size:10px;font-weight:700}
 .cart-bar{max-width:700px;width:calc(100% - 20px);bottom:10px;border-radius:15px;padding:16px 18px;background:linear-gradient(90deg,#6b0e14,#8e141b);box-shadow:0 10px 28px rgba(87,11,16,.28)}
 .order-button{background:var(--wine)}
 .payment-option input:checked + label{background:var(--wine);border-color:var(--wine)}
-@media(max-width:500px){header h1{font-size:31px}.menu-card{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px}.menu-image-placeholder{width:96px;min-height:118px}.menu-name{font-size:16px}.menu-description{font-size:12px}.price{font-size:17px}.add-button{min-width:64px;padding:9px 12px}.menu-section-title{font-size:21px;gap:10px}}
+@media(max-width:500px){header h1{font-size:32px}.menu-card{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:11px}.menu-image-placeholder{width:96px;min-height:118px}.menu-name{font-size:18px}.menu-name-en{font-size:12.5px}.menu-description{font-size:13px}.price{font-size:18px}.add-button{min-width:64px;padding:10px 13px;font-size:14px}.menu-section-title{font-size:22px;gap:10px}.category-nav button{font-size:13px}.room-info{font-size:14px}}
 
+
+/* ==========================================
+   BOTTEGA SIGN LAYOUT - FINAL
+   승인한 3번 타이포 + 버건디 간판 스타일
+========================================== */
+
+body {
+  font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background: #faf6ef;
+}
+
+.bottega-sign {
+  position: relative;
+  background: #6b1018;
+  color: #f0d7a8;
+  text-align: center;
+  padding: 30px 18px 22px;
+  border-bottom: 1px solid rgba(224,191,134,.32);
+  box-shadow: 0 8px 24px rgba(72,10,14,.18);
+}
+
+.bottega-brand h1 {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 49px;
+  line-height: .95;
+  font-weight: 600;
+  letter-spacing: 8px;
+  color: #ead09d;
+  text-shadow: 0 1px 0 rgba(255,255,255,.08);
+}
+
+.bottega-brand p {
+  margin: 11px 0 0;
+  font-family: "Noto Sans KR", sans-serif;
+  color: #e2c48d;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 6px;
+}
+
+.bottega-sign .language-bar {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  padding: 22px 0 0;
+  background: transparent;
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.bottega-sign .language-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.bottega-sign .language-button {
+  min-width: 105px;
+  padding: 9px 16px;
+  border: 1px solid rgba(235,210,167,.45);
+  border-radius: 18px;
+  background: transparent;
+  color: #ead8bb;
+  font-family: "Noto Serif KR", serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .2px;
+}
+
+.bottega-sign .language-button.active {
+  background: #fffdf9;
+  color: #571014;
+  border-color: #fffdf9;
+  font-weight: 700;
+}
+
+.room-info {
+  max-width: none;
+  margin: 0;
+  padding: 17px 18px;
+  background: linear-gradient(90deg,#f4eadb,#fffaf2,#f4eadb);
+  border-bottom: 1px solid #e4d5bf;
+  color: #332824;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.room-info strong {
+  color: #651118;
+  font-family: "Noto Serif KR", serif;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.category-nav {
+  background: rgba(255,253,249,.98);
+}
+
+.menu-section-title {
+  font-family: "Noto Serif KR", serif !important;
+  font-size: 25px !important;
+  font-weight: 600 !important;
+  letter-spacing: .2px !important;
+}
+
+.menu-name {
+  font-family: "Noto Serif KR", serif !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: -.25px !important;
+}
+
+.menu-name-en {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: 16px !important;
+  font-weight: 500;
+  color: #9b7447 !important;
+  letter-spacing: .15px !important;
+}
+
+.menu-description {
+  font-family: "Noto Sans KR", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+}
+
+.price {
+  font-family: "Noto Serif KR", serif !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+.add-button,
+.order-button {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+@media (max-width: 500px) {
+  .bottega-sign {
+    padding: 26px 12px 18px;
+  }
+
+  .bottega-brand h1 {
+    font-size: 42px;
+    letter-spacing: 6px;
+  }
+
+  .bottega-brand p {
+    margin-top: 9px;
+    font-size: 10px;
+    letter-spacing: 5px;
+  }
+
+  .bottega-sign .language-bar {
+    justify-content: flex-start;
+    padding-top: 18px;
+  }
+
+  .bottega-sign .language-button {
+    min-width: 92px;
+    padding: 8px 13px;
+    font-size: 11.5px;
+  }
+
+  .room-info {
+    padding: 15px 14px;
+    font-size: 14px;
+  }
+
+  .menu-name {
+    font-size: 18px !important;
+  }
+
+  .menu-name-en {
+    font-size: 14px !important;
+  }
+
+  .menu-description {
+    font-size: 13px !important;
+  }
+
+  .price {
+    font-size: 18px !important;
+  }
+
+  .menu-section-title {
+    font-size: 22px !important;
+  }
+}
+
+</style>
+<style>
+/* ==========================================
+   BOTTEGA FINAL 3-COLOR PALETTE
+   BURGUNDY / WHITE / BLACK ONLY
+========================================== */
+:root {
+  --wine: #6b1018 !important;
+  --wine-dark: #6b1018 !important;
+  --wine-soft: #6b1018 !important;
+  --cream: #ffffff !important;
+  --cream-deep: #ffffff !important;
+  --gold: #ffffff !important;
+  --gold-soft: #ffffff !important;
+  --ink: #000000 !important;
+  --muted: #000000 !important;
+  --line: #000000 !important;
+}
+
+html,
+body {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.bottega-sign {
+  background: #6b1018 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+.bottega-brand h1,
+.bottega-brand p {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+.bottega-sign .language-button {
+  background: #6b1018 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.bottega-sign .language-button.active {
+  background: #ffffff !important;
+  color: #6b1018 !important;
+  border-color: #ffffff !important;
+}
+
+.room-info {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.room-info strong {
+  color: #6b1018 !important;
+}
+
+.category-nav,
+.menu-section,
+.menu-card,
+.cart,
+.cart-content,
+.modal,
+.modal-content,
+.cutlery-section,
+.cutlery-item {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.category-nav {
+  border-bottom: 1px solid #000000 !important;
+}
+
+.category-nav button {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.category-nav button.active {
+  background: #6b1018 !important;
+  color: #ffffff !important;
+  border-color: #6b1018 !important;
+}
+
+.menu-section-title,
+.menu-name,
+.menu-name-en,
+.menu-description,
+.price {
+  color: #000000 !important;
+}
+
+.menu-section-title::after {
+  background: #6b1018 !important;
+}
+
+.menu-image-placeholder {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.add-button,
+.order-button,
+.cart-button,
+.confirm-button {
+  background: #6b1018 !important;
+  color: #ffffff !important;
+  border-color: #6b1018 !important;
+}
+
+.add-button:disabled,
+.soldout-button,
+.sold-out,
+.soldout-badge {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.cart-item,
+.cart-row,
+.order-summary,
+.cutlery-section,
+.cutlery-item {
+  border-color: #000000 !important;
+}
+
+.cart-count,
+.badge,
+.count-badge {
+  background: #6b1018 !important;
+  color: #ffffff !important;
+}
+
+button,
+input,
+textarea,
+select {
+  color: #000000;
+}
+
+input,
+textarea,
+select {
+  background: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+hr {
+  border-color: #000000 !important;
+}
+
+/* 기존 회색/베이지/금색 계열 인라인 요소를 마지막 단계에서 정리 */
+.menu-name-en,
+.menu-description,
+.empty-text,
+.helper-text,
+.note-text,
+.cart-empty,
+.status-text {
+  color: #000000 !important;
+}
+</style>
+<style>
+/* ==========================================
+   CATEGORY LAYOUT - REFERENCE IMAGE STYLE
+   카테고리 영역만 변경
+========================================== */
+
+.category-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  padding: 14px 16px !important;
+  background: #ffffff !important;
+  border-bottom: 0 !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none !important;
+}
+
+.category-nav button {
+  flex: 0 0 auto !important;
+  min-width: auto !important;
+  padding: 10px 18px !important;
+  border: 1px solid #000000 !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.2px !important;
+  box-shadow: none !important;
+}
+
+.category-nav button::after {
+  display: none !important;
+}
+
+.category-nav button.active {
+  background: #6b1018 !important;
+  color: #ffffff !important;
+  border-color: #6b1018 !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 500px) {
+  .category-nav {
+    gap: 7px !important;
+    padding: 13px 14px !important;
+  }
+
+  .category-nav button {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>BOTTEGA</h1>
-  <p>ROOM SERVICE</p>
-</header>
+<div class="bottega-sign">
+  <div class="bottega-brand">
+    <h1>BOTTEGA</h1>
+    <p>ROOM SERVICE</p>
+  </div>
 
-<div class="language-bar">
-  <button class="language-button active" data-lang="ko">한국어</button>
-  <button class="language-button" data-lang="en">English</button>
-  <button class="language-button" data-lang="ja">日本語</button>
-  <button class="language-button" data-lang="zh">中文</button>
+  <div class="language-bar">
+    <button class="language-button active" data-lang="ko">한국어</button>
+    <button class="language-button" data-lang="en">ENGLISH</button>
+    <button class="language-button" data-lang="ja">日本語</button>
+    <button class="language-button" data-lang="zh">中文(简体)</button>
+  </div>
 </div>
 
 
@@ -3955,18 +4381,7 @@ function changeCutleryQty(change) {
 
   loadMenus();
 
-
-
-  /* 메뉴 상태 3초 자동 갱신 */
-
-  setInterval(
-
-    loadMenus,
-
-    3000
-
-  );
-  loadServiceStatus();
+loadServiceStatus();
 
   startServiceStatusPolling();
 
