@@ -685,6 +685,43 @@
   font-weight: bold;
 }
 
+
+:root{--wine:#7d1118;--wine2:#631015;--cream:#fbf7f1;--line:#e5ddd2;--text:#241f1d}
+body{background:linear-gradient(180deg,#fffdf9 0%,#fbf7f1 40%,#f8f2ea 100%);color:var(--text)}
+header{background:#fffdf9;color:var(--wine);padding:30px 20px 19px;border-bottom:1px solid var(--line)}
+header h1{font-family:"Times New Roman","Noto Serif KR",Georgia,serif;font-size:36px;font-weight:500;letter-spacing:4px}
+header p{color:#2d2825;font-size:11px;letter-spacing:4px;margin-top:7px}
+.language-bar{background:#fffdf9;border-bottom:1px solid var(--line);padding:8px 12px 12px}
+.language-button{color:#8b7f79;border-color:transparent}
+.language-button.active{color:var(--wine);background:transparent;border:1px solid var(--wine)}
+.room-info{background:#fffdf9;border-bottom:1px solid var(--line);color:#6c625d}
+.category-nav{background:rgba(255,253,249,.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:13px 15px}
+.category-nav button{border:0;border-radius:0;padding:9px 12px 10px;color:#655d58;background:transparent;position:relative;font-size:12px}
+.category-nav button.active{background:transparent;color:var(--wine);border:0;font-weight:700}
+.category-nav button.active::after{content:"";position:absolute;left:10px;right:10px;bottom:2px;height:2px;background:var(--wine)}
+main{max-width:760px;padding:22px 16px 120px}
+.menu-section-title{display:flex;align-items:center;gap:14px;margin:28px 0 15px;color:var(--wine);font-family:"Times New Roman","Noto Serif KR",Georgia,serif;font-size:24px;letter-spacing:.6px;text-transform:uppercase}
+.menu-section-title::before,.menu-section-title::after{content:"";height:1px;background:var(--wine);opacity:.75;flex:1}
+.menu-section-title span{white-space:nowrap}
+.menu-card{display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px;background:rgba(255,255,255,.92);border:1px solid #eadfd3;padding:12px;border-radius:15px;box-shadow:0 4px 16px rgba(87,52,35,.07);margin-bottom:12px}
+.menu-card.menu-soldout{opacity:.78}
+.menu-image-placeholder{width:112px;min-height:128px;border-radius:12px;background:linear-gradient(135deg,#f0e8df,#f7f1ea);border:1px solid #eadfd5;display:flex;align-items:center;justify-content:center;color:#b6aaa0}
+.menu-image-placeholder::before{content:"PHOTO";font-size:10px;letter-spacing:1.8px;color:#b5aaa1}
+.menu-content{min-width:0;display:flex;flex-direction:column}
+.menu-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.menu-name{font-family:"Noto Serif KR","Times New Roman",Georgia,serif;font-size:18px;font-weight:700;color:#241f1d}
+.menu-name-en{margin-top:5px;color:#6e645f;font-size:12px}
+.menu-description{color:#6d625d;font-size:12.5px;line-height:1.65;margin-top:10px}
+.menu-bottom{margin-top:auto;padding-top:14px}
+.price{color:var(--wine);font-family:"Times New Roman","Noto Serif KR",Georgia,serif;font-size:18px;font-weight:700}
+.add-button{min-width:72px;background:linear-gradient(180deg,#94151d 0%,#7d1118 100%);color:#fff;padding:10px 16px;border-radius:9px}
+.add-button:disabled{opacity:1;background:#f4f0eb;border:1px solid #b8aea7;color:#928781}
+.menu-soldout-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:5px;background:#9a8f88;color:#fff;font-size:10px;font-weight:700}
+.cart-bar{max-width:700px;width:calc(100% - 20px);bottom:10px;border-radius:15px;padding:16px 18px;background:linear-gradient(90deg,#6b0e14,#8e141b);box-shadow:0 10px 28px rgba(87,11,16,.28)}
+.order-button{background:var(--wine)}
+.payment-option input:checked + label{background:var(--wine);border-color:var(--wine)}
+@media(max-width:500px){header h1{font-size:31px}.menu-card{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px}.menu-image-placeholder{width:96px;min-height:118px}.menu-name{font-size:16px}.menu-description{font-size:12px}.price{font-size:17px}.add-button{min-width:64px;padding:9px 12px}.menu-section-title{font-size:21px;gap:10px}}
+
 </style>
 </head>
 
@@ -1124,6 +1161,7 @@
       loadError: '메뉴를 불러오지 못했습니다.',
 
       add: '담기',
+      soldOutMenu: '품절',
       menuSoldOut: '품절',
 
       cart: '장바구니',
@@ -1251,6 +1289,7 @@
       loadError: 'Unable to load the menu.',
 
       add: 'Add',
+      soldOutMenu: 'Sold Out',
       menuSoldOut: 'Sold Out',
 
       cart: 'Cart',
@@ -1381,6 +1420,7 @@
         'メニューを読み込めませんでした。',
 
       add: '追加',
+      soldOutMenu: '売り切れ',
       menuSoldOut: '売り切れ',
 
       cart: 'カート',
@@ -1510,6 +1550,7 @@
       loadError: '无法加载菜单。',
 
       add: '加入',
+      soldOutMenu: '售罄',
       menuSoldOut: '售罄',
 
       cart: '购物车',
@@ -2564,121 +2605,79 @@
   }
 
 
-  function renderMenus(
-    menus
-  ) {
 
-    const menuList =
-      document.getElementById(
-        'menu-list'
-      );
+  function isMenuSoldOut(menu) {
+    if (!menu) return true;
+    if (menu.is_hidden === true) return true;
+    if (menu.sold_out_until) {
+      const until = new Date(menu.sold_out_until).getTime();
+      if (Number.isFinite(until) && until > Date.now()) return true;
+    }
+    return menu.is_available === false;
+  }
 
+  function getMenuSectionTitle(category) {
+    return getCategoryLabel(category) || category || '';
+  }
 
-    if (
-      !menus ||
-      !menus.length
-    ) {
+  function renderMenuCard(menu) {
+    const displayName = getMenuName(menu);
+    const displayDescription = getMenuDescription(menu);
+    const soldOut = isMenuSoldOut(menu);
 
-      menuList.innerHTML =
-        `<div class="loading">${t('noMenu')}</div>`;
+    return `
+      <div class="menu-card ${soldOut ? 'menu-soldout' : ''}">
+        <div class="menu-image-placeholder"></div>
+        <div class="menu-content">
+          <div class="menu-name-row">
+            <div class="menu-name">${escapeHtml(displayName)}</div>
+            ${soldOut ? `<span class="menu-soldout-badge">${escapeHtml(t('soldOutMenu'))}</span>` : ''}
+          </div>
+          ${currentLanguage === 'ko' && menu.name_en ? `<div class="menu-name-en">${escapeHtml(menu.name_en)}</div>` : ''}
+          ${displayDescription ? `<div class="menu-description">${escapeHtml(displayDescription)}</div>` : ''}
+          <div class="menu-bottom">
+            <div class="price">${formatWon(menu.price)}</div>
+            <button type="button" class="add-button" onclick="addToCart(${Number(menu.id)})" ${(!isOrderingAllowed() || soldOut) ? 'disabled' : ''}>
+              ${soldOut ? escapeHtml(t('soldOutMenu')) : escapeHtml(t('add'))}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
+  function renderMenus(menus) {
+    const menuList = document.getElementById('menu-list');
+
+    if (!menus || !menus.length) {
+      menuList.innerHTML = `<div class="loading">${t('noMenu')}</div>`;
       return;
-
     }
 
+    if (currentCategory === 'ALL') {
+      const groups = [];
+      menus.forEach(menu => {
+        const category = menu.category || '';
+        let group = groups.find(item => item.category === category);
+        if (!group) {
+          group = { category, menus: [] };
+          groups.push(group);
+        }
+        group.menus.push(menu);
+      });
 
-    menuList.innerHTML =
-      menus
-        .map(
-          menu => {
+      menuList.innerHTML = groups.map(group => `
+        <section class="menu-category-section">
+          <div class="menu-section-title">
+            <span>${escapeHtml(getMenuSectionTitle(group.category))}</span>
+          </div>
+          ${group.menus.map(menu => renderMenuCard(menu)).join('')}
+        </section>
+      `).join('');
+      return;
+    }
 
-            const displayName =
-              getMenuName(
-                menu
-              );
-
-
-            const displayDescription =
-              getMenuDescription(
-                menu
-              );
-
-            const menuSoldOut =
-              isMenuSoldOut(menu);
-
-
-            return `
-
-              <div class="menu-card">
-
-                <div class="menu-name">
-                  ${escapeHtml(displayName)}
-                  ${
-                    menuSoldOut
-                      ? `<span style="margin-left:8px; color:#b42318; font-size:13px;">${escapeHtml(t('menuSoldOut'))}</span>`
-                      : ''
-                  }
-                </div>
-
-                ${
-                  currentLanguage === 'ko' &&
-                  menu.name_en
-
-                    ? `
-                      <div class="menu-name-en">
-                        ${escapeHtml(menu.name_en)}
-                      </div>
-                    `
-
-                    : ''
-                }
-
-                ${
-                  displayDescription
-
-                    ? `
-                      <div class="menu-description">
-                        ${escapeHtml(displayDescription)}
-                      </div>
-                    `
-
-                    : ''
-                }
-
-                <div class="menu-bottom">
-
-                  <div class="price">
-                    ${formatWon(menu.price)}
-                  </div>
-
-                  <button
-                    type="button"
-                    class="add-button"
-                    onclick="addToCart(${Number(menu.id)})"
-                    ${
-                      isOrderingAllowed() &&
-                      !menuSoldOut
-                        ? ''
-                        : 'disabled'
-                    }
-                  >
-                    ${
-                      menuSoldOut
-                        ? escapeHtml(t('menuSoldOut'))
-                        : escapeHtml(t('add'))
-                    }
-                  </button>
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        )
-        .join('');
-
+    menuList.innerHTML = menus.map(menu => renderMenuCard(menu)).join('');
   }
 
 
