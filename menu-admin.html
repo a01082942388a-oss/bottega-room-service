@@ -683,6 +683,144 @@
       background: #f5f5f5;
     }
 
+    .sort-manager {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .sort-manager-title {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .sort-help {
+      margin-bottom: 12px;
+      color: #777;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .sort-category-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 14px;
+    }
+
+    .sort-category-button {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 9px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .sort-category-button.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .sort-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sort-item {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px 12px;
+      background: #f8f8f8;
+      border: 1px solid #e5e5e5;
+      border-radius: 9px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .sort-item.dragging {
+      opacity: 0.45;
+    }
+
+    .sort-handle {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #777;
+      font-size: 18px;
+    }
+
+    .sort-item-main {
+      min-width: 0;
+    }
+
+    .sort-item-name {
+      font-size: 13px;
+      font-weight: bold;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sort-item-meta {
+      margin-top: 3px;
+      color: #999;
+      font-size: 11px;
+    }
+
+    .sort-item-state {
+      padding: 5px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .sort-item-state.selling {
+      background: #e8f7ed;
+      color: #24753d;
+    }
+
+    .sort-item-state.soldout {
+      background: #fff1d6;
+      color: #8a5900;
+    }
+
+    .sort-item-state.hidden {
+      background: #eee;
+      color: #555;
+    }
+
+    .sort-empty {
+      padding: 24px 14px;
+      border-radius: 9px;
+      background: #f8f8f8;
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+    }
+
+    .preview-category-label {
+      margin-top: 4px;
+      color: #888;
+      font-size: 11px;
+    }
+
     .preview-panel {
       position: sticky;
       top: 18px;
@@ -1344,6 +1482,30 @@
       </div>
 
 
+      <div class="sort-manager">
+
+        <div class="sort-manager-title">
+          메뉴 순서 관리
+        </div>
+
+        <div class="sort-help">
+          카테고리를 선택한 뒤 메뉴를 마우스로 끌어 원하는 순서에 놓으면 즉시 저장됩니다.
+          오른쪽 미리보기도 선택한 카테고리에 맞춰 실시간으로 변경됩니다.
+        </div>
+
+        <div
+          class="sort-category-tabs"
+          id="sort-category-tabs"
+        ></div>
+
+        <div
+          class="sort-list"
+          id="sort-list"
+        ></div>
+
+      </div>
+
+
       <div class="menu-workspace" id="menu-workspace">
 
         <div class="menu-editor-column">
@@ -1362,7 +1524,13 @@
 
           <div class="preview-header">
             <strong>고객화면 실시간 미리보기</strong>
-            <span>순서 변경 시 즉시 반영됩니다.</span>
+            <span>선택한 카테고리의 순서를 실시간으로 확인합니다.</span>
+            <div
+              class="preview-category-label"
+              id="preview-category-label"
+            >
+              전체 메뉴
+            </div>
           </div>
 
           <div
@@ -1422,6 +1590,12 @@
 
   let isSaving =
     false;
+
+  let currentSortCategory =
+    'ALL';
+
+  let draggedMenuId =
+    null;
 
 
   /* =========================================
@@ -1679,7 +1853,13 @@
 
     buildCategoryFilter();
 
+    buildSortCategoryTabs();
+
+    renderSortList();
+
     applyFilters();
+
+    renderPreview();
 
   }
 
@@ -2056,17 +2236,6 @@
 
 
                 </div>
-
-
-                <div class="order-control">
-
-                  <div class="order-control-label">
-                    고객 노출 순서
-                    <strong>
-                      ${getMenuPosition(menu.id)}
-                    </strong>
-                  </div>
-
                   <button
                     type="button"
                     class="move-button"
@@ -2461,23 +2630,467 @@
   }
 
 
-  function getMenuPosition(menuId) {
+
+
+  function getSortCategories() {
+
+    return [
+      ...new Set(
+        getSortedMenus()
+          .map(menu => menu.category)
+          .filter(Boolean)
+      )
+    ];
+  }
+
+
+  function buildSortCategoryTabs() {
+
+    const wrap =
+      document.getElementById(
+        'sort-category-tabs'
+      );
+
+    if (!wrap) {
+      return;
+    }
+
+    const categories =
+      getSortCategories();
+
+    if (
+      currentSortCategory !== 'ALL' &&
+      !categories.includes(currentSortCategory)
+    ) {
+      currentSortCategory = 'ALL';
+    }
+
+    wrap.innerHTML = `
+
+      <button
+        type="button"
+        class="sort-category-button ${
+          currentSortCategory === 'ALL'
+            ? 'active'
+            : ''
+        }"
+        data-sort-category="ALL"
+      >
+        전체
+      </button>
+
+      ${
+        categories.map(category => `
+
+          <button
+            type="button"
+            class="sort-category-button ${
+              currentSortCategory === category
+                ? 'active'
+                : ''
+            }"
+            data-sort-category="${escapeAttribute(category)}"
+          >
+            ${escapeHtml(category)}
+          </button>
+
+        `).join('')
+      }
+
+    `;
+
+    wrap
+      .querySelectorAll(
+        '.sort-category-button'
+      )
+      .forEach(button => {
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            currentSortCategory =
+              button.dataset.sortCategory;
+
+            buildSortCategoryTabs();
+            renderSortList();
+            renderPreview();
+
+          }
+        );
+
+      });
+  }
+
+
+  function getMenusForCurrentSortCategory() {
 
     const sorted =
       getSortedMenus();
 
-    const index =
-      sorted.findIndex(
-        menu =>
-          Number(menu.id) ===
-          Number(menuId)
+    if (
+      currentSortCategory === 'ALL'
+    ) {
+      return sorted;
+    }
+
+    return sorted.filter(
+      menu =>
+        menu.category ===
+        currentSortCategory
+    );
+  }
+
+
+  function getMenuState(menu) {
+
+    if (menu.is_hidden === true) {
+      return {
+        text: '숨김',
+        className: 'hidden'
+      };
+    }
+
+    if (!isMenuAvailable(menu)) {
+      return {
+        text: '품절',
+        className: 'soldout'
+      };
+    }
+
+    return {
+      text: '판매중',
+      className: 'selling'
+    };
+  }
+
+
+  function renderSortList() {
+
+    const list =
+      document.getElementById(
+        'sort-list'
       );
 
-    return (
-      index >= 0
-        ? index + 1
-        : '-'
+    if (!list) {
+      return;
+    }
+
+    const menus =
+      getMenusForCurrentSortCategory();
+
+    if (!menus.length) {
+
+      list.innerHTML =
+        '<div class="sort-empty">이 카테고리에 메뉴가 없습니다.</div>';
+
+      return;
+    }
+
+    list.innerHTML =
+      menus.map(
+        (menu, index) => {
+
+          const state =
+            getMenuState(menu);
+
+          return `
+
+            <div
+              class="sort-item"
+              draggable="true"
+              data-menu-id="${Number(menu.id)}"
+            >
+
+              <div class="sort-handle">
+                ☰
+              </div>
+
+              <div class="sort-item-main">
+
+                <div class="sort-item-name">
+                  ${escapeHtml(menu.name || '메뉴')}
+                </div>
+
+                <div class="sort-item-meta">
+                  ${index + 1}번째 · ${escapeHtml(menu.category || '-')}
+                </div>
+
+              </div>
+
+              <div
+                class="sort-item-state ${state.className}"
+              >
+                ${state.text}
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      ).join('');
+
+    bindSortDragEvents();
+  }
+
+
+  function bindSortDragEvents() {
+
+    document
+      .querySelectorAll(
+        '#sort-list .sort-item'
+      )
+      .forEach(item => {
+
+        item.addEventListener(
+          'dragstart',
+          event => {
+
+            draggedMenuId =
+              Number(item.dataset.menuId);
+
+            item.classList.add(
+              'dragging'
+            );
+
+            if (event.dataTransfer) {
+              event.dataTransfer.effectAllowed =
+                'move';
+
+              event.dataTransfer.setData(
+                'text/plain',
+                String(draggedMenuId)
+              );
+            }
+
+          }
+        );
+
+        item.addEventListener(
+          'dragend',
+          () => {
+
+            item.classList.remove(
+              'dragging'
+            );
+
+            draggedMenuId =
+              null;
+
+          }
+        );
+
+        item.addEventListener(
+          'dragover',
+          event => {
+
+            event.preventDefault();
+
+          }
+        );
+
+        item.addEventListener(
+          'drop',
+          async event => {
+
+            event.preventDefault();
+
+            const targetId =
+              Number(item.dataset.menuId);
+
+            if (
+              !draggedMenuId ||
+              draggedMenuId === targetId
+            ) {
+              return;
+            }
+
+            await moveMenuByDrag(
+              draggedMenuId,
+              targetId
+            );
+
+          }
+        );
+
+      });
+  }
+
+
+  async function moveMenuByDrag(
+    sourceMenuId,
+    targetMenuId
+  ) {
+
+    if (isSaving) {
+      return;
+    }
+
+    const categoryList =
+      getMenusForCurrentSortCategory();
+
+    const sourceIndex =
+      categoryList.findIndex(
+        menu =>
+          Number(menu.id) ===
+          Number(sourceMenuId)
+      );
+
+    const targetIndex =
+      categoryList.findIndex(
+        menu =>
+          Number(menu.id) ===
+          Number(targetMenuId)
+      );
+
+    if (
+      sourceIndex < 0 ||
+      targetIndex < 0
+    ) {
+      return;
+    }
+
+    const reordered =
+      [...categoryList];
+
+    const [moved] =
+      reordered.splice(
+        sourceIndex,
+        1
+      );
+
+    reordered.splice(
+      targetIndex,
+      0,
+      moved
     );
+
+    let finalOrder;
+
+    if (
+      currentSortCategory === 'ALL'
+    ) {
+
+      finalOrder =
+        reordered;
+
+    } else {
+
+      const fullSorted =
+        getSortedMenus();
+
+      finalOrder =
+        [...fullSorted];
+
+      const categoryIndexes =
+        [];
+
+      fullSorted.forEach(
+        (menu, index) => {
+
+          if (
+            menu.category ===
+            currentSortCategory
+          ) {
+            categoryIndexes.push(index);
+          }
+
+        }
+      );
+
+      categoryIndexes.forEach(
+        (position, index) => {
+
+          finalOrder[position] =
+            reordered[index];
+
+        }
+      );
+
+    }
+
+    finalOrder.forEach(
+      (menu, index) => {
+
+        menu.sort_order =
+          (index + 1) * 10;
+
+      }
+    );
+
+    allMenus =
+      finalOrder;
+
+    buildSortCategoryTabs();
+    renderSortList();
+    applyFilters();
+    renderPreview();
+
+    isSaving =
+      true;
+
+    showSaving(
+      '메뉴 순서 저장 중...'
+    );
+
+    const results =
+      await Promise.all(
+        finalOrder.map(
+          menu =>
+            supabaseClient
+              .from('menus')
+              .update({
+                sort_order:
+                  Number(menu.sort_order)
+              })
+              .eq(
+                'id',
+                Number(menu.id)
+              )
+        )
+      );
+
+    const failed =
+      results.find(
+        result =>
+          result.error
+      );
+
+    if (failed) {
+
+      console.error(
+        'CATEGORY ORDER UPDATE ERROR:',
+        failed.error
+      );
+
+      alert(
+        '메뉴 순서 저장에 실패했습니다.'
+      );
+
+      isSaving =
+        false;
+
+      hideSaving();
+
+      await loadMenus();
+
+      return;
+    }
+
+    showSaving(
+      '순서 저장 완료'
+    );
+
+    isSaving =
+      false;
+
+    setTimeout(
+      hideSaving,
+      700
+    );
+
+    await loadMenus();
 
   }
 
@@ -2550,21 +3163,48 @@
         'menu-preview'
       );
 
+    const label =
+      document.getElementById(
+        'preview-category-label'
+      );
+
     if (!preview) {
       return;
     }
 
-    const visibleMenus =
+    if (label) {
+
+      label.textContent =
+        currentSortCategory === 'ALL'
+          ? '전체 메뉴'
+          : currentSortCategory;
+
+    }
+
+    let visibleMenus =
       getSortedMenus()
         .filter(
           menu =>
             menu.is_hidden !== true
         );
 
+    if (
+      currentSortCategory !== 'ALL'
+    ) {
+
+      visibleMenus =
+        visibleMenus.filter(
+          menu =>
+            menu.category ===
+            currentSortCategory
+        );
+
+    }
+
     if (!visibleMenus.length) {
 
       preview.innerHTML =
-        '<div class="preview-empty">고객에게 표시될 메뉴가 없습니다.</div>';
+        '<div class="preview-empty">미리보기에 표시할 메뉴가 없습니다.</div>';
 
       return;
     }
@@ -2585,46 +3225,60 @@
           );
 
         if (
+          currentSortCategory === 'ALL' &&
           category !== lastCategory
         ) {
 
           html += `
-            <div class="preview-category-title">
+
+            <div class="preview-category">
               ${escapeHtml(category)}
             </div>
+
           `;
 
           lastCategory =
             category;
+
         }
 
-        const soldOut =
+        const soldout =
           !isMenuAvailable(menu);
 
         html += `
-          <div class="preview-menu-card ${soldOut ? 'soldout-preview' : ''}">
 
-            ${
-              soldOut
-                ? '<span class="preview-soldout-badge">품절</span>'
-                : ''
-            }
+          <div class="preview-menu-card">
 
-            <div class="preview-menu-name">
-              ${escapeHtml(menu.name || '메뉴')}
+            <div class="preview-menu-top">
+
+              <div class="preview-menu-name">
+                ${escapeHtml(menu.name || '메뉴')}
+              </div>
+
+              ${
+                soldout
+                  ? `
+                    <span class="preview-soldout">
+                      품절
+                    </span>
+                  `
+                  : ''
+              }
+
             </div>
 
             ${
               menu.description
                 ? `
-                  <div class="preview-menu-description">
+                  <div class="preview-description">
                     ${escapeHtml(menu.description)}
                   </div>
                 `
                 : ''
             }
 
-            <div class="preview-menu-bottom">
+            <div class="preview-bottom">
+
               <span class="preview-price">
                 ${Number(menu.price || 0).toLocaleString()}원
               </span>
@@ -2632,9 +3286,11 @@
               <span class="preview-order-number">
                 #${index + 1}
               </span>
+
             </div>
 
           </div>
+
         `;
 
       }
@@ -2646,137 +3302,6 @@
   }
 
 
-  async function moveMenu(
-    menuId,
-    direction
-  ) {
-
-    if (isSaving) {
-      return;
-    }
-
-    const sorted =
-      getSortedMenus();
-
-    const currentIndex =
-      sorted.findIndex(
-        menu =>
-          Number(menu.id) ===
-          Number(menuId)
-      );
-
-    if (
-      currentIndex < 0
-    ) {
-      return;
-    }
-
-    const targetIndex =
-      currentIndex +
-      Number(direction);
-
-    if (
-      targetIndex < 0 ||
-      targetIndex >= sorted.length
-    ) {
-      return;
-    }
-
-    const movedMenu =
-      sorted[currentIndex];
-
-    sorted.splice(
-      currentIndex,
-      1
-    );
-
-    sorted.splice(
-      targetIndex,
-      0,
-      movedMenu
-    );
-
-    /* 화면에는 먼저 즉시 반영 */
-    sorted.forEach(
-      (menu, index) => {
-        menu.sort_order =
-          (index + 1) * 10;
-      }
-    );
-
-    allMenus =
-      sorted;
-
-    updateSummary();
-    buildCategoryFilter();
-    applyFilters();
-
-    isSaving =
-      true;
-
-    showSaving(
-      '메뉴 순서 저장 중...'
-    );
-
-    const results =
-      await Promise.all(
-        sorted.map(
-          menu =>
-            supabaseClient
-              .from('menus')
-              .update({
-                sort_order:
-                  Number(menu.sort_order)
-              })
-              .eq(
-                'id',
-                Number(menu.id)
-              )
-        )
-      );
-
-    const failed =
-      results.find(
-        result =>
-          result.error
-      );
-
-    if (failed) {
-
-      console.error(
-        'MENU ORDER UPDATE ERROR:',
-        failed.error
-      );
-
-      alert(
-        '메뉴 순서 저장에 실패했습니다. 다시 시도해주세요.'
-      );
-
-      isSaving =
-        false;
-
-      hideSaving();
-
-      await loadMenus();
-
-      return;
-    }
-
-    showSaving(
-      '순서 저장 완료'
-    );
-
-    isSaving =
-      false;
-
-    setTimeout(
-      hideSaving,
-      700
-    );
-
-    await loadMenus();
-
-  }
 
 
   /* =========================================
