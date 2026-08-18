@@ -1124,6 +1124,7 @@
       loadError: '메뉴를 불러오지 못했습니다.',
 
       add: '담기',
+      menuSoldOut: '품절',
 
       cart: '장바구니',
       cartTitle: '주문 내역',
@@ -1250,6 +1251,7 @@
       loadError: 'Unable to load the menu.',
 
       add: 'Add',
+      menuSoldOut: 'Sold Out',
 
       cart: 'Cart',
       cartTitle: 'Your Order',
@@ -1379,6 +1381,7 @@
         'メニューを読み込めませんでした。',
 
       add: '追加',
+      menuSoldOut: '売り切れ',
 
       cart: 'カート',
       cartTitle: 'ご注文内容',
@@ -1507,6 +1510,7 @@
       loadError: '无法加载菜单。',
 
       add: '加入',
+      menuSoldOut: '售罄',
 
       cart: '购物车',
       cartTitle: '订单内容',
@@ -2256,8 +2260,8 @@
         .from('menus')
         .select('*')
         .eq(
-          'is_available',
-          true
+          'is_hidden',
+          false
         )
         .order(
           'sort_order',
@@ -2533,6 +2537,33 @@
   }
 
 
+  function isMenuSoldOut(menu) {
+
+    if (!menu) {
+      return false;
+    }
+
+    if (menu.is_available === false) {
+
+      if (!menu.sold_out_until) {
+        return true;
+      }
+
+      const soldOutUntil =
+        new Date(menu.sold_out_until);
+
+      if (Number.isNaN(soldOutUntil.getTime())) {
+        return true;
+      }
+
+      return soldOutUntil.getTime() > Date.now();
+    }
+
+    return false;
+
+  }
+
+
   function renderMenus(
     menus
   ) {
@@ -2572,6 +2603,9 @@
                 menu
               );
 
+            const menuSoldOut =
+              isMenuSoldOut(menu);
+
 
             return `
 
@@ -2579,6 +2613,11 @@
 
                 <div class="menu-name">
                   ${escapeHtml(displayName)}
+                  ${
+                    menuSoldOut
+                      ? `<span style="margin-left:8px; color:#b42318; font-size:13px;">${escapeHtml(t('menuSoldOut'))}</span>`
+                      : ''
+                  }
                 </div>
 
                 ${
@@ -2617,12 +2656,17 @@
                     class="add-button"
                     onclick="addToCart(${Number(menu.id)})"
                     ${
-                      isOrderingAllowed()
+                      isOrderingAllowed() &&
+                      !menuSoldOut
                         ? ''
                         : 'disabled'
                     }
                   >
-                    ${escapeHtml(t('add'))}
+                    ${
+                      menuSoldOut
+                        ? escapeHtml(t('menuSoldOut'))
+                        : escapeHtml(t('add'))
+                    }
                   </button>
 
                 </div>
@@ -2659,6 +2703,13 @@
 
     if (
       !menu
+    ) {
+      return;
+    }
+
+
+    if (
+      isMenuSoldOut(menu)
     ) {
       return;
     }
