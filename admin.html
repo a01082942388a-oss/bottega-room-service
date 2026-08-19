@@ -719,6 +719,31 @@
       }
     }
   </style>
+
+<style>
+  html:not(.auth-ready) body {
+    visibility: hidden;
+  }
+
+  .logout-button {
+    margin-top: 10px;
+    border: 1px solid #444;
+    background: transparent;
+    color: #aaa;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+
+  .logout-button:hover {
+    background: #242424;
+    color: #fff;
+  }
+</style>
+
 </head>
 
 <body>
@@ -744,7 +769,16 @@
       <button class="sidebar-link" onclick="alert('운영설정 기능은 다음 단계에서 연결합니다.')">운영설정</button>
     </nav>
 
-  </aside>
+  
+    <button
+      type="button"
+      class="logout-button"
+      onclick="adminLogout()"
+    >
+      로그아웃
+    </button>
+
+</aside>
 
   <div class="content-area">
 
@@ -959,6 +993,84 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  window.__BOTTEGA_AUTH_READY__ = false;
+
+  
+const BOTTEGA_REMEMBER_KEY = 'bottega_admin_remember';
+
+const bottegaAuthStorage = {
+  getItem(key) {
+    return sessionStorage.getItem(key) ?? localStorage.getItem(key);
+  },
+  setItem(key, value) {
+    const remember =
+      localStorage.getItem(BOTTEGA_REMEMBER_KEY) === '1' ||
+      sessionStorage.getItem(BOTTEGA_REMEMBER_KEY) === '1';
+
+    if (remember) {
+      localStorage.setItem(key, value);
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, value);
+      localStorage.removeItem(key);
+    }
+  },
+  removeItem(key) {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  }
+};
+
+
+  const bottegaAuthClient =
+    supabase.createClient(
+      'https://yookspgooyewhnkobckw.supabase.co',
+      'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp',
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storage: bottegaAuthStorage
+        }
+      }
+    );
+
+  async function requireAdminLogin() {
+    const {
+      data,
+      error
+    } =
+      await bottegaAuthClient.auth.getUser();
+
+    if (
+      error ||
+      !data?.user
+    ) {
+      window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/login.html');
+      return false;
+    }
+
+    window.__BOTTEGA_AUTH_READY__ = true;
+    document.documentElement.classList.add('auth-ready');
+
+    return true;
+  }
+
+  async function adminLogout() {
+    await bottegaAuthClient.auth.signOut({ scope: 'local' });
+
+    localStorage.removeItem(BOTTEGA_REMEMBER_KEY);
+    sessionStorage.removeItem(BOTTEGA_REMEMBER_KEY);
+
+    window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/login.html');
+  }
+
+  requireAdminLogin();
+</script>
+
 
 <script>
 
