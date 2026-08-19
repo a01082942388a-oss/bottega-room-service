@@ -2,8 +2,382 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOTTEGA ADMIN LOGIN</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #f4f4f4;
+      color: #111;
+      font-family: Arial, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 430px;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 7px;
+      font-weight: 700;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: #777;
+      font-size: 11px;
+      letter-spacing: 3px;
+    }
+
+    .login-card {
+      background: #fff;
+      border: 1px solid #e4e4e4;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.08);
+    }
+
+    .login-card h2 {
+      margin: 0 0 6px;
+      font-size: 21px;
+    }
+
+    .login-card .description {
+      margin: 0 0 24px;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #ccc;
+      border-radius: 9px;
+      padding: 0 13px;
+      font: inherit;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 2px rgba(0,0,0,.05);
+    }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 3px 0 20px;
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .remember-row input {
+      width: 17px;
+      height: 17px;
+      accent-color: #111;
+    }
+
+    .login-button {
+      width: 100%;
+      height: 49px;
+      border: 0;
+      border-radius: 9px;
+      background: #111;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .login-button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 14px;
+      padding: 11px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: #fff0f0;
+      color: #9b3131;
+      border: 1px solid #efcccc;
+    }
+
+    .message.info {
+      background: #f3f3f3;
+      color: #555;
+      border: 1px solid #ddd;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 16px;
+      color: #999;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+  </style>
 </head>
+
 <body>
+
+  <div class="login-wrap">
+
+    <div class="brand">
+      <h1>BOTTEGA</h1>
+      <p>ADMINISTRATION</p>
+    </div>
+
+    <div class="login-card">
+
+      <h2>관리자 로그인</h2>
+
+      <p class="description">
+        주문관리 및 메뉴관리를 위해 관리자 계정으로 로그인해주세요.
+      </p>
+
+      <form id="login-form">
+
+        <div class="field">
+          <label for="email">이메일</label>
+          <input
+            id="email"
+            type="email"
+            autocomplete="username"
+            placeholder="관리자 이메일"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="password">비밀번호</label>
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="비밀번호"
+            required
+          >
+        </div>
+
+        <label class="remember-row">
+          <input id="remember-login" type="checkbox" checked>
+          <span>로그인 상태 유지</span>
+        </label>
+
+        <button
+          id="login-button"
+          class="login-button"
+          type="submit"
+        >
+          로그인
+        </button>
+
+        <div
+          id="message"
+          class="message"
+        ></div>
+
+      </form>
+
+    </div>
+
+    <div class="footer-note">
+      BOTTEGA ROOM SERVICE · ADMIN
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://yookspgooyewhnkobckw.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
+
+    
+const BOTTEGA_REMEMBER_KEY = 'bottega_admin_remember';
+
+const bottegaAuthStorage = {
+  getItem(key) {
+    return sessionStorage.getItem(key) ?? localStorage.getItem(key);
+  },
+  setItem(key, value) {
+    const remember =
+      localStorage.getItem(BOTTEGA_REMEMBER_KEY) === '1' ||
+      sessionStorage.getItem(BOTTEGA_REMEMBER_KEY) === '1';
+
+    if (remember) {
+      localStorage.setItem(key, value);
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, value);
+      localStorage.removeItem(key);
+    }
+  },
+  removeItem(key) {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  }
+};
+
+
+    const supabaseClient =
+      supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storage: bottegaAuthStorage
+          }
+        }
+      );
+
+    const loginForm =
+      document.getElementById('login-form');
+
+    const loginButton =
+      document.getElementById('login-button');
+
+    const message =
+      document.getElementById('message');
+
+    const rememberLogin =
+      document.getElementById('remember-login');
+
+    function showMessage(text, type = 'error') {
+      message.textContent = text;
+      message.className = `message show ${type}`;
+    }
+
+    function clearMessage() {
+      message.textContent = '';
+      message.className = 'message';
+    }
+
+    function setRememberMode(remember) {
+      if (remember) {
+        localStorage.setItem(BOTTEGA_REMEMBER_KEY, '1');
+        sessionStorage.removeItem(BOTTEGA_REMEMBER_KEY);
+      } else {
+        sessionStorage.setItem(BOTTEGA_REMEMBER_KEY, '0');
+        localStorage.removeItem(BOTTEGA_REMEMBER_KEY);
+      }
+    }
+
+    async function checkExistingLogin() {
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.getUser();
+
+      if (!error && data?.user) {
+        window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/admin.html');
+      }
+    }
+
+    loginForm.addEventListener(
+      'submit',
+      async event => {
+
+        event.preventDefault();
+        clearMessage();
+
+        const email =
+          document
+            .getElementById('email')
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById('password')
+            .value;
+
+        if (!email || !password) {
+          showMessage('이메일과 비밀번호를 입력해주세요.');
+          return;
+        }
+
+        setRememberMode(
+          rememberLogin.checked
+        );
+
+        loginButton.disabled = true;
+        loginButton.textContent = '로그인 중...';
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error || !data?.user) {
+          loginButton.disabled = false;
+          loginButton.textContent = '로그인';
+          showMessage('이메일 또는 비밀번호를 확인해주세요.');
+          return;
+        }
+
+        showMessage('로그인되었습니다. 이동합니다.', 'info');
+
+        window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/admin.html');
+      }
+    );
+
+    checkExistingLogin();
+  </script>
+
 </body>
 </html>
