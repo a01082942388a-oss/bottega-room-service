@@ -740,12 +740,12 @@ body {
 
 .bottega-sign {
   position: relative;
-  background: #6b1018;
+  background: #000000;
   color: #f0d7a8;
   text-align: center;
   padding: 30px 18px 22px;
   border-bottom: 1px solid rgba(224,191,134,.32);
-  box-shadow: 0 8px 24px rgba(72,10,14,.18);
+  box-shadow: 0 8px 24px #000000;
 }
 
 .bottega-brand h1 {
@@ -798,7 +798,7 @@ body {
 
 .bottega-sign .language-button.active {
   background: #fffdf9;
-  color: #571014;
+  color: #000000;
   border-color: #fffdf9;
   font-weight: 700;
 }
@@ -815,7 +815,7 @@ body {
 }
 
 .room-info strong {
-  color: #651118;
+  color: #000000;
   font-family: "Noto Serif KR", serif;
   font-size: 21px;
   font-weight: 700;
@@ -924,9 +924,9 @@ body {
    BURGUNDY / WHITE / BLACK ONLY
 ========================================== */
 :root {
-  --wine: #6b1018 !important;
-  --wine-dark: #6b1018 !important;
-  --wine-soft: #6b1018 !important;
+  --wine: #000000 !important;
+  --wine-dark: #000000 !important;
+  --wine-soft: #000000 !important;
   --cream: #ffffff !important;
   --cream-deep: #ffffff !important;
   --gold: #ffffff !important;
@@ -943,7 +943,7 @@ body {
 }
 
 .bottega-sign {
-  background: #6b1018 !important;
+  background: #000000 !important;
   color: #ffffff !important;
   border-bottom: 1px solid #000000 !important;
   box-shadow: none !important;
@@ -956,14 +956,14 @@ body {
 }
 
 .bottega-sign .language-button {
-  background: #6b1018 !important;
+  background: #000000 !important;
   color: #ffffff !important;
   border-color: #ffffff !important;
 }
 
 .bottega-sign .language-button.active {
   background: #ffffff !important;
-  color: #6b1018 !important;
+  color: #000000 !important;
   border-color: #ffffff !important;
 }
 
@@ -974,7 +974,7 @@ body {
 }
 
 .room-info strong {
-  color: #6b1018 !important;
+  color: #000000 !important;
 }
 
 .category-nav,
@@ -1001,9 +1001,9 @@ body {
 }
 
 .category-nav button.active {
-  background: #6b1018 !important;
+  background: #000000 !important;
   color: #ffffff !important;
-  border-color: #6b1018 !important;
+  border-color: #000000 !important;
 }
 
 .menu-section-title,
@@ -1015,7 +1015,7 @@ body {
 }
 
 .menu-section-title::after {
-  background: #6b1018 !important;
+  background: #000000 !important;
 }
 
 .menu-image-placeholder {
@@ -1028,9 +1028,9 @@ body {
 .order-button,
 .cart-button,
 .confirm-button {
-  background: #6b1018 !important;
+  background: #000000 !important;
   color: #ffffff !important;
-  border-color: #6b1018 !important;
+  border-color: #000000 !important;
 }
 
 .add-button:disabled,
@@ -1053,7 +1053,7 @@ body {
 .cart-count,
 .badge,
 .count-badge {
-  background: #6b1018 !important;
+  background: #000000 !important;
   color: #ffffff !important;
 }
 
@@ -1129,9 +1129,9 @@ hr {
 }
 
 .category-nav button.active {
-  background: #6b1018 !important;
+  background: #000000 !important;
   color: #ffffff !important;
-  border-color: #6b1018 !important;
+  border-color: #000000 !important;
   font-weight: 700 !important;
 }
 
@@ -1147,6 +1147,129 @@ hr {
   }
 }
 </style>
+
+<style>
+/* BOTTEGA FINAL BLACK / WHITE PALETTE */
+:root {
+  --wine: #000000 !important;
+  --wine-dark: #000000 !important;
+  --wine-soft: #000000 !important;
+}
+
+.bottega-sign,
+.category-nav button.active,
+.add-button,
+.order-button,
+.cart-button,
+.confirm-button,
+.cart-count,
+.badge,
+.count-badge {
+  background: #000000 !important;
+}
+
+.room-info strong,
+.menu-section-title {
+  color: #000000 !important;
+}
+
+.menu-section-title::after {
+  background: #000000 !important;
+}
+
+.category-nav button.active,
+.add-button,
+.order-button,
+.cart-button,
+.confirm-button {
+  border-color: #000000 !important;
+}
+</style>
+
+
+<style>
+/* ==========================================
+   TYPOGRAPHY FINAL
+   BOTTEGA 간판 글씨체만 유지
+   나머지는 카테고리와 동일한 글씨체
+========================================== */
+
+body,
+button,
+input,
+textarea,
+select,
+.room-info,
+.room-info strong,
+.category-nav,
+.category-nav button,
+.menu-section-title,
+.menu-name,
+.menu-name-en,
+.menu-description,
+.price,
+.add-button,
+.order-button,
+.cart-button,
+.confirm-button,
+.cart-bar,
+.cart-modal,
+.cart-modal *,
+.payment-option,
+.payment-option *,
+.cutlery-section,
+.cutlery-section *,
+.loading,
+.menu-soldout-badge,
+.language-bar,
+.language-button {
+  font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif !important;
+}
+
+/* BOTTEGA 간판 브랜드 글씨체만 기존 스타일 유지 */
+.bottega-brand h1 {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+}
+
+/* ROOM SERVICE는 일반 UI 글씨체로 통일 */
+.bottega-brand p {
+  font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif !important;
+}
+</style>
+
+
+<style>
+/* CATEGORY ALIGNMENT FINAL
+   카테고리 가운데 정렬 + 카테고리 간격 확대
+*/
+.category-nav {
+  justify-content: center !important;
+  gap: 16px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* 카테고리가 화면 너비보다 많아지는 경우 가로 스크롤 유지 */
+@media (max-width: 700px) {
+  .category-nav {
+    justify-content: flex-start !important;
+    gap: 14px !important;
+  }
+
+  /* 카테고리 전체 폭이 화면보다 작을 때 시각적으로 중앙 배치 */
+  .category-nav::before,
+  .category-nav::after {
+    content: "";
+    flex: 1 0 0;
+    min-width: 0;
+  }
+
+  .category-nav button {
+    flex: 0 0 auto !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -2271,11 +2394,20 @@ hr {
     }
 
 
-    currentServiceStatus =
+    const nextServiceStatus =
       data.status || 'open';
 
 
-    renderServiceStatus();
+    if (
+      nextServiceStatus !== currentServiceStatus
+    ) {
+
+      currentServiceStatus =
+        nextServiceStatus;
+
+      renderServiceStatus();
+
+    }
 
   }
 
@@ -4383,9 +4515,8 @@ function changeCutleryQty(change) {
 
 loadServiceStatus();
 
-  startServiceStatusPolling();
-
-
+  // 영업상태는 최초 진입 시 1회만 확인합니다.
+  // 메뉴 화면 자동 폴링은 사용하지 않습니다.
   /*
     고객이 새로고침해도
     기존 주문상태 복구
