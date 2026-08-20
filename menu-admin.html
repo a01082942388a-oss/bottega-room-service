@@ -1612,8 +1612,8 @@ function clearLiveThemeObjectUrls() {
       </div>
 
       <div class="design-help">
-        설정을 저장하면 주문페이지에도 적용됩니다.
-        미리보기는 저장 후 자동으로 다시 불러옵니다.
+        색상·폰트·사진 선택은 저장 전에도 즉시 미리보기에 반영됩니다.
+        실제 주문페이지 적용은 <b>디자인 설정 저장</b>을 눌러야 완료됩니다.
       </div>
     </div>
 
@@ -4823,6 +4823,8 @@ async function uploadThemeImage(
   showSaving(
     '사진 적용 완료'
   );
+
+  refreshThemePreview();
 
   setTimeout(
     hideSaving,
