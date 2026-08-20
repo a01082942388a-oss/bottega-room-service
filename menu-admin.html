@@ -583,6 +583,30 @@ function getLiveThemeValues() {
       )?.value ||
       themeDraft.sign_text_color,
 
+    language_font:
+      document.getElementById(
+        'theme-language-font'
+      )?.value ||
+      themeDraft.language_font,
+
+    language_font_size:
+      document.getElementById(
+        'theme-language-font-size'
+      )?.value ||
+      themeDraft.language_font_size,
+
+    language_text_color:
+      document.getElementById(
+        'theme-language-text-color'
+      )?.value ||
+      themeDraft.language_text_color,
+
+    language_active_text_color:
+      document.getElementById(
+        'theme-language-active-text-color'
+      )?.value ||
+      themeDraft.language_active_text_color,
+
     category_active_color:
       document.getElementById(
         'theme-category-color'
@@ -711,6 +735,31 @@ function applyLiveThemePreview() {
     ]
   );
 
+  root.style.setProperty(
+    '--theme-language-font',
+    LIVE_THEME_FONT_MAP[
+      settings.language_font
+    ] ||
+    LIVE_THEME_FONT_MAP[
+      'noto-sans'
+    ]
+  );
+
+  root.style.setProperty(
+    '--theme-language-font-size',
+    settings.language_font_size
+  );
+
+  root.style.setProperty(
+    '--theme-language-text-color',
+    settings.language_text_color
+  );
+
+  root.style.setProperty(
+    '--theme-language-active-text-color',
+    settings.language_active_text_color
+  );
+
 }
 
 
@@ -725,6 +774,10 @@ function bindThemeLivePreview() {
       'theme-sign-bg-color',
       'theme-sign-text-color',
       'theme-sign-font',
+      'theme-language-font',
+      'theme-language-font-size',
+      'theme-language-text-color',
+      'theme-language-active-text-color',
       'theme-category-color',
       'theme-button-color'
     ];
@@ -1420,6 +1473,53 @@ function clearLiveThemeObjectUrls() {
               </div>
 
             </div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+      <div class="design-panel">
+        <h2 class="design-section-title">언어 선택 버튼</h2>
+        <p class="design-section-sub">
+          한국어 · ENGLISH · 日本語 · 中文(简体) 언어 버튼의 글씨체, 글씨크기와 글씨색을 설정합니다.
+        </p>
+
+        <div class="design-fields">
+
+          <div class="design-field">
+            <label>언어 버튼 글씨체</label>
+            <select id="theme-language-font">
+              <option value="noto-sans">Noto Sans KR · 깔끔한 고딕</option>
+              <option value="noto-serif">Noto Serif KR · 정갈한 명조</option>
+              <option value="nanum-myeongjo">Nanum Myeongjo · 클래식</option>
+              <option value="gowun-batang">Gowun Batang · 부드러운 바탕</option>
+              <option value="system">기본 시스템 고딕</option>
+            </select>
+          </div>
+
+          <div class="design-field">
+            <label>언어 버튼 글씨크기</label>
+            <select id="theme-language-font-size">
+              <option value="11px">아주 작게 · 11px</option>
+              <option value="12px">작게 · 12px</option>
+              <option value="13px">기본 · 13px</option>
+              <option value="14px">조금 크게 · 14px</option>
+              <option value="15px">크게 · 15px</option>
+              <option value="16px">아주 크게 · 16px</option>
+              <option value="18px">특대 · 18px</option>
+            </select>
+          </div>
+
+          <div class="design-field">
+            <label>언어 버튼 글씨색</label>
+            <input id="theme-language-text-color" type="color" value="#ffffff">
+          </div>
+
+          <div class="design-field">
+            <label>선택된 언어 글씨색</label>
+            <input id="theme-language-active-text-color" type="color" value="#000000">
           </div>
 
         </div>
@@ -4040,6 +4140,14 @@ const THEME_DEFAULTS = {
     'cormorant',
   sign_text_color:
     '#ffffff',
+  language_font:
+    'noto-sans',
+  language_font_size:
+    '13px',
+  language_text_color:
+    '#ffffff',
+  language_active_text_color:
+    '#000000',
   category_active_color:
     '#000000',
   button_color:
@@ -4156,6 +4264,26 @@ function fillThemeControls() {
     themeDraft.sign_font;
 
   document.getElementById(
+    'theme-language-font'
+  ).value =
+    themeDraft.language_font;
+
+  document.getElementById(
+    'theme-language-font-size'
+  ).value =
+    themeDraft.language_font_size;
+
+  document.getElementById(
+    'theme-language-text-color'
+  ).value =
+    themeDraft.language_text_color;
+
+  document.getElementById(
+    'theme-language-active-text-color'
+  ).value =
+    themeDraft.language_active_text_color;
+
+  document.getElementById(
     'theme-category-color'
   ).value =
     themeDraft.category_active_color;
@@ -4218,6 +4346,26 @@ function collectThemeControls() {
     sign_font:
       document.getElementById(
         'theme-sign-font'
+      ).value,
+
+    language_font:
+      document.getElementById(
+        'theme-language-font'
+      ).value,
+
+    language_font_size:
+      document.getElementById(
+        'theme-language-font-size'
+      ).value,
+
+    language_text_color:
+      document.getElementById(
+        'theme-language-text-color'
+      ).value,
+
+    language_active_text_color:
+      document.getElementById(
+        'theme-language-active-text-color'
       ).value,
 
     category_active_color:
