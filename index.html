@@ -1304,8 +1304,10 @@ select,
   --theme-sign-text-color: #ffffff;
   --theme-language-font: "Noto Sans KR", sans-serif;
   --theme-language-font-size: 13px;
-  --theme-language-text-color: #ffffff;
-  --theme-language-active-text-color: #000000;
+  --theme-language-text-color: #000000;
+  --theme-language-bg-color: #ffffff;
+  --theme-language-active-text-color: #ffffff;
+  --theme-language-active-bg-color: #000000;
   --theme-category-color: #000000;
   --theme-button-color: #000000;
   --theme-ui-font: "Noto Sans KR", sans-serif;
@@ -1379,11 +1381,13 @@ select,
   font-family: var(--theme-language-font) !important;
   font-size: var(--theme-language-font-size) !important;
   color: var(--theme-language-text-color) !important;
+  background: var(--theme-language-bg-color) !important;
 }
 
 .language-bar .language-button.active,
 .language-button.active {
   color: var(--theme-language-active-text-color) !important;
+  background: var(--theme-language-active-bg-color) !important;
 }
 
 
@@ -1872,8 +1876,12 @@ select,
     language_font_size:
       '13px',
     language_text_color:
+      '#000000',
+    language_bg_color:
       '#ffffff',
     language_active_text_color:
+      '#ffffff',
+    language_active_bg_color:
       '#000000',
     category_active_color:
       '#000000',
@@ -2033,8 +2041,18 @@ select,
     );
 
     root.style.setProperty(
+      '--theme-language-bg-color',
+      settings.language_bg_color
+    );
+
+    root.style.setProperty(
       '--theme-language-active-text-color',
       settings.language_active_text_color
+    );
+
+    root.style.setProperty(
+      '--theme-language-active-bg-color',
+      settings.language_active_bg_color
     );
 
     try {
