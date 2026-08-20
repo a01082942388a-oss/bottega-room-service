@@ -1421,6 +1421,47 @@ select,
   color: #ffffff !important;
 }
 </style>
+<style>
+/* ==========================================
+   PAGE BACKGROUND IMAGE RELIABILITY FIX
+   body 자체 배경 대신 고정 레이어를 사용
+========================================== */
+html {
+  background: var(--theme-page-bg-color) !important;
+}
+
+body {
+  position: relative !important;
+  isolation: isolate !important;
+  background: transparent !important;
+  background-image: none !important;
+  min-height: 100vh !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--theme-page-bg-color);
+  background-image: var(--theme-page-bg-image);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+/* 메뉴 영역은 배경사진이 보이도록 투명 유지 */
+main,
+.menu-category-section {
+  background: transparent !important;
+}
+
+/* 메뉴카드는 관리자가 지정한 카드색 유지 */
+.menu-card {
+  background: var(--theme-card-bg-color) !important;
+}
+</style>
 </head>
 
 <body>
