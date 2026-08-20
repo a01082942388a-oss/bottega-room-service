@@ -1302,6 +1302,10 @@ select,
   --theme-sign-bg-color: #000000;
   --theme-sign-bg-image: none;
   --theme-sign-text-color: #ffffff;
+  --theme-language-font: "Noto Sans KR", sans-serif;
+  --theme-language-font-size: 13px;
+  --theme-language-text-color: #ffffff;
+  --theme-language-active-text-color: #000000;
   --theme-category-color: #000000;
   --theme-button-color: #000000;
   --theme-ui-font: "Noto Sans KR", sans-serif;
@@ -1368,6 +1372,20 @@ select,
   color: var(--theme-sign-text-color) !important;
   font-family: var(--theme-sign-font) !important;
 }
+
+
+.language-bar .language-button,
+.language-button {
+  font-family: var(--theme-language-font) !important;
+  font-size: var(--theme-language-font-size) !important;
+  color: var(--theme-language-text-color) !important;
+}
+
+.language-bar .language-button.active,
+.language-button.active {
+  color: var(--theme-language-active-text-color) !important;
+}
+
 
 .room-info,
 .menu-section-title,
@@ -1849,6 +1867,14 @@ select,
       'cormorant',
     sign_text_color:
       '#ffffff',
+    language_font:
+      'noto-sans',
+    language_font_size:
+      '13px',
+    language_text_color:
+      '#ffffff',
+    language_active_text_color:
+      '#000000',
     category_active_color:
       '#000000',
     button_color:
@@ -1984,6 +2010,31 @@ select,
       ORDER_THEME_FONT_MAP[
         'cormorant'
       ]
+    );
+
+    root.style.setProperty(
+      '--theme-language-font',
+      ORDER_THEME_FONT_MAP[
+        settings.language_font
+      ] ||
+      ORDER_THEME_FONT_MAP[
+        'noto-sans'
+      ]
+    );
+
+    root.style.setProperty(
+      '--theme-language-font-size',
+      settings.language_font_size
+    );
+
+    root.style.setProperty(
+      '--theme-language-text-color',
+      settings.language_text_color
+    );
+
+    root.style.setProperty(
+      '--theme-language-active-text-color',
+      settings.language_active_text_color
     );
 
     try {
