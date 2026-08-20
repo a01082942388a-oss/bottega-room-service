@@ -1423,8 +1423,8 @@ select,
 </style>
 <style>
 /* ==========================================
-   PAGE BACKGROUND IMAGE RELIABILITY FIX
-   body 자체 배경 대신 고정 레이어를 사용
+   PAGE BACKGROUND IMAGE FINAL FIX
+   실제 배경 레이어를 화면 최하단에 안전하게 표시
 ========================================== */
 html {
   background: var(--theme-page-bg-color) !important;
@@ -1432,17 +1432,20 @@ html {
 
 body {
   position: relative !important;
-  isolation: isolate !important;
   background: transparent !important;
   background-image: none !important;
   min-height: 100vh !important;
 }
 
+/*
+  z-index:-1은 html 배경 뒤로 숨어 사진이 안 보일 수 있어서
+  0번 레이어에 배경을 두고 실제 화면을 1번 이상으로 올립니다.
+*/
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   background-color: var(--theme-page-bg-color);
   background-image: var(--theme-page-bg-image);
@@ -1451,16 +1454,34 @@ body::before {
   background-repeat: no-repeat;
 }
 
-/* 메뉴 영역은 배경사진이 보이도록 투명 유지 */
+/* 실제 주문 UI는 배경 레이어보다 위에 표시 */
+.bottega-sign,
+#order-section,
+.status-page,
+.cart-modal-overlay,
+.time-modal-overlay {
+  position: relative;
+  z-index: 1;
+}
+
+/* 주문 콘텐츠 영역은 배경사진이 비치도록 투명 */
+#order-section,
+#menu-area,
 main,
 .menu-category-section {
   background: transparent !important;
 }
 
-/* 메뉴카드는 관리자가 지정한 카드색 유지 */
+/* 객실정보/카테고리/메뉴카드는 각각 기존 설정 유지 */
 .menu-card {
   background: var(--theme-card-bg-color) !important;
 }
+
+/* 배경 이미지가 있을 때 페이지 여백에서도 확실히 보이도록 */
+#menu-list {
+  background: transparent !important;
+}
+
 </style>
 </head>
 
@@ -2003,6 +2024,26 @@ main,
         settings.page_bg_image_url
       )
     );
+
+    if (
+      settings.page_bg_image_url
+    ) {
+
+      const pageBackgroundProbe =
+        new Image();
+
+      pageBackgroundProbe.onerror =
+        () => {
+          console.error(
+            'PAGE BACKGROUND IMAGE LOAD ERROR:',
+            settings.page_bg_image_url
+          );
+        };
+
+      pageBackgroundProbe.src =
+        settings.page_bg_image_url;
+
+    }
 
     root.style.setProperty(
       '--theme-text-color',
