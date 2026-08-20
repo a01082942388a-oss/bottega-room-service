@@ -468,6 +468,214 @@ header p {
   display: block;
 }
 
+
+/* =========================
+   주문페이지 디자인 설정
+========================= */
+.design-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+  gap: 18px;
+  align-items: start;
+}
+
+.design-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #e5e5e5;
+}
+
+.design-panel + .design-panel {
+  margin-top: 14px;
+}
+
+.design-section-title {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+
+.design-section-sub {
+  margin: 0 0 16px;
+  color: #888;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.design-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.design-field {
+  min-width: 0;
+}
+
+.design-field.full {
+  grid-column: 1 / -1;
+}
+
+.design-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #444;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.design-field input[type="color"] {
+  width: 100%;
+  height: 44px;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 9px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.design-field select,
+.design-field input[type="text"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 11px;
+  border: 1px solid #ddd;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.design-upload-box {
+  border: 1px solid #e3e3e3;
+  border-radius: 11px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.design-image-preview {
+  width: 100%;
+  height: 150px;
+  margin-bottom: 10px;
+  border: 1px dashed #ccc;
+  border-radius: 9px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #aaa;
+  font-size: 11px;
+}
+
+.design-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.design-file-input {
+  width: 100%;
+  margin-bottom: 9px;
+  font-size: 11px;
+}
+
+.design-upload-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.design-upload-actions .btn {
+  flex: 1;
+}
+
+.design-save-bar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 8px 28px rgba(0,0,0,.08);
+}
+
+.design-save-bar .btn {
+  flex: 1;
+}
+
+.design-preview-wrap {
+  position: sticky;
+  top: 18px;
+}
+
+.design-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.design-preview-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.design-preview {
+  width: 100%;
+  height: 720px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.design-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.design-help {
+  margin-top: 8px;
+  color: #888;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media(max-width: 1000px) {
+  .design-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .design-preview-wrap {
+    position: static;
+  }
+
+  .design-preview {
+    height: 650px;
+  }
+}
+
+@media(max-width: 600px) {
+  .design-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .design-field.full {
+    grid-column: auto;
+  }
+
+  .design-upload-actions,
+  .design-save-bar {
+    flex-direction: column;
+  }
+}
+
 </style>
 
 <style>
@@ -515,7 +723,7 @@ header p {
       주문관리
     </button>
 
-    <button class="sidebar-item active" onclick="showView('sort')">
+    <button id="sidebar-sort" class="sidebar-item active" onclick="showView('sort')">
       <span class="sidebar-dot"></span>
       메뉴관리
     </button>
@@ -526,10 +734,9 @@ header p {
       <span class="sidebar-coming">예정</span>
     </button>
 
-    <button class="sidebar-item" onclick="alert('운영설정 기능은 다음 단계에서 추가합니다.')">
+    <button id="sidebar-design" class="sidebar-item" onclick="showView('design')">
       <span class="sidebar-dot"></span>
-      운영설정
-      <span class="sidebar-coming">예정</span>
+      주문페이지 디자인
     </button>
 
 
@@ -548,8 +755,8 @@ header p {
 <div class="main-area">
 
 <header>
-  <h1>메뉴관리</h1>
-  <p>ROOM SERVICE · MENU MANAGEMENT</p>
+  <h1 id="admin-page-title">메뉴관리</h1>
+  <p id="admin-page-subtitle">ROOM SERVICE · MENU MANAGEMENT</p>
 </header>
 
 <div class="container">
@@ -630,6 +837,201 @@ header p {
   </div>
 
 </section>
+
+
+<section id="design-view" class="view">
+
+  <div class="design-grid">
+
+    <div>
+
+      <div class="design-panel">
+        <h2 class="design-section-title">전체 페이지</h2>
+        <p class="design-section-sub">
+          주문페이지의 기본 글씨체, 글씨색, 배경색과 배경사진을 설정합니다.
+        </p>
+
+        <div class="design-fields">
+
+          <div class="design-field">
+            <label>전체 글씨체</label>
+            <select id="theme-ui-font">
+              <option value="noto-sans">Noto Sans KR · 깔끔한 고딕</option>
+              <option value="noto-serif">Noto Serif KR · 정갈한 명조</option>
+              <option value="nanum-myeongjo">Nanum Myeongjo · 클래식</option>
+              <option value="gowun-batang">Gowun Batang · 부드러운 바탕</option>
+              <option value="system">기본 시스템 고딕</option>
+            </select>
+          </div>
+
+          <div class="design-field">
+            <label>전체 글씨색</label>
+            <input id="theme-text-color" type="color" value="#000000">
+          </div>
+
+          <div class="design-field">
+            <label>페이지 배경색</label>
+            <input id="theme-page-bg-color" type="color" value="#ffffff">
+          </div>
+
+          <div class="design-field">
+            <label>메뉴 카드 배경색</label>
+            <input id="theme-card-bg-color" type="color" value="#ffffff">
+          </div>
+
+          <div class="design-field full">
+            <label>페이지 배경사진</label>
+            <div class="design-upload-box">
+
+              <div class="design-image-preview" id="theme-page-bg-preview">
+                등록된 배경사진이 없습니다.
+              </div>
+
+              <input
+                id="theme-page-bg-file"
+                class="design-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+              >
+
+              <div class="design-upload-actions">
+                <button class="btn btn-black" type="button" onclick="uploadThemeImage('page')">
+                  사진 추가 / 수정
+                </button>
+                <button class="btn btn-gray" type="button" onclick="removeThemeImage('page')">
+                  사진 삭제
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="design-panel">
+        <h2 class="design-section-title">BOTTEGA 간판</h2>
+        <p class="design-section-sub">
+          상단 BOTTEGA 간판의 배경, 글씨체와 글씨색을 설정합니다.
+          배경사진이 등록되어 있으면 배경색 위에 사진이 표시됩니다.
+        </p>
+
+        <div class="design-fields">
+
+          <div class="design-field">
+            <label>간판 배경색</label>
+            <input id="theme-sign-bg-color" type="color" value="#000000">
+          </div>
+
+          <div class="design-field">
+            <label>간판 글씨색</label>
+            <input id="theme-sign-text-color" type="color" value="#ffffff">
+          </div>
+
+          <div class="design-field full">
+            <label>간판 글씨체</label>
+            <select id="theme-sign-font">
+              <option value="cormorant">Cormorant Garamond · 현재 스타일</option>
+              <option value="noto-serif">Noto Serif KR</option>
+              <option value="nanum-myeongjo">Nanum Myeongjo</option>
+              <option value="gowun-batang">Gowun Batang</option>
+              <option value="system">기본 고딕</option>
+            </select>
+          </div>
+
+          <div class="design-field full">
+            <label>간판 배경사진</label>
+            <div class="design-upload-box">
+
+              <div class="design-image-preview" id="theme-sign-bg-preview">
+                등록된 간판 배경사진이 없습니다.
+              </div>
+
+              <input
+                id="theme-sign-bg-file"
+                class="design-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+              >
+
+              <div class="design-upload-actions">
+                <button class="btn btn-black" type="button" onclick="uploadThemeImage('sign')">
+                  사진 추가 / 수정
+                </button>
+                <button class="btn btn-gray" type="button" onclick="removeThemeImage('sign')">
+                  사진 삭제
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="design-panel">
+        <h2 class="design-section-title">버튼 / 카테고리</h2>
+        <p class="design-section-sub">
+          주문페이지의 선택된 카테고리와 주요 버튼 색상을 별도로 설정할 수 있습니다.
+        </p>
+
+        <div class="design-fields">
+
+          <div class="design-field">
+            <label>선택 카테고리 색</label>
+            <input id="theme-category-color" type="color" value="#000000">
+          </div>
+
+          <div class="design-field">
+            <label>주요 버튼 색</label>
+            <input id="theme-button-color" type="color" value="#000000">
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="design-save-bar">
+        <button class="btn btn-black" type="button" onclick="saveThemeSettings()">
+          디자인 설정 저장
+        </button>
+
+        <button class="btn btn-gray" type="button" onclick="resetThemeSettings()">
+          기본 디자인으로 초기화
+        </button>
+      </div>
+
+    </div>
+
+
+    <div class="design-preview-wrap">
+      <div class="design-preview-head">
+        <h3>실시간 확인</h3>
+        <button class="btn btn-gray" type="button" onclick="refreshThemePreview()">
+          새로고침
+        </button>
+      </div>
+
+      <div class="design-preview">
+        <iframe
+          id="theme-preview-frame"
+          title="주문페이지 디자인 미리보기"
+          src="https://a01082942388a-oss.github.io/bottega-room-service/?room=301"
+        ></iframe>
+      </div>
+
+      <div class="design-help">
+        설정을 저장하면 주문페이지에도 적용됩니다.
+        미리보기는 저장 후 자동으로 다시 불러옵니다.
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
 
 
 
@@ -817,7 +1219,6 @@ const bottegaAuthStorage = {
     window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/login.html');
   }
 
-  requireAdminLogin();
 </script>
 
 
@@ -829,11 +1230,10 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp';
 
+/* 관리자 인증 세션을 메뉴관리 DB 작업에도 동일하게 사용합니다.
+   별도의 Supabase Auth 인스턴스를 만들지 않아 로그인 유지/권한이 일관됩니다. */
 const supabaseClient =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  bottegaAuthClient;
 
 
 let allMenus = [];
@@ -968,15 +1368,80 @@ function hideSaving() {
    화면
 ========================= */
 
-function showView() {
+function showView(viewName = 'sort') {
 
-  document
-    .getElementById(
+  const sortView =
+    document.getElementById(
       'sort-view'
-    )
-    .classList.add(
-      'active'
     );
+
+  const designView =
+    document.getElementById(
+      'design-view'
+    );
+
+  const sortButton =
+    document.getElementById(
+      'sidebar-sort'
+    );
+
+  const designButton =
+    document.getElementById(
+      'sidebar-design'
+    );
+
+  const title =
+    document.getElementById(
+      'admin-page-title'
+    );
+
+  const subtitle =
+    document.getElementById(
+      'admin-page-subtitle'
+    );
+
+  const isDesign =
+    viewName === 'design';
+
+  sortView.classList.toggle(
+    'active',
+    !isDesign
+  );
+
+  designView.classList.toggle(
+    'active',
+    isDesign
+  );
+
+  sortButton.classList.toggle(
+    'active',
+    !isDesign
+  );
+
+  designButton.classList.toggle(
+    'active',
+    isDesign
+  );
+
+  if (isDesign) {
+
+    title.textContent =
+      '주문페이지 디자인';
+
+    subtitle.textContent =
+      'ROOM SERVICE · DESIGN SETTINGS';
+
+    loadThemeSettings();
+
+  } else {
+
+    title.textContent =
+      '메뉴관리';
+
+    subtitle.textContent =
+      'ROOM SERVICE · MENU MANAGEMENT';
+
+  }
 
 }
 
@@ -3026,16 +3491,770 @@ function addNewCategory() {
 }
 
 
+
+/* =========================
+   주문페이지 디자인 설정
+========================= */
+
+const THEME_IMAGE_BUCKET =
+  'theme-images';
+
+const THEME_DEFAULTS = {
+  ui_font:
+    'noto-sans',
+  text_color:
+    '#000000',
+  page_bg_color:
+    '#ffffff',
+  page_bg_image_url:
+    null,
+  card_bg_color:
+    '#ffffff',
+  sign_bg_color:
+    '#000000',
+  sign_bg_image_url:
+    null,
+  sign_font:
+    'cormorant',
+  sign_text_color:
+    '#ffffff',
+  category_active_color:
+    '#000000',
+  button_color:
+    '#000000'
+};
+
+let themeDraft =
+  {
+    ...THEME_DEFAULTS
+  };
+
+
+function getThemeStoragePathFromPublicUrl(url) {
+
+  if (!url) {
+    return null;
+  }
+
+  const marker =
+    '/storage/v1/object/public/' +
+    THEME_IMAGE_BUCKET +
+    '/';
+
+  const index =
+    String(url).indexOf(
+      marker
+    );
+
+  if (index === -1) {
+    return null;
+  }
+
+  return decodeURIComponent(
+    String(url).slice(
+      index +
+      marker.length
+    )
+  );
+
+}
+
+
+function setThemeImagePreview(
+  type,
+  url
+) {
+
+  const previewId =
+    type === 'page'
+      ? 'theme-page-bg-preview'
+      : 'theme-sign-bg-preview';
+
+  const preview =
+    document.getElementById(
+      previewId
+    );
+
+  if (!preview) {
+    return;
+  }
+
+  if (url) {
+
+    preview.innerHTML =
+      `<img src="${escapeHtml(url)}" alt="">`;
+
+  } else {
+
+    preview.textContent =
+      type === 'page'
+        ? '등록된 배경사진이 없습니다.'
+        : '등록된 간판 배경사진이 없습니다.';
+
+  }
+
+}
+
+
+function fillThemeControls() {
+
+  document.getElementById(
+    'theme-ui-font'
+  ).value =
+    themeDraft.ui_font;
+
+  document.getElementById(
+    'theme-text-color'
+  ).value =
+    themeDraft.text_color;
+
+  document.getElementById(
+    'theme-page-bg-color'
+  ).value =
+    themeDraft.page_bg_color;
+
+  document.getElementById(
+    'theme-card-bg-color'
+  ).value =
+    themeDraft.card_bg_color;
+
+  document.getElementById(
+    'theme-sign-bg-color'
+  ).value =
+    themeDraft.sign_bg_color;
+
+  document.getElementById(
+    'theme-sign-text-color'
+  ).value =
+    themeDraft.sign_text_color;
+
+  document.getElementById(
+    'theme-sign-font'
+  ).value =
+    themeDraft.sign_font;
+
+  document.getElementById(
+    'theme-category-color'
+  ).value =
+    themeDraft.category_active_color;
+
+  document.getElementById(
+    'theme-button-color'
+  ).value =
+    themeDraft.button_color;
+
+  setThemeImagePreview(
+    'page',
+    themeDraft.page_bg_image_url
+  );
+
+  setThemeImagePreview(
+    'sign',
+    themeDraft.sign_bg_image_url
+  );
+
+}
+
+
+function collectThemeControls() {
+
+  return {
+    ...themeDraft,
+
+    ui_font:
+      document.getElementById(
+        'theme-ui-font'
+      ).value,
+
+    text_color:
+      document.getElementById(
+        'theme-text-color'
+      ).value,
+
+    page_bg_color:
+      document.getElementById(
+        'theme-page-bg-color'
+      ).value,
+
+    card_bg_color:
+      document.getElementById(
+        'theme-card-bg-color'
+      ).value,
+
+    sign_bg_color:
+      document.getElementById(
+        'theme-sign-bg-color'
+      ).value,
+
+    sign_text_color:
+      document.getElementById(
+        'theme-sign-text-color'
+      ).value,
+
+    sign_font:
+      document.getElementById(
+        'theme-sign-font'
+      ).value,
+
+    category_active_color:
+      document.getElementById(
+        'theme-category-color'
+      ).value,
+
+    button_color:
+      document.getElementById(
+        'theme-button-color'
+      ).value
+  };
+
+}
+
+
+async function loadThemeSettings() {
+
+  const {
+    data,
+    error
+  } =
+    await bottegaAuthClient
+      .from('site_settings')
+      .select('settings')
+      .eq(
+        'key',
+        'theme'
+      )
+      .maybeSingle();
+
+  if (error) {
+
+    console.error(
+      'THEME LOAD ERROR:',
+      error
+    );
+
+    return;
+  }
+
+  themeDraft = {
+    ...THEME_DEFAULTS,
+    ...(
+      data &&
+      data.settings
+        ? data.settings
+        : {}
+    )
+  };
+
+  fillThemeControls();
+
+}
+
+
+async function saveThemeSettings(
+  options = {}
+) {
+
+  const {
+    silent = false
+  } =
+    options;
+
+  themeDraft =
+    collectThemeControls();
+
+  if (!silent) {
+    showSaving(
+      '디자인 저장 중...'
+    );
+  }
+
+  const {
+    error
+  } =
+    await bottegaAuthClient
+      .from('site_settings')
+      .upsert(
+        {
+          key:
+            'theme',
+          settings:
+            themeDraft,
+          updated_at:
+            new Date().toISOString()
+        },
+        {
+          onConflict:
+            'key'
+        }
+      );
+
+  if (error) {
+
+    console.error(
+      'THEME SAVE ERROR:',
+      error
+    );
+
+    hideSaving();
+
+    alert(
+      '디자인 설정 저장에 실패했습니다.\n' +
+      (error.message || '')
+    );
+
+    return false;
+  }
+
+  if (!silent) {
+
+    showSaving(
+      '디자인 저장 완료'
+    );
+
+    setTimeout(
+      hideSaving,
+      700
+    );
+
+  }
+
+  refreshThemePreview();
+
+  return true;
+
+}
+
+
+function refreshThemePreview() {
+
+  const frame =
+    document.getElementById(
+      'theme-preview-frame'
+    );
+
+  if (!frame) {
+    return;
+  }
+
+  const url =
+    new URL(
+      frame.src
+    );
+
+  url.searchParams.set(
+    'themePreview',
+    Date.now()
+  );
+
+  frame.src =
+    url.toString();
+
+}
+
+
+async function uploadThemeImage(
+  type
+) {
+
+  const isPage =
+    type === 'page';
+
+  const fileInput =
+    document.getElementById(
+      isPage
+        ? 'theme-page-bg-file'
+        : 'theme-sign-bg-file'
+    );
+
+  const file =
+    fileInput &&
+    fileInput.files &&
+    fileInput.files[0];
+
+  if (!file) {
+    alert('업로드할 사진을 선택해주세요.');
+    return;
+  }
+
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  if (
+    !allowedTypes.includes(
+      file.type
+    )
+  ) {
+    alert('JPG, PNG, WEBP 이미지만 사용할 수 있습니다.');
+    return;
+  }
+
+  if (
+    file.size >
+    5 * 1024 * 1024
+  ) {
+    alert('사진은 5MB 이하로 선택해주세요.');
+    return;
+  }
+
+  const extensionMap = {
+    'image/jpeg':
+      'jpg',
+    'image/png':
+      'png',
+    'image/webp':
+      'webp'
+  };
+
+  const extension =
+    extensionMap[file.type] ||
+    'jpg';
+
+  const storagePath =
+    `order-theme/${type}-${Date.now()}.${extension}`;
+
+  const oldUrl =
+    isPage
+      ? themeDraft.page_bg_image_url
+      : themeDraft.sign_bg_image_url;
+
+  showSaving(
+    '사진 업로드 중...'
+  );
+
+  const {
+    error: uploadError
+  } =
+    await bottegaAuthClient
+      .storage
+      .from(
+        THEME_IMAGE_BUCKET
+      )
+      .upload(
+        storagePath,
+        file,
+        {
+          contentType:
+            file.type,
+          cacheControl:
+            '3600',
+          upsert:
+            false
+        }
+      );
+
+  if (uploadError) {
+
+    console.error(
+      'THEME IMAGE UPLOAD ERROR:',
+      uploadError
+    );
+
+    hideSaving();
+
+    alert(
+      '사진 업로드에 실패했습니다.\n' +
+      (uploadError.message || '')
+    );
+
+    return;
+  }
+
+  const {
+    data: publicUrlData
+  } =
+    bottegaAuthClient
+      .storage
+      .from(
+        THEME_IMAGE_BUCKET
+      )
+      .getPublicUrl(
+        storagePath
+      );
+
+  const newUrl =
+    publicUrlData &&
+    publicUrlData.publicUrl;
+
+  if (!newUrl) {
+
+    hideSaving();
+
+    alert('사진 주소 생성에 실패했습니다.');
+    return;
+  }
+
+  if (isPage) {
+    themeDraft.page_bg_image_url =
+      newUrl;
+  } else {
+    themeDraft.sign_bg_image_url =
+      newUrl;
+  }
+
+  setThemeImagePreview(
+    type,
+    newUrl
+  );
+
+  const saved =
+    await saveThemeSettings({
+      silent:
+        true
+    });
+
+  if (!saved) {
+
+    await bottegaAuthClient
+      .storage
+      .from(
+        THEME_IMAGE_BUCKET
+      )
+      .remove(
+        [
+          storagePath
+        ]
+      );
+
+    return;
+  }
+
+  if (oldUrl) {
+
+    const oldPath =
+      getThemeStoragePathFromPublicUrl(
+        oldUrl
+      );
+
+    if (oldPath) {
+
+      const {
+        error: removeOldError
+      } =
+        await bottegaAuthClient
+          .storage
+          .from(
+            THEME_IMAGE_BUCKET
+          )
+          .remove(
+            [
+              oldPath
+            ]
+          );
+
+      if (removeOldError) {
+        console.warn(
+          'THEME OLD IMAGE DELETE ERROR:',
+          removeOldError
+        );
+      }
+
+    }
+
+  }
+
+  fileInput.value =
+    '';
+
+  showSaving(
+    '사진 적용 완료'
+  );
+
+  setTimeout(
+    hideSaving,
+    700
+  );
+
+}
+
+
+async function removeThemeImage(
+  type
+) {
+
+  const isPage =
+    type === 'page';
+
+  const oldUrl =
+    isPage
+      ? themeDraft.page_bg_image_url
+      : themeDraft.sign_bg_image_url;
+
+  if (!oldUrl) {
+    return;
+  }
+
+  if (
+    !confirm(
+      '등록된 배경사진을 삭제하시겠습니까?'
+    )
+  ) {
+    return;
+  }
+
+  if (isPage) {
+    themeDraft.page_bg_image_url =
+      null;
+  } else {
+    themeDraft.sign_bg_image_url =
+      null;
+  }
+
+  setThemeImagePreview(
+    type,
+    null
+  );
+
+  const saved =
+    await saveThemeSettings({
+      silent:
+        true
+    });
+
+  if (!saved) {
+
+    if (isPage) {
+      themeDraft.page_bg_image_url =
+        oldUrl;
+    } else {
+      themeDraft.sign_bg_image_url =
+        oldUrl;
+    }
+
+    setThemeImagePreview(
+      type,
+      oldUrl
+    );
+
+    return;
+  }
+
+  const oldPath =
+    getThemeStoragePathFromPublicUrl(
+      oldUrl
+    );
+
+  if (oldPath) {
+
+    const {
+      error: removeError
+    } =
+      await bottegaAuthClient
+        .storage
+        .from(
+          THEME_IMAGE_BUCKET
+        )
+        .remove(
+          [
+            oldPath
+          ]
+        );
+
+    if (removeError) {
+      console.warn(
+        'THEME IMAGE DELETE ERROR:',
+        removeError
+      );
+    }
+
+  }
+
+  refreshThemePreview();
+
+}
+
+
+async function resetThemeSettings() {
+
+  if (
+    !confirm(
+      '주문페이지 디자인을 기본값으로 초기화하시겠습니까?'
+    )
+  ) {
+    return;
+  }
+
+  const oldPageUrl =
+    themeDraft.page_bg_image_url;
+
+  const oldSignUrl =
+    themeDraft.sign_bg_image_url;
+
+  themeDraft = {
+    ...THEME_DEFAULTS
+  };
+
+  fillThemeControls();
+
+  const saved =
+    await saveThemeSettings();
+
+  if (!saved) {
+    return;
+  }
+
+  const paths =
+    [
+      getThemeStoragePathFromPublicUrl(
+        oldPageUrl
+      ),
+      getThemeStoragePathFromPublicUrl(
+        oldSignUrl
+      )
+    ]
+      .filter(Boolean);
+
+  if (paths.length) {
+
+    const {
+      error
+    } =
+      await bottegaAuthClient
+        .storage
+        .from(
+          THEME_IMAGE_BUCKET
+        )
+        .remove(
+          paths
+        );
+
+    if (error) {
+      console.warn(
+        'THEME RESET IMAGE CLEANUP ERROR:',
+        error
+      );
+    }
+
+  }
+
+}
+
+
 /* =========================
    최초 실행
 ========================= */
 
-loadMenus();
+async function initializeAdminPage() {
 
-setInterval(
-  loadMenus,
-  60000
-);
+  const authenticated =
+    await requireAdminLogin();
+
+  if (!authenticated) {
+    return;
+  }
+
+  await loadMenus();
+
+  setInterval(
+    loadMenus,
+    60000
+  );
+
+}
+
+initializeAdminPage();
 
 </script>
 
