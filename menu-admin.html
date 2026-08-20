@@ -471,577 +471,6 @@ header p {
 
 
 /* =========================
-   실시간 디자인 미리보기
-========================= */
-
-let livePageImageObjectUrl =
-  null;
-
-let liveSignImageObjectUrl =
-  null;
-
-
-const LIVE_THEME_FONT_MAP = {
-
-  'noto-sans':
-    '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
-
-  'noto-serif':
-    '"Noto Serif KR", Georgia, serif',
-
-  'nanum-myeongjo':
-    '"Nanum Myeongjo", "Noto Serif KR", serif',
-
-  'gowun-batang':
-    '"Gowun Batang", "Noto Serif KR", serif',
-
-  'cormorant':
-    '"Cormorant Garamond", Georgia, serif',
-
-  'system':
-    '"Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif'
-};
-
-
-function makeCssUrl(
-  url
-) {
-
-  if (!url) {
-    return 'none';
-  }
-
-  const escaped =
-    String(url)
-      .replace(
-        /\\/g,
-        '\\\\'
-      )
-      .replace(
-        /"/g,
-        '\\"'
-      );
-
-  return `url("${escaped}")`;
-
-}
-
-
-function getLiveThemeValues() {
-
-  return {
-
-    ui_font:
-      document.getElementById(
-        'theme-ui-font'
-      )?.value ||
-      themeDraft.ui_font,
-
-    text_color:
-      document.getElementById(
-        'theme-text-color'
-      )?.value ||
-      themeDraft.text_color,
-
-    page_bg_color:
-      document.getElementById(
-        'theme-page-bg-color'
-      )?.value ||
-      themeDraft.page_bg_color,
-
-    page_bg_image_url:
-      livePageImageObjectUrl ||
-      themeDraft.page_bg_image_url ||
-      null,
-
-    card_bg_color:
-      document.getElementById(
-        'theme-card-bg-color'
-      )?.value ||
-      themeDraft.card_bg_color,
-
-    sign_bg_color:
-      document.getElementById(
-        'theme-sign-bg-color'
-      )?.value ||
-      themeDraft.sign_bg_color,
-
-    sign_bg_image_url:
-      liveSignImageObjectUrl ||
-      themeDraft.sign_bg_image_url ||
-      null,
-
-    sign_font:
-      document.getElementById(
-        'theme-sign-font'
-      )?.value ||
-      themeDraft.sign_font,
-
-    sign_text_color:
-      document.getElementById(
-        'theme-sign-text-color'
-      )?.value ||
-      themeDraft.sign_text_color,
-
-    language_font:
-      document.getElementById(
-        'theme-language-font'
-      )?.value ||
-      themeDraft.language_font,
-
-    language_font_size:
-      document.getElementById(
-        'theme-language-font-size'
-      )?.value ||
-      themeDraft.language_font_size,
-
-    language_text_color:
-      document.getElementById(
-        'theme-language-text-color'
-      )?.value ||
-      themeDraft.language_text_color,
-
-    language_bg_color:
-      document.getElementById(
-        'theme-language-bg-color'
-      )?.value ||
-      themeDraft.language_bg_color,
-
-    language_active_text_color:
-      document.getElementById(
-        'theme-language-active-text-color'
-      )?.value ||
-      themeDraft.language_active_text_color,
-
-    language_active_bg_color:
-      document.getElementById(
-        'theme-language-active-bg-color'
-      )?.value ||
-      themeDraft.language_active_bg_color,
-
-    category_active_color:
-      document.getElementById(
-        'theme-category-color'
-      )?.value ||
-      themeDraft.category_active_color,
-
-    button_color:
-      document.getElementById(
-        'theme-button-color'
-      )?.value ||
-      themeDraft.button_color
-
-  };
-
-}
-
-
-function applyLiveThemePreview() {
-
-  const frame =
-    document.getElementById(
-      'theme-preview-frame'
-    );
-
-  if (!frame) {
-    return;
-  }
-
-  let previewDocument;
-
-  try {
-
-    previewDocument =
-      frame.contentDocument ||
-      frame.contentWindow?.document;
-
-  } catch (error) {
-
-    console.warn(
-      '미리보기 문서 접근 실패:',
-      error
-    );
-
-    return;
-  }
-
-  if (
-    !previewDocument ||
-    !previewDocument.documentElement
-  ) {
-    return;
-  }
-
-  const settings =
-    getLiveThemeValues();
-
-  const root =
-    previewDocument.documentElement;
-
-  root.style.setProperty(
-    '--theme-page-bg-color',
-    settings.page_bg_color
-  );
-
-  root.style.setProperty(
-    '--theme-page-bg-image',
-    makeCssUrl(
-      settings.page_bg_image_url
-    )
-  );
-
-  const previewBackgroundLayer =
-    previewDocument.getElementById(
-      'page-background-layer'
-    );
-
-  if (previewBackgroundLayer) {
-
-    previewBackgroundLayer.style.backgroundColor =
-      settings.page_bg_color;
-
-    previewBackgroundLayer.style.backgroundImage =
-      makeCssUrl(
-        settings.page_bg_image_url
-      );
-
-  } else if (previewDocument.body) {
-
-    /* 아직 최신 index가 배포되기 전에도 미리보기는 보이게 fallback */
-    previewDocument.body.style.backgroundColor =
-      settings.page_bg_color;
-
-    previewDocument.body.style.backgroundImage =
-      makeCssUrl(
-        settings.page_bg_image_url
-      );
-
-    previewDocument.body.style.backgroundSize =
-      'cover';
-
-    previewDocument.body.style.backgroundPosition =
-      'center center';
-
-    previewDocument.body.style.backgroundRepeat =
-      'no-repeat';
-
-    previewDocument.body.style.backgroundAttachment =
-      'fixed';
-
-  }
-
-  root.style.setProperty(
-    '--theme-text-color',
-    settings.text_color
-  );
-
-  root.style.setProperty(
-    '--theme-card-bg-color',
-    settings.card_bg_color
-  );
-
-  root.style.setProperty(
-    '--theme-sign-bg-color',
-    settings.sign_bg_color
-  );
-
-  root.style.setProperty(
-    '--theme-sign-bg-image',
-    makeCssUrl(
-      settings.sign_bg_image_url
-    )
-  );
-
-  root.style.setProperty(
-    '--theme-sign-text-color',
-    settings.sign_text_color
-  );
-
-  root.style.setProperty(
-    '--theme-category-color',
-    settings.category_active_color
-  );
-
-  root.style.setProperty(
-    '--theme-button-color',
-    settings.button_color
-  );
-
-  root.style.setProperty(
-    '--theme-ui-font',
-    LIVE_THEME_FONT_MAP[
-      settings.ui_font
-    ] ||
-    LIVE_THEME_FONT_MAP[
-      'noto-sans'
-    ]
-  );
-
-  root.style.setProperty(
-    '--theme-sign-font',
-    LIVE_THEME_FONT_MAP[
-      settings.sign_font
-    ] ||
-    LIVE_THEME_FONT_MAP[
-      'cormorant'
-    ]
-  );
-
-  root.style.setProperty(
-    '--theme-language-font',
-    LIVE_THEME_FONT_MAP[
-      settings.language_font
-    ] ||
-    LIVE_THEME_FONT_MAP[
-      'noto-sans'
-    ]
-  );
-
-  root.style.setProperty(
-    '--theme-language-font-size',
-    settings.language_font_size
-  );
-
-  root.style.setProperty(
-    '--theme-language-text-color',
-    settings.language_text_color
-  );
-
-  root.style.setProperty(
-    '--theme-language-bg-color',
-    settings.language_bg_color
-  );
-
-  root.style.setProperty(
-    '--theme-language-active-text-color',
-    settings.language_active_text_color
-  );
-
-  root.style.setProperty(
-    '--theme-language-active-bg-color',
-    settings.language_active_bg_color
-  );
-
-}
-
-
-function bindThemeLivePreview() {
-
-  const controlIds =
-    [
-      'theme-ui-font',
-      'theme-text-color',
-      'theme-page-bg-color',
-      'theme-card-bg-color',
-      'theme-sign-bg-color',
-      'theme-sign-text-color',
-      'theme-sign-font',
-      'theme-language-font',
-      'theme-language-font-size',
-      'theme-language-text-color',
-      'theme-language-bg-color',
-      'theme-language-active-text-color',
-      'theme-language-active-bg-color',
-      'theme-category-color',
-      'theme-button-color'
-    ];
-
-  controlIds.forEach(
-    id => {
-
-      const element =
-        document.getElementById(
-          id
-        );
-
-      if (!element) {
-        return;
-      }
-
-      element.addEventListener(
-        'input',
-        applyLiveThemePreview
-      );
-
-      element.addEventListener(
-        'change',
-        applyLiveThemePreview
-      );
-
-    }
-  );
-
-
-  const pageFileInput =
-    document.getElementById(
-      'theme-page-bg-file'
-    );
-
-  if (pageFileInput) {
-
-    pageFileInput.addEventListener(
-      'change',
-      () => {
-
-        const file =
-          pageFileInput.files &&
-          pageFileInput.files[0];
-
-        if (
-          livePageImageObjectUrl
-        ) {
-
-          URL.revokeObjectURL(
-            livePageImageObjectUrl
-          );
-
-          livePageImageObjectUrl =
-            null;
-
-        }
-
-        if (file) {
-
-          livePageImageObjectUrl =
-            URL.createObjectURL(
-              file
-            );
-
-          setThemeImagePreview(
-            'page',
-            livePageImageObjectUrl
-          );
-
-        } else {
-
-          setThemeImagePreview(
-            'page',
-            themeDraft.page_bg_image_url
-          );
-
-        }
-
-        applyLiveThemePreview();
-
-      }
-    );
-
-  }
-
-
-  const signFileInput =
-    document.getElementById(
-      'theme-sign-bg-file'
-    );
-
-  if (signFileInput) {
-
-    signFileInput.addEventListener(
-      'change',
-      () => {
-
-        const file =
-          signFileInput.files &&
-          signFileInput.files[0];
-
-        if (
-          liveSignImageObjectUrl
-        ) {
-
-          URL.revokeObjectURL(
-            liveSignImageObjectUrl
-          );
-
-          liveSignImageObjectUrl =
-            null;
-
-        }
-
-        if (file) {
-
-          liveSignImageObjectUrl =
-            URL.createObjectURL(
-              file
-            );
-
-          setThemeImagePreview(
-            'sign',
-            liveSignImageObjectUrl
-          );
-
-        } else {
-
-          setThemeImagePreview(
-            'sign',
-            themeDraft.sign_bg_image_url
-          );
-
-        }
-
-        applyLiveThemePreview();
-
-      }
-    );
-
-  }
-
-
-  const frame =
-    document.getElementById(
-      'theme-preview-frame'
-    );
-
-  if (frame) {
-
-    frame.addEventListener(
-      'load',
-      () => {
-
-        setTimeout(
-          applyLiveThemePreview,
-          150
-        );
-
-      }
-    );
-
-  }
-
-}
-
-
-function clearLiveThemeObjectUrls() {
-
-  if (
-    livePageImageObjectUrl
-  ) {
-
-    URL.revokeObjectURL(
-      livePageImageObjectUrl
-    );
-
-    livePageImageObjectUrl =
-      null;
-
-  }
-
-  if (
-    liveSignImageObjectUrl
-  ) {
-
-    URL.revokeObjectURL(
-      liveSignImageObjectUrl
-    );
-
-    liveSignImageObjectUrl =
-      null;
-
-  }
-
-}
-
-
-/* =========================
    주문페이지 디자인 설정
 ========================= */
 .design-grid {
@@ -4189,6 +3618,537 @@ function addNewCategory() {
 
 
 /* =========================
+   실시간 디자인 미리보기
+========================= */
+
+let livePageImageObjectUrl =
+  null;
+
+let liveSignImageObjectUrl =
+  null;
+
+
+const LIVE_THEME_FONT_MAP = {
+
+  'noto-sans':
+    '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+
+  'noto-serif':
+    '"Noto Serif KR", Georgia, serif',
+
+  'nanum-myeongjo':
+    '"Nanum Myeongjo", "Noto Serif KR", serif',
+
+  'gowun-batang':
+    '"Gowun Batang", "Noto Serif KR", serif',
+
+  'cormorant':
+    '"Cormorant Garamond", Georgia, serif',
+
+  'system':
+    '"Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif'
+};
+
+
+function makeCssUrl(
+  url
+) {
+
+  if (!url) {
+    return 'none';
+  }
+
+  const escaped =
+    String(url)
+      .replace(
+        /\\/g,
+        '\\\\'
+      )
+      .replace(
+        /"/g,
+        '\\"'
+      );
+
+  return `url("${escaped}")`;
+
+}
+
+
+function getLiveThemeValues() {
+
+  return {
+
+    ui_font:
+      document.getElementById(
+        'theme-ui-font'
+      )?.value ||
+      themeDraft.ui_font,
+
+    text_color:
+      document.getElementById(
+        'theme-text-color'
+      )?.value ||
+      themeDraft.text_color,
+
+    page_bg_color:
+      document.getElementById(
+        'theme-page-bg-color'
+      )?.value ||
+      themeDraft.page_bg_color,
+
+    page_bg_image_url:
+      livePageImageObjectUrl ||
+      themeDraft.page_bg_image_url ||
+      null,
+
+    card_bg_color:
+      document.getElementById(
+        'theme-card-bg-color'
+      )?.value ||
+      themeDraft.card_bg_color,
+
+    sign_bg_color:
+      document.getElementById(
+        'theme-sign-bg-color'
+      )?.value ||
+      themeDraft.sign_bg_color,
+
+    sign_bg_image_url:
+      liveSignImageObjectUrl ||
+      themeDraft.sign_bg_image_url ||
+      null,
+
+    sign_font:
+      document.getElementById(
+        'theme-sign-font'
+      )?.value ||
+      themeDraft.sign_font,
+
+    sign_text_color:
+      document.getElementById(
+        'theme-sign-text-color'
+      )?.value ||
+      themeDraft.sign_text_color,
+
+    language_font:
+      document.getElementById(
+        'theme-language-font'
+      )?.value ||
+      themeDraft.language_font,
+
+    language_font_size:
+      document.getElementById(
+        'theme-language-font-size'
+      )?.value ||
+      themeDraft.language_font_size,
+
+    language_text_color:
+      document.getElementById(
+        'theme-language-text-color'
+      )?.value ||
+      themeDraft.language_text_color,
+
+    language_bg_color:
+      document.getElementById(
+        'theme-language-bg-color'
+      )?.value ||
+      themeDraft.language_bg_color,
+
+    language_active_text_color:
+      document.getElementById(
+        'theme-language-active-text-color'
+      )?.value ||
+      themeDraft.language_active_text_color,
+
+    language_active_bg_color:
+      document.getElementById(
+        'theme-language-active-bg-color'
+      )?.value ||
+      themeDraft.language_active_bg_color,
+
+    category_active_color:
+      document.getElementById(
+        'theme-category-color'
+      )?.value ||
+      themeDraft.category_active_color,
+
+    button_color:
+      document.getElementById(
+        'theme-button-color'
+      )?.value ||
+      themeDraft.button_color
+
+  };
+
+}
+
+
+function applyLiveThemePreview() {
+
+  const frame =
+    document.getElementById(
+      'theme-preview-frame'
+    );
+
+  if (!frame) {
+    return;
+  }
+
+  let previewDocument;
+
+  try {
+
+    previewDocument =
+      frame.contentDocument ||
+      frame.contentWindow?.document;
+
+  } catch (error) {
+
+    console.warn(
+      '미리보기 문서 접근 실패:',
+      error
+    );
+
+    return;
+  }
+
+  if (
+    !previewDocument ||
+    !previewDocument.documentElement
+  ) {
+    return;
+  }
+
+  const settings =
+    getLiveThemeValues();
+
+  const root =
+    previewDocument.documentElement;
+
+  root.style.setProperty(
+    '--theme-page-bg-color',
+    settings.page_bg_color
+  );
+
+  root.style.setProperty(
+    '--theme-page-bg-image',
+    makeCssUrl(
+      settings.page_bg_image_url
+    )
+  );
+
+  root.style.setProperty(
+    '--theme-text-color',
+    settings.text_color
+  );
+
+  root.style.setProperty(
+    '--theme-card-bg-color',
+    settings.card_bg_color
+  );
+
+  root.style.setProperty(
+    '--theme-sign-bg-color',
+    settings.sign_bg_color
+  );
+
+  root.style.setProperty(
+    '--theme-sign-bg-image',
+    makeCssUrl(
+      settings.sign_bg_image_url
+    )
+  );
+
+  root.style.setProperty(
+    '--theme-sign-text-color',
+    settings.sign_text_color
+  );
+
+  root.style.setProperty(
+    '--theme-category-color',
+    settings.category_active_color
+  );
+
+  root.style.setProperty(
+    '--theme-button-color',
+    settings.button_color
+  );
+
+  root.style.setProperty(
+    '--theme-ui-font',
+    LIVE_THEME_FONT_MAP[
+      settings.ui_font
+    ] ||
+    LIVE_THEME_FONT_MAP[
+      'noto-sans'
+    ]
+  );
+
+  root.style.setProperty(
+    '--theme-sign-font',
+    LIVE_THEME_FONT_MAP[
+      settings.sign_font
+    ] ||
+    LIVE_THEME_FONT_MAP[
+      'cormorant'
+    ]
+  );
+
+  root.style.setProperty(
+    '--theme-language-font',
+    LIVE_THEME_FONT_MAP[
+      settings.language_font
+    ] ||
+    LIVE_THEME_FONT_MAP[
+      'noto-sans'
+    ]
+  );
+
+  root.style.setProperty(
+    '--theme-language-font-size',
+    settings.language_font_size
+  );
+
+  root.style.setProperty(
+    '--theme-language-text-color',
+    settings.language_text_color
+  );
+
+  root.style.setProperty(
+    '--theme-language-bg-color',
+    settings.language_bg_color
+  );
+
+  root.style.setProperty(
+    '--theme-language-active-text-color',
+    settings.language_active_text_color
+  );
+
+  root.style.setProperty(
+    '--theme-language-active-bg-color',
+    settings.language_active_bg_color
+  );
+
+}
+
+
+function bindThemeLivePreview() {
+
+  const controlIds =
+    [
+      'theme-ui-font',
+      'theme-text-color',
+      'theme-page-bg-color',
+      'theme-card-bg-color',
+      'theme-sign-bg-color',
+      'theme-sign-text-color',
+      'theme-sign-font',
+      'theme-language-font',
+      'theme-language-font-size',
+      'theme-language-text-color',
+      'theme-language-bg-color',
+      'theme-language-active-text-color',
+      'theme-language-active-bg-color',
+      'theme-category-color',
+      'theme-button-color'
+    ];
+
+  controlIds.forEach(
+    id => {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+      if (!element) {
+        return;
+      }
+
+      element.addEventListener(
+        'input',
+        applyLiveThemePreview
+      );
+
+      element.addEventListener(
+        'change',
+        applyLiveThemePreview
+      );
+
+    }
+  );
+
+
+  const pageFileInput =
+    document.getElementById(
+      'theme-page-bg-file'
+    );
+
+  if (pageFileInput) {
+
+    pageFileInput.addEventListener(
+      'change',
+      () => {
+
+        const file =
+          pageFileInput.files &&
+          pageFileInput.files[0];
+
+        if (
+          livePageImageObjectUrl
+        ) {
+
+          URL.revokeObjectURL(
+            livePageImageObjectUrl
+          );
+
+          livePageImageObjectUrl =
+            null;
+
+        }
+
+        if (file) {
+
+          livePageImageObjectUrl =
+            URL.createObjectURL(
+              file
+            );
+
+          setThemeImagePreview(
+            'page',
+            livePageImageObjectUrl
+          );
+
+        } else {
+
+          setThemeImagePreview(
+            'page',
+            themeDraft.page_bg_image_url
+          );
+
+        }
+
+        applyLiveThemePreview();
+
+      }
+    );
+
+  }
+
+
+  const signFileInput =
+    document.getElementById(
+      'theme-sign-bg-file'
+    );
+
+  if (signFileInput) {
+
+    signFileInput.addEventListener(
+      'change',
+      () => {
+
+        const file =
+          signFileInput.files &&
+          signFileInput.files[0];
+
+        if (
+          liveSignImageObjectUrl
+        ) {
+
+          URL.revokeObjectURL(
+            liveSignImageObjectUrl
+          );
+
+          liveSignImageObjectUrl =
+            null;
+
+        }
+
+        if (file) {
+
+          liveSignImageObjectUrl =
+            URL.createObjectURL(
+              file
+            );
+
+          setThemeImagePreview(
+            'sign',
+            liveSignImageObjectUrl
+          );
+
+        } else {
+
+          setThemeImagePreview(
+            'sign',
+            themeDraft.sign_bg_image_url
+          );
+
+        }
+
+        applyLiveThemePreview();
+
+      }
+    );
+
+  }
+
+
+  const frame =
+    document.getElementById(
+      'theme-preview-frame'
+    );
+
+  if (frame) {
+
+    frame.addEventListener(
+      'load',
+      () => {
+
+        setTimeout(
+          applyLiveThemePreview,
+          150
+        );
+
+      }
+    );
+
+  }
+
+}
+
+
+function clearLiveThemeObjectUrls() {
+
+  if (
+    livePageImageObjectUrl
+  ) {
+
+    URL.revokeObjectURL(
+      livePageImageObjectUrl
+    );
+
+    livePageImageObjectUrl =
+      null;
+
+  }
+
+  if (
+    liveSignImageObjectUrl
+  ) {
+
+    URL.revokeObjectURL(
+      liveSignImageObjectUrl
+    );
+
+    liveSignImageObjectUrl =
+      null;
+
+  }
+
+}
+
+
+/* =========================
    주문페이지 디자인 설정
 ========================= */
 
@@ -4520,6 +4480,117 @@ async function loadThemeSettings() {
 }
 
 
+
+async function persistThemeImageUrl(
+  type,
+  imageUrl
+) {
+
+  const isPage =
+    type === 'page';
+
+  const currentControls =
+    collectThemeControls();
+
+  const nextSettings = {
+    ...THEME_DEFAULTS,
+    ...themeDraft,
+    ...currentControls,
+    page_bg_image_url:
+      isPage
+        ? imageUrl
+        : (
+            themeDraft.page_bg_image_url ||
+            null
+          ),
+    sign_bg_image_url:
+      isPage
+        ? (
+            themeDraft.sign_bg_image_url ||
+            null
+          )
+        : imageUrl
+  };
+
+  const {
+    data,
+    error
+  } =
+    await bottegaAuthClient
+      .from('site_settings')
+      .upsert(
+        {
+          key:
+            'theme',
+          settings:
+            nextSettings,
+          updated_at:
+            new Date().toISOString()
+        },
+        {
+          onConflict:
+            'key'
+        }
+      )
+      .select('settings')
+      .single();
+
+  if (error) {
+
+    console.error(
+      'THEME IMAGE DB SAVE ERROR:',
+      error
+    );
+
+    return {
+      ok: false,
+      error
+    };
+
+  }
+
+  const storedUrl =
+    isPage
+      ? data?.settings?.page_bg_image_url
+      : data?.settings?.sign_bg_image_url;
+
+  if (storedUrl !== imageUrl) {
+
+    console.error(
+      'THEME IMAGE DB VERIFY FAILED:',
+      {
+        expected:
+          imageUrl,
+        actual:
+          storedUrl,
+        data
+      }
+    );
+
+    return {
+      ok: false,
+      error:
+        new Error(
+          '저장 후 이미지 URL 검증 실패'
+        )
+    };
+
+  }
+
+  themeDraft = {
+    ...THEME_DEFAULTS,
+    ...data.settings
+  };
+
+  return {
+    ok: true,
+    settings:
+      themeDraft
+  };
+
+}
+
+
 async function saveThemeSettings(
   options = {}
 ) {
@@ -4618,51 +4689,6 @@ function refreshThemePreview() {
 
   frame.src =
     url.toString();
-
-}
-
-
-
-function verifyPublicImageUrl(url) {
-
-  return new Promise(
-    resolve => {
-
-      const image =
-        new Image();
-
-      const timer =
-        setTimeout(
-          () => {
-            resolve(false);
-          },
-          10000
-        );
-
-      image.onload =
-        () => {
-          clearTimeout(timer);
-          resolve(true);
-        };
-
-      image.onerror =
-        () => {
-          clearTimeout(timer);
-          resolve(false);
-        };
-
-      image.src =
-        url +
-        (
-          url.includes('?')
-            ? '&'
-            : '?'
-        ) +
-        'verify=' +
-        Date.now();
-
-    }
-  );
 
 }
 
@@ -4801,23 +4827,6 @@ async function uploadThemeImage(
     return;
   }
 
-  const imageAccessible =
-    await verifyPublicImageUrl(
-      newUrl
-    );
-
-  if (!imageAccessible) {
-
-    hideSaving();
-
-    alert(
-      '사진은 업로드됐지만 공개 주소로 불러오지 못했습니다.\n' +
-      'Supabase Storage의 theme-images bucket이 Public인지 확인해주세요.'
-    );
-
-    return;
-  }
-
   if (isPage) {
 
     if (
@@ -4863,13 +4872,13 @@ async function uploadThemeImage(
 
   applyLiveThemePreview();
 
-  const saved =
-    await saveThemeSettings({
-      silent:
-        true
-    });
+  const persistResult =
+    await persistThemeImageUrl(
+      type,
+      newUrl
+    );
 
-  if (!saved) {
+  if (!persistResult.ok) {
 
     await bottegaAuthClient
       .storage
@@ -4882,43 +4891,14 @@ async function uploadThemeImage(
         ]
       );
 
-    return;
-  }
-
-  const {
-    data: savedThemeRow,
-    error: savedThemeReadError
-  } =
-    await bottegaAuthClient
-      .from('site_settings')
-      .select('settings')
-      .eq(
-        'key',
-        'theme'
-      )
-      .maybeSingle();
-
-  const savedImageUrl =
-    isPage
-      ? savedThemeRow?.settings?.page_bg_image_url
-      : savedThemeRow?.settings?.sign_bg_image_url;
-
-  if (
-    savedThemeReadError ||
-    savedImageUrl !== newUrl
-  ) {
-
-    console.error(
-      'THEME IMAGE SAVE VERIFY ERROR:',
-      savedThemeReadError,
-      savedThemeRow
-    );
-
     hideSaving();
 
     alert(
-      '사진 업로드는 됐지만 디자인 설정 DB 저장 확인에 실패했습니다.\n' +
-      'site_settings의 authenticated UPDATE 정책을 확인해주세요.'
+      '사진 업로드는 됐지만 DB에 이미지 주소 저장이 실패했습니다.\n' +
+      (
+        persistResult.error?.message ||
+        'site_settings 저장 오류'
+      )
     );
 
     return;
@@ -4961,8 +4941,26 @@ async function uploadThemeImage(
   fileInput.value =
     '';
 
+  setThemeImagePreview(
+    type,
+    newUrl
+  );
+
+  applyLiveThemePreview();
+
   showSaving(
-    '사진 저장 및 적용 완료'
+    '사진 저장 완료'
+  );
+
+  console.log(
+    'THEME IMAGE SAVED:',
+    {
+      type,
+      url:
+        newUrl,
+      settings:
+        themeDraft
+    }
   );
 
   refreshThemePreview();
@@ -5044,13 +5042,13 @@ async function removeThemeImage(
 
   applyLiveThemePreview();
 
-  const saved =
-    await saveThemeSettings({
-      silent:
-        true
-    });
+  const persistResult =
+    await persistThemeImageUrl(
+      type,
+      null
+    );
 
-  if (!saved) {
+  if (!persistResult.ok) {
 
     if (isPage) {
       themeDraft.page_bg_image_url =
@@ -5063,6 +5061,12 @@ async function removeThemeImage(
     setThemeImagePreview(
       type,
       oldUrl
+    );
+
+    applyLiveThemePreview();
+
+    alert(
+      '사진 삭제 정보 저장에 실패했습니다.'
     );
 
     return;
