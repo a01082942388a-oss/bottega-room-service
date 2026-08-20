@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet">
 
 
   <style>
@@ -1290,6 +1290,115 @@ select,
   display: block;
 }
 </style>
+<style>
+/* ==========================================
+   ADMIN-CONTROLLED ORDER PAGE THEME
+========================================== */
+:root {
+  --theme-page-bg-color: #ffffff;
+  --theme-page-bg-image: none;
+  --theme-text-color: #000000;
+  --theme-card-bg-color: #ffffff;
+  --theme-sign-bg-color: #000000;
+  --theme-sign-bg-image: none;
+  --theme-sign-text-color: #ffffff;
+  --theme-category-color: #000000;
+  --theme-button-color: #000000;
+  --theme-ui-font: "Noto Sans KR", sans-serif;
+  --theme-sign-font: "Cormorant Garamond", Georgia, serif;
+}
+
+html,
+body {
+  background-color: var(--theme-page-bg-color) !important;
+}
+
+body {
+  background-image: var(--theme-page-bg-image) !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+  color: var(--theme-text-color) !important;
+  font-family: var(--theme-ui-font) !important;
+}
+
+body,
+button,
+input,
+textarea,
+select,
+.room-info,
+.room-info strong,
+.category-nav,
+.category-nav button,
+.menu-section-title,
+.menu-name,
+.menu-name-en,
+.menu-description,
+.price,
+.add-button,
+.order-button,
+.cart-button,
+.confirm-button,
+.cart-bar,
+.cart-modal,
+.cart-modal *,
+.payment-option,
+.payment-option *,
+.cutlery-section,
+.cutlery-section *,
+.loading,
+.menu-soldout-badge,
+.language-bar,
+.language-button {
+  font-family: var(--theme-ui-font) !important;
+}
+
+.bottega-sign {
+  background-color: var(--theme-sign-bg-color) !important;
+  background-image: var(--theme-sign-bg-image) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.bottega-brand h1,
+.bottega-brand p {
+  color: var(--theme-sign-text-color) !important;
+  font-family: var(--theme-sign-font) !important;
+}
+
+.room-info,
+.menu-section-title,
+.menu-name,
+.menu-name-en,
+.menu-description,
+.price,
+.category-nav button:not(.active) {
+  color: var(--theme-text-color) !important;
+}
+
+.menu-card {
+  background: var(--theme-card-bg-color) !important;
+}
+
+.category-nav button.active {
+  background: var(--theme-category-color) !important;
+  border-color: var(--theme-category-color) !important;
+  color: #ffffff !important;
+}
+
+.add-button,
+.order-button,
+.cart-button,
+.confirm-button,
+.cart-bar {
+  background: var(--theme-button-color) !important;
+  border-color: var(--theme-button-color) !important;
+  color: #ffffff !important;
+}
+</style>
 </head>
 
 <body>
@@ -1714,6 +1823,257 @@ select,
       SUPABASE_URL,
       SUPABASE_KEY
     );
+
+
+
+  /* =========================
+     주문페이지 관리자 디자인 설정
+  ========================= */
+
+  const ORDER_THEME_DEFAULTS = {
+    ui_font:
+      'noto-sans',
+    text_color:
+      '#000000',
+    page_bg_color:
+      '#ffffff',
+    page_bg_image_url:
+      null,
+    card_bg_color:
+      '#ffffff',
+    sign_bg_color:
+      '#000000',
+    sign_bg_image_url:
+      null,
+    sign_font:
+      'cormorant',
+    sign_text_color:
+      '#ffffff',
+    category_active_color:
+      '#000000',
+    button_color:
+      '#000000'
+  };
+
+
+  const ORDER_THEME_FONT_MAP = {
+
+    'noto-sans':
+      '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+
+    'noto-serif':
+      '"Noto Serif KR", Georgia, serif',
+
+    'nanum-myeongjo':
+      '"Nanum Myeongjo", "Noto Serif KR", serif',
+
+    'gowun-batang':
+      '"Gowun Batang", "Noto Serif KR", serif',
+
+    'cormorant':
+      '"Cormorant Garamond", Georgia, serif',
+
+    'system':
+      '"Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif'
+  };
+
+
+  function cssUrl(
+    url
+  ) {
+
+    if (!url) {
+      return 'none';
+    }
+
+    const escaped =
+      String(url)
+        .replace(
+          /\\/g,
+          '\\\\'
+        )
+        .replace(
+          /"/g,
+          '\\"'
+        );
+
+    return `url("${escaped}")`;
+
+  }
+
+
+  function applyOrderTheme(
+    rawSettings
+  ) {
+
+    const settings = {
+      ...ORDER_THEME_DEFAULTS,
+      ...(
+        rawSettings ||
+        {}
+      )
+    };
+
+    const root =
+      document.documentElement;
+
+    root.style.setProperty(
+      '--theme-page-bg-color',
+      settings.page_bg_color
+    );
+
+    root.style.setProperty(
+      '--theme-page-bg-image',
+      cssUrl(
+        settings.page_bg_image_url
+      )
+    );
+
+    root.style.setProperty(
+      '--theme-text-color',
+      settings.text_color
+    );
+
+    root.style.setProperty(
+      '--theme-card-bg-color',
+      settings.card_bg_color
+    );
+
+    root.style.setProperty(
+      '--theme-sign-bg-color',
+      settings.sign_bg_color
+    );
+
+    root.style.setProperty(
+      '--theme-sign-bg-image',
+      cssUrl(
+        settings.sign_bg_image_url
+      )
+    );
+
+    root.style.setProperty(
+      '--theme-sign-text-color',
+      settings.sign_text_color
+    );
+
+    root.style.setProperty(
+      '--theme-category-color',
+      settings.category_active_color
+    );
+
+    root.style.setProperty(
+      '--theme-button-color',
+      settings.button_color
+    );
+
+    root.style.setProperty(
+      '--theme-ui-font',
+      ORDER_THEME_FONT_MAP[
+        settings.ui_font
+      ] ||
+      ORDER_THEME_FONT_MAP[
+        'noto-sans'
+      ]
+    );
+
+    root.style.setProperty(
+      '--theme-sign-font',
+      ORDER_THEME_FONT_MAP[
+        settings.sign_font
+      ] ||
+      ORDER_THEME_FONT_MAP[
+        'cormorant'
+      ]
+    );
+
+    try {
+
+      localStorage.setItem(
+        'bottega_order_theme_cache',
+        JSON.stringify(
+          settings
+        )
+      );
+
+    } catch (error) {
+      console.warn(
+        'THEME CACHE SAVE ERROR:',
+        error
+      );
+    }
+
+  }
+
+
+  function applyCachedOrderTheme() {
+
+    try {
+
+      const cached =
+        localStorage.getItem(
+          'bottega_order_theme_cache'
+        );
+
+      if (cached) {
+
+        applyOrderTheme(
+          JSON.parse(
+            cached
+          )
+        );
+
+      }
+
+    } catch (error) {
+      console.warn(
+        'THEME CACHE LOAD ERROR:',
+        error
+      );
+    }
+
+  }
+
+
+  async function loadOrderTheme() {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from(
+          'site_settings'
+        )
+        .select(
+          'settings'
+        )
+        .eq(
+          'key',
+          'theme'
+        )
+        .maybeSingle();
+
+    if (error) {
+
+      console.error(
+        'ORDER THEME LOAD ERROR:',
+        error
+      );
+
+      return;
+    }
+
+    applyOrderTheme(
+      data &&
+      data.settings
+        ? data.settings
+        : ORDER_THEME_DEFAULTS
+    );
+
+  }
+
+
+  applyCachedOrderTheme();
 
 
   const translations = {
@@ -4536,6 +4896,8 @@ function changeCutleryQty(change) {
   showRoomInfo();
 
   handlePaymentChange();
+
+  loadOrderTheme();
 
   loadMenus();
 
