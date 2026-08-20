@@ -690,6 +690,46 @@ function applyLiveThemePreview() {
     )
   );
 
+  const previewBackgroundLayer =
+    previewDocument.getElementById(
+      'page-background-layer'
+    );
+
+  if (previewBackgroundLayer) {
+
+    previewBackgroundLayer.style.backgroundColor =
+      settings.page_bg_color;
+
+    previewBackgroundLayer.style.backgroundImage =
+      makeCssUrl(
+        settings.page_bg_image_url
+      );
+
+  } else if (previewDocument.body) {
+
+    /* 아직 최신 index가 배포되기 전에도 미리보기는 보이게 fallback */
+    previewDocument.body.style.backgroundColor =
+      settings.page_bg_color;
+
+    previewDocument.body.style.backgroundImage =
+      makeCssUrl(
+        settings.page_bg_image_url
+      );
+
+    previewDocument.body.style.backgroundSize =
+      'cover';
+
+    previewDocument.body.style.backgroundPosition =
+      'center center';
+
+    previewDocument.body.style.backgroundRepeat =
+      'no-repeat';
+
+    previewDocument.body.style.backgroundAttachment =
+      'fixed';
+
+  }
+
   root.style.setProperty(
     '--theme-text-color',
     settings.text_color
@@ -4582,6 +4622,51 @@ function refreshThemePreview() {
 }
 
 
+
+function verifyPublicImageUrl(url) {
+
+  return new Promise(
+    resolve => {
+
+      const image =
+        new Image();
+
+      const timer =
+        setTimeout(
+          () => {
+            resolve(false);
+          },
+          10000
+        );
+
+      image.onload =
+        () => {
+          clearTimeout(timer);
+          resolve(true);
+        };
+
+      image.onerror =
+        () => {
+          clearTimeout(timer);
+          resolve(false);
+        };
+
+      image.src =
+        url +
+        (
+          url.includes('?')
+            ? '&'
+            : '?'
+        ) +
+        'verify=' +
+        Date.now();
+
+    }
+  );
+
+}
+
+
 async function uploadThemeImage(
   type
 ) {
@@ -4716,6 +4801,23 @@ async function uploadThemeImage(
     return;
   }
 
+  const imageAccessible =
+    await verifyPublicImageUrl(
+      newUrl
+    );
+
+  if (!imageAccessible) {
+
+    hideSaving();
+
+    alert(
+      '사진은 업로드됐지만 공개 주소로 불러오지 못했습니다.\n' +
+      'Supabase Storage의 theme-images bucket이 Public인지 확인해주세요.'
+    );
+
+    return;
+  }
+
   if (isPage) {
 
     if (
@@ -4783,6 +4885,45 @@ async function uploadThemeImage(
     return;
   }
 
+  const {
+    data: savedThemeRow,
+    error: savedThemeReadError
+  } =
+    await bottegaAuthClient
+      .from('site_settings')
+      .select('settings')
+      .eq(
+        'key',
+        'theme'
+      )
+      .maybeSingle();
+
+  const savedImageUrl =
+    isPage
+      ? savedThemeRow?.settings?.page_bg_image_url
+      : savedThemeRow?.settings?.sign_bg_image_url;
+
+  if (
+    savedThemeReadError ||
+    savedImageUrl !== newUrl
+  ) {
+
+    console.error(
+      'THEME IMAGE SAVE VERIFY ERROR:',
+      savedThemeReadError,
+      savedThemeRow
+    );
+
+    hideSaving();
+
+    alert(
+      '사진 업로드는 됐지만 디자인 설정 DB 저장 확인에 실패했습니다.\n' +
+      'site_settings의 authenticated UPDATE 정책을 확인해주세요.'
+    );
+
+    return;
+  }
+
   if (oldUrl) {
 
     const oldPath =
@@ -4821,7 +4962,7 @@ async function uploadThemeImage(
     '';
 
   showSaving(
-    '사진 적용 완료'
+    '사진 저장 및 적용 완료'
   );
 
   refreshThemePreview();
