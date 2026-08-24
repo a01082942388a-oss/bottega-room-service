@@ -7,7 +7,7 @@
   <title>BOTTEGA 매출관리</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
   <style>
     * {
@@ -2252,15 +2252,26 @@
 
 
     /*
-      필터 / 피벗 분석을 쉽게 하기 위해
-      "주문 1건 = 1행"이 아니라
-      "메뉴 1개 = 1행" 구조로 내보냅니다.
-
-      한 주문에 메뉴가 3종류면
-      같은 객실번호/주문자/결제방법이 3행으로 반복됩니다.
-      대신 메뉴명 필터, 판매수량 합계, 메뉴매출 합계가 매우 쉬워집니다.
+      엑셀 구조
+      - 메뉴 1종 = 1행
+      - 주문 1건의 메뉴가 끝날 때마다 회색 "주문합계" 행 추가
+      - 객실번호가 같아도 order.id가 다르면 각각 별도 합계 행
     */
-    const rows = [];
+    const excelRows = [
+      [
+        '날짜',
+        '객실번호',
+        '주문자명',
+        '메뉴명',
+        '수량',
+        '단가',
+        '메뉴매출',
+        '결제방법'
+      ]
+    ];
+
+
+    const subtotalRowNumbers = [];
 
 
     currentSalesOrders.forEach(
@@ -2287,72 +2298,75 @@
 
         if (!items.length) {
 
-          rows.push({
-            '날짜':
-              orderDate,
-            '객실번호':
-              order.room_number ||
-              '',
-            '주문자명':
-              order.guest_name ||
-              '',
-            '메뉴명':
-              '메뉴정보 없음',
-            '수량':
-              0,
-            '단가':
-              0,
-            '메뉴매출':
-              0,
-            '결제방법':
-              paymentText
-          });
+          excelRows.push([
+            orderDate,
+            order.room_number || '',
+            order.guest_name || '',
+            '메뉴정보 없음',
+            0,
+            0,
+            0,
+            paymentText
+          ]);
+
+        } else {
+
+          items.forEach(
+            item => {
+
+              const quantity =
+                getItemQuantity(
+                  item
+                );
+
+              const price =
+                getItemPrice(
+                  item
+                );
 
 
-          return;
+              excelRows.push([
+                orderDate,
+                order.room_number || '',
+                order.guest_name || '',
+                getItemName(
+                  item
+                ),
+                quantity,
+                price,
+                price *
+                  quantity,
+                paymentText
+              ]);
+
+            }
+          );
 
         }
 
 
-        items.forEach(
-          item => {
+        /*
+          주문별 합계 행.
+          실제 orders.total_amount를 사용하므로
+          메뉴단가 합산과 주문 총액이 달라도 주문 DB 금액을 우선합니다.
+        */
+        excelRows.push([
+          '',
+          order.room_number || '',
+          order.guest_name || '',
+          '주문합계',
+          '',
+          '',
+          Number(
+            order.total_amount ||
+            0
+          ),
+          ''
+        ]);
 
-            const quantity =
-              getItemQuantity(
-                item
-              );
 
-            const price =
-              getItemPrice(
-                item
-              );
-
-
-            rows.push({
-              '날짜':
-                orderDate,
-              '객실번호':
-                order.room_number ||
-                '',
-              '주문자명':
-                order.guest_name ||
-                '',
-              '메뉴명':
-                getItemName(
-                  item
-                ),
-              '수량':
-                quantity,
-              '단가':
-                price,
-              '메뉴매출':
-                price *
-                quantity,
-              '결제방법':
-                paymentText
-            });
-
-          }
+        subtotalRowNumbers.push(
+          excelRows.length
         );
 
       }
@@ -2360,13 +2374,14 @@
 
 
     const worksheet =
-      XLSX.utils.json_to_sheet(
-        rows
+      XLSX.utils.aoa_to_sheet(
+        excelRows
       );
 
 
     /*
-      필터가 바로 적용되도록 첫 행 전체에 AutoFilter 설정.
+      자동필터는 실제 메뉴 데이터 + 합계행 전체 범위에 적용.
+      메뉴명에서 "주문합계"를 제외하면 순수 메뉴 데이터만 볼 수 있습니다.
     */
     if (
       worksheet['!ref']
@@ -2380,10 +2395,6 @@
     }
 
 
-    /*
-      헤더 고정을 위한 Excel pane 정보.
-      일부 뷰어에서는 무시될 수 있지만 Excel에서는 유용합니다.
-    */
     worksheet['!freeze'] = {
       xSplit:
         0,
@@ -2414,13 +2425,76 @@
 
 
     /*
-      단가 / 메뉴매출은 숫자 형식으로 저장합니다.
-      그래서 Excel 필터·합계·피벗테이블에서 바로 계산 가능합니다.
+      헤더 스타일
+    */
+    for (
+      let column = 0;
+      column < 8;
+      column += 1
+    ) {
+
+      const address =
+        XLSX.utils.encode_cell({
+          r:
+            0,
+          c:
+            column
+        });
+
+
+      if (
+        worksheet[
+          address
+        ]
+      ) {
+
+        worksheet[
+          address
+        ].s = {
+          font: {
+            bold:
+              true
+          },
+          fill: {
+            patternType:
+              'solid',
+            fgColor: {
+              rgb:
+                'E7E6E6'
+            }
+          },
+          alignment: {
+            horizontal:
+              'center',
+            vertical:
+              'center'
+          },
+          border: {
+            bottom: {
+              style:
+                'thin',
+              color: {
+                rgb:
+                  'A6A6A6'
+              }
+            }
+          }
+        };
+
+      }
+
+    }
+
+
+    /*
+      숫자 형식
+      F = 단가
+      G = 메뉴매출 / 주문합계
     */
     for (
       let row = 2;
       row <=
-        rows.length + 1;
+        excelRows.length;
       row += 1
     ) {
 
@@ -2437,7 +2511,11 @@
         ];
 
 
-      if (unitPriceCell) {
+      if (
+        unitPriceCell &&
+        typeof unitPriceCell.v ===
+          'number'
+      ) {
 
         unitPriceCell.z =
           '#,##0"원"';
@@ -2445,7 +2523,11 @@
       }
 
 
-      if (salesCell) {
+      if (
+        salesCell &&
+        typeof salesCell.v ===
+          'number'
+      ) {
 
         salesCell.z =
           '#,##0"원"';
@@ -2453,6 +2535,88 @@
       }
 
     }
+
+
+    /*
+      주문합계 행 전체를 회색으로 표시.
+      사용자가 보여준 예시처럼 주문과 주문 사이가 한눈에 구분됩니다.
+    */
+    subtotalRowNumbers.forEach(
+      rowNumber => {
+
+        for (
+          let column = 0;
+          column < 8;
+          column += 1
+        ) {
+
+          const address =
+            XLSX.utils.encode_cell({
+              r:
+                rowNumber -
+                1,
+              c:
+                column
+            });
+
+
+          if (
+            !worksheet[
+              address
+            ]
+          ) {
+
+            worksheet[
+              address
+            ] = {
+              t:
+                's',
+              v:
+                ''
+            };
+
+          }
+
+
+          worksheet[
+            address
+          ].s = {
+            fill: {
+              patternType:
+                'solid',
+              fgColor: {
+                rgb:
+                  'D9D9D9'
+              }
+            },
+            font: {
+              bold:
+                true
+            },
+            border: {
+              top: {
+                style:
+                  'thin',
+                color: {
+                  rgb:
+                    'A6A6A6'
+                }
+              },
+              bottom: {
+                style:
+                  'thin',
+                color: {
+                  rgb:
+                    'A6A6A6'
+                }
+              }
+            }
+          };
+
+        }
+
+      }
+    );
 
 
     const workbook =
