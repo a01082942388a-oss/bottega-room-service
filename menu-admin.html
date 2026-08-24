@@ -814,6 +814,20 @@ header p {
       <input id="new-menu-description-zh" class="form-control" placeholder="中文说明">
     </div>
 
+    <div class="tip-box" style="margin-bottom:14px;">
+      한국어 메뉴명/설명만 입력해도 <b>+ 새 메뉴</b>를 누르면 비어 있는 영어 · 일본어 · 중국어 항목을 자동 번역합니다.
+      기존에 번역 없이 등록된 메뉴는 아래 버튼으로 한 번에 채울 수 있습니다.
+      <div style="margin-top:10px;">
+        <button
+          type="button"
+          class="btn btn-black"
+          onclick="translateMissingMenus()"
+        >
+          미번역 메뉴 자동번역
+        </button>
+      </div>
+    </div>
+
     <div class="tool-row">
       <input id="new-category-name" class="form-control" placeholder="새 카테고리명 예: PASTA">
       <button class="btn btn-black" onclick="addNewCategory()">+ 새 카테고리</button>
@@ -3142,68 +3156,184 @@ function modalBackgroundClose(event) {
 
 async function saveModalBasicInfo() {
 
-  if (modalMenuId === null) {
+  if (
+    modalMenuId ===
+    null
+  ) {
     return;
   }
 
+
   const name =
-    document.getElementById('modal-name')
+    document
+      .getElementById(
+        'modal-name'
+      )
       .value
       .trim();
 
-  const nameEn =
-    document.getElementById('modal-name-en')
+  let nameEn =
+    document
+      .getElementById(
+        'modal-name-en'
+      )
       .value
       .trim();
 
-  const nameJa =
-    document.getElementById('modal-name-ja')
+  let nameJa =
+    document
+      .getElementById(
+        'modal-name-ja'
+      )
       .value
       .trim();
 
-  const nameZh =
-    document.getElementById('modal-name-zh')
+  let nameZh =
+    document
+      .getElementById(
+        'modal-name-zh'
+      )
       .value
       .trim();
 
   const description =
-    document.getElementById('modal-description')
+    document
+      .getElementById(
+        'modal-description'
+      )
       .value
       .trim();
 
-  const descriptionEn =
-    document.getElementById('modal-description-en')
+  let descriptionEn =
+    document
+      .getElementById(
+        'modal-description-en'
+      )
       .value
       .trim();
 
-  const descriptionJa =
-    document.getElementById('modal-description-ja')
+  let descriptionJa =
+    document
+      .getElementById(
+        'modal-description-ja'
+      )
       .value
       .trim();
 
-  const descriptionZh =
-    document.getElementById('modal-description-zh')
+  let descriptionZh =
+    document
+      .getElementById(
+        'modal-description-zh'
+      )
       .value
       .trim();
 
   const price =
     Number(
-      document.getElementById('modal-price')
+      document
+        .getElementById(
+          'modal-price'
+        )
         .value
     );
 
+
   if (!name) {
-    alert('한국어 메뉴명을 입력해주세요.');
+
+    alert(
+      '한국어 메뉴명을 입력해주세요.'
+    );
+
     return;
+
   }
 
+
   if (
-    !Number.isFinite(price) ||
+    !Number.isFinite(
+      price
+    ) ||
     price < 0
   ) {
-    alert('가격을 확인해주세요.');
+
+    alert(
+      '가격을 확인해주세요.'
+    );
+
     return;
+
   }
+
+
+  showSaving(
+    '메뉴 자동번역 중...'
+  );
+
+
+  try {
+
+    const translated =
+      await buildMenuTranslations({
+        name,
+        description,
+        nameEn,
+        nameJa,
+        nameZh,
+        descriptionEn,
+        descriptionJa,
+        descriptionZh
+      });
+
+
+    nameEn =
+      translated.nameEn;
+
+    nameJa =
+      translated.nameJa;
+
+    nameZh =
+      translated.nameZh;
+
+    descriptionEn =
+      translated.descriptionEn;
+
+    descriptionJa =
+      translated.descriptionJa;
+
+    descriptionZh =
+      translated.descriptionZh;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      'MENU EDIT AUTO TRANSLATION ERROR:',
+      error
+    );
+
+
+    hideSaving();
+
+
+    alert(
+      '메뉴 자동번역에 실패하여 저장하지 않았습니다.\n\n' +
+      (
+        error.message ||
+        ''
+      )
+    );
+
+
+    return;
+
+  }
+
+
+  showSaving(
+    '메뉴 정보 저장 중...'
+  );
+
 
   const {
     error
@@ -3213,19 +3343,26 @@ async function saveModalBasicInfo() {
       .update({
         name,
         name_en:
-          nameEn || null,
+          nameEn ||
+          null,
         name_ja:
-          nameJa || null,
+          nameJa ||
+          null,
         name_zh:
-          nameZh || null,
+          nameZh ||
+          null,
         description:
-          description || null,
+          description ||
+          null,
         description_en:
-          descriptionEn || null,
+          descriptionEn ||
+          null,
         description_ja:
-          descriptionJa || null,
+          descriptionJa ||
+          null,
         description_zh:
-          descriptionZh || null,
+          descriptionZh ||
+          null,
         price
       })
       .eq(
@@ -3233,17 +3370,46 @@ async function saveModalBasicInfo() {
         modalMenuId
       );
 
+
   if (error) {
-    console.error(error);
+
+    console.error(
+      error
+    );
+
+
+    hideSaving();
+
+
     alert(
       '메뉴 정보 저장에 실패했습니다.\n' +
-      (error.message || '')
+      (
+        error.message ||
+        ''
+      )
     );
+
+
     return;
+
   }
 
+
   closeMenuModal();
+
+
   await loadMenus();
+
+
+  showSaving(
+    '메뉴 정보 저장 완료'
+  );
+
+
+  setTimeout(
+    hideSaving,
+    800
+  );
 
 }
 
@@ -3922,6 +4088,506 @@ function fillCategorySelect() {
 }
 
 
+
+/* =========================
+   메뉴 자동 번역
+   한국어 → 영어 / 일본어 / 중국어
+========================= */
+
+async function translateText(
+  text,
+  targetLanguage
+) {
+
+  const sourceText =
+    String(
+      text || ''
+    ).trim();
+
+  if (!sourceText) {
+    return '';
+  }
+
+
+  const targetMap = {
+    en:
+      'en',
+    ja:
+      'ja',
+    zh:
+      'zh-CN'
+  };
+
+
+  const target =
+    targetMap[
+      targetLanguage
+    ];
+
+  if (!target) {
+    return '';
+  }
+
+
+  const endpoint =
+    'https://translate.googleapis.com/translate_a/single' +
+    '?client=gtx' +
+    '&sl=ko' +
+    '&tl=' +
+    encodeURIComponent(
+      target
+    ) +
+    '&dt=t' +
+    '&q=' +
+    encodeURIComponent(
+      sourceText
+    );
+
+
+  const response =
+    await fetch(
+      endpoint,
+      {
+        method:
+          'GET',
+        cache:
+          'no-store'
+      }
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      '자동 번역 서버 응답 오류 (' +
+      response.status +
+      ')'
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  if (
+    !Array.isArray(
+      data
+    ) ||
+    !Array.isArray(
+      data[0]
+    )
+  ) {
+
+    throw new Error(
+      '자동 번역 결과 형식 오류'
+    );
+
+  }
+
+
+  return data[0]
+    .map(
+      item =>
+        Array.isArray(
+          item
+        )
+          ? (
+              item[0] ||
+              ''
+            )
+          : ''
+    )
+    .join('')
+    .trim();
+
+}
+
+
+async function buildMenuTranslations({
+  name,
+  description,
+  nameEn = '',
+  nameJa = '',
+  nameZh = '',
+  descriptionEn = '',
+  descriptionJa = '',
+  descriptionZh = ''
+}) {
+
+  const result = {
+    nameEn,
+    nameJa,
+    nameZh,
+    descriptionEn,
+    descriptionJa,
+    descriptionZh
+  };
+
+
+  const jobs = [];
+
+
+  if (
+    name &&
+    !result.nameEn
+  ) {
+
+    jobs.push(
+      translateText(
+        name,
+        'en'
+      ).then(
+        value => {
+          result.nameEn =
+            value;
+        }
+      )
+    );
+
+  }
+
+
+  if (
+    name &&
+    !result.nameJa
+  ) {
+
+    jobs.push(
+      translateText(
+        name,
+        'ja'
+      ).then(
+        value => {
+          result.nameJa =
+            value;
+        }
+      )
+    );
+
+  }
+
+
+  if (
+    name &&
+    !result.nameZh
+  ) {
+
+    jobs.push(
+      translateText(
+        name,
+        'zh'
+      ).then(
+        value => {
+          result.nameZh =
+            value;
+        }
+      )
+    );
+
+  }
+
+
+  if (
+    description &&
+    !result.descriptionEn
+  ) {
+
+    jobs.push(
+      translateText(
+        description,
+        'en'
+      ).then(
+        value => {
+          result.descriptionEn =
+            value;
+        }
+      )
+    );
+
+  }
+
+
+  if (
+    description &&
+    !result.descriptionJa
+  ) {
+
+    jobs.push(
+      translateText(
+        description,
+        'ja'
+      ).then(
+        value => {
+          result.descriptionJa =
+            value;
+        }
+      )
+    );
+
+  }
+
+
+  if (
+    description &&
+    !result.descriptionZh
+  ) {
+
+    jobs.push(
+      translateText(
+        description,
+        'zh'
+      ).then(
+        value => {
+          result.descriptionZh =
+            value;
+        }
+      )
+    );
+
+  }
+
+
+  await Promise.all(
+    jobs
+  );
+
+
+  return result;
+
+}
+
+
+function hasMissingMenuTranslations(
+  menu
+) {
+
+  if (!menu) {
+    return false;
+  }
+
+
+  const hasName =
+    String(
+      menu.name || ''
+    ).trim();
+
+
+  if (!hasName) {
+    return false;
+  }
+
+
+  if (
+    !String(
+      menu.name_en || ''
+    ).trim() ||
+    !String(
+      menu.name_ja || ''
+    ).trim() ||
+    !String(
+      menu.name_zh || ''
+    ).trim()
+  ) {
+
+    return true;
+
+  }
+
+
+  const hasDescription =
+    String(
+      menu.description || ''
+    ).trim();
+
+
+  if (
+    hasDescription &&
+    (
+      !String(
+        menu.description_en || ''
+      ).trim() ||
+      !String(
+        menu.description_ja || ''
+      ).trim() ||
+      !String(
+        menu.description_zh || ''
+      ).trim()
+    )
+  ) {
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+async function translateMissingMenus() {
+
+  const targets =
+    allMenus.filter(
+      hasMissingMenuTranslations
+    );
+
+
+  if (!targets.length) {
+
+    alert(
+      '미번역 메뉴가 없습니다.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !confirm(
+      `미번역 메뉴 ${targets.length}개를 자동 번역하시겠습니까?\n\n` +
+      '이미 입력된 번역은 유지하고, 비어 있는 영어 · 일본어 · 중국어 항목만 채웁니다.'
+    )
+  ) {
+    return;
+  }
+
+
+  showSaving(
+    `메뉴 자동번역 중... 0 / ${targets.length}`
+  );
+
+
+  try {
+
+    for (
+      let index = 0;
+      index < targets.length;
+      index += 1
+    ) {
+
+      const menu =
+        targets[
+          index
+        ];
+
+
+      showSaving(
+        `메뉴 자동번역 중... ${index + 1} / ${targets.length}`
+      );
+
+
+      const translated =
+        await buildMenuTranslations({
+          name:
+            menu.name ||
+            '',
+          description:
+            menu.description ||
+            '',
+          nameEn:
+            menu.name_en ||
+            '',
+          nameJa:
+            menu.name_ja ||
+            '',
+          nameZh:
+            menu.name_zh ||
+            '',
+          descriptionEn:
+            menu.description_en ||
+            '',
+          descriptionJa:
+            menu.description_ja ||
+            '',
+          descriptionZh:
+            menu.description_zh ||
+            ''
+        });
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from('menus')
+          .update({
+            name_en:
+              translated.nameEn ||
+              null,
+            name_ja:
+              translated.nameJa ||
+              null,
+            name_zh:
+              translated.nameZh ||
+              null,
+            description_en:
+              translated.descriptionEn ||
+              null,
+            description_ja:
+              translated.descriptionJa ||
+              null,
+            description_zh:
+              translated.descriptionZh ||
+              null
+          })
+          .eq(
+            'id',
+            Number(
+              menu.id
+            )
+          );
+
+
+      if (error) {
+        throw error;
+      }
+
+    }
+
+
+    showSaving(
+      '메뉴 자동번역 완료'
+    );
+
+
+    await loadMenus();
+
+
+    setTimeout(
+      hideSaving,
+      900
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      'MENU AUTO TRANSLATION ERROR:',
+      error
+    );
+
+
+    hideSaving();
+
+
+    alert(
+      '메뉴 자동번역에 실패했습니다.\n\n' +
+      (
+        error.message ||
+        ''
+      )
+    );
+
+  }
+
+}
+
+
 async function addNewMenu() {
 
   const name =
@@ -3932,7 +4598,7 @@ async function addNewMenu() {
       .value
       .trim();
 
-  const nameEn =
+  let nameEn =
     document
       .getElementById(
         'new-menu-name-en'
@@ -3940,7 +4606,7 @@ async function addNewMenu() {
       .value
       .trim();
 
-  const nameJa =
+  let nameJa =
     document
       .getElementById(
         'new-menu-name-ja'
@@ -3948,7 +4614,7 @@ async function addNewMenu() {
       .value
       .trim();
 
-  const nameZh =
+  let nameZh =
     document
       .getElementById(
         'new-menu-name-zh'
@@ -3964,7 +4630,7 @@ async function addNewMenu() {
       .value
       .trim();
 
-  const descriptionEn =
+  let descriptionEn =
     document
       .getElementById(
         'new-menu-description-en'
@@ -3972,7 +4638,7 @@ async function addNewMenu() {
       .value
       .trim();
 
-  const descriptionJa =
+  let descriptionJa =
     document
       .getElementById(
         'new-menu-description-ja'
@@ -3980,7 +4646,7 @@ async function addNewMenu() {
       .value
       .trim();
 
-  const descriptionZh =
+  let descriptionZh =
     document
       .getElementById(
         'new-menu-description-zh'
@@ -4004,33 +4670,126 @@ async function addNewMenu() {
       )
       .value;
 
+
   if (!name) {
-    alert('한국어 메뉴명을 입력해주세요.');
+    alert(
+      '한국어 메뉴명을 입력해주세요.'
+    );
     return;
   }
+
 
   if (
-    !Number.isFinite(price) ||
+    !Number.isFinite(
+      price
+    ) ||
     price < 0
   ) {
-    alert('가격을 확인해주세요.');
+    alert(
+      '가격을 확인해주세요.'
+    );
     return;
   }
 
+
   if (!category) {
-    alert('카테고리를 먼저 추가해주세요.');
+    alert(
+      '카테고리를 먼저 추가해주세요.'
+    );
     return;
   }
+
+
+  /*
+    한국어만 입력한 경우 비어 있는 언어를 자동 번역합니다.
+    직접 입력한 번역은 덮어쓰지 않습니다.
+  */
+  showSaving(
+    '메뉴 자동번역 중...'
+  );
+
+
+  try {
+
+    const translated =
+      await buildMenuTranslations({
+        name,
+        description,
+        nameEn,
+        nameJa,
+        nameZh,
+        descriptionEn,
+        descriptionJa,
+        descriptionZh
+      });
+
+
+    nameEn =
+      translated.nameEn;
+
+    nameJa =
+      translated.nameJa;
+
+    nameZh =
+      translated.nameZh;
+
+    descriptionEn =
+      translated.descriptionEn;
+
+    descriptionJa =
+      translated.descriptionJa;
+
+    descriptionZh =
+      translated.descriptionZh;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      'NEW MENU AUTO TRANSLATION ERROR:',
+      error
+    );
+
+
+    hideSaving();
+
+
+    alert(
+      '메뉴 자동번역에 실패하여 저장하지 않았습니다.\n\n' +
+      (
+        error.message ||
+        ''
+      )
+    );
+
+
+    return;
+
+  }
+
 
   const maxSort =
     allMenus.reduce(
-      (max, menu) =>
+      (
+        max,
+        menu
+      ) =>
         Math.max(
           max,
-          Number(menu.sort_order || 0)
+          Number(
+            menu.sort_order ||
+            0
+          )
         ),
       0
     );
+
+
+  showSaving(
+    '새 메뉴 저장 중...'
+  );
+
 
   const {
     error
@@ -4040,23 +4799,31 @@ async function addNewMenu() {
       .insert({
         name,
         name_en:
-          nameEn || null,
+          nameEn ||
+          null,
         name_ja:
-          nameJa || null,
+          nameJa ||
+          null,
         name_zh:
-          nameZh || null,
+          nameZh ||
+          null,
         description:
-          description || null,
+          description ||
+          null,
         description_en:
-          descriptionEn || null,
+          descriptionEn ||
+          null,
         description_ja:
-          descriptionJa || null,
+          descriptionJa ||
+          null,
         description_zh:
-          descriptionZh || null,
+          descriptionZh ||
+          null,
         price,
         category,
         sort_order:
-          maxSort + 1,
+          maxSort +
+          1,
         is_available:
           true,
         is_hidden:
@@ -4065,14 +4832,30 @@ async function addNewMenu() {
           null
       });
 
+
   if (error) {
-    console.error(error);
+
+    console.error(
+      error
+    );
+
+
+    hideSaving();
+
+
     alert(
       '메뉴 추가에 실패했습니다.\n' +
-      (error.message || '')
+      (
+        error.message ||
+        ''
+      )
     );
+
+
     return;
+
   }
+
 
   [
     'new-menu-name',
@@ -4086,22 +4869,42 @@ async function addNewMenu() {
     'new-menu-description-zh'
   ].forEach(
     id => {
+
       const element =
-        document.getElementById(id);
+        document.getElementById(
+          id
+        );
+
 
       if (element) {
-        element.value = '';
+        element.value =
+          '';
       }
+
     }
   );
+
 
   tempCategories =
     tempCategories.filter(
       item =>
-        item !== category
+        item !==
+        category
     );
 
+
   await loadMenus();
+
+
+  showSaving(
+    '새 메뉴 추가 완료'
+  );
+
+
+  setTimeout(
+    hideSaving,
+    800
+  );
 
 }
 
