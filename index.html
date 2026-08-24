@@ -1754,7 +1754,10 @@ main,
         placeholder="객실번호를 입력해주세요"
       >
 
-      <p class="phone-notice" id="room-number-help">
+      <p
+        class="phone-notice"
+        id="room-number-help"
+      >
         주문하실 객실번호를 정확히 입력해주세요.
       </p>
 
@@ -2901,7 +2904,7 @@ main,
   let serviceStatusTimer = null;
 
 
-  /* 공용 주문페이지: 객실번호는 주문창에서 직접 입력 */
+  /* 공용 주문페이지: 객실번호는 주문창에서 고객이 직접 입력 */
   let roomNumber = '';
 
 
@@ -3496,6 +3499,65 @@ main,
           this.value.trim();
 
       };
+
+  }
+
+
+  async function loadMenus() {
+
+    const menuList =
+      document.getElementById(
+        'menu-list'
+      );
+
+
+    menuList.innerHTML =
+      `<div class="loading">${t('loading')}</div>`;
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('menus')
+        .select('*')
+        .eq(
+          'is_hidden',
+          false
+        )
+        .order(
+          'sort_order',
+          {
+            ascending: true
+          }
+        );
+
+
+    if (
+      error
+    ) {
+
+      console.error(
+        error
+      );
+
+
+      menuList.innerHTML =
+        `<div class="loading">${t('loadError')}</div>`;
+
+      return;
+
+    }
+
+
+    allMenus =
+      data || [];
+
+
+    buildCategories();
+
+    applyCategoryFilter();
 
   }
 
