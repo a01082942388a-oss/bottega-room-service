@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>BOTTEGA 매출관리</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      visibility: hidden;
+    }
+
+    html.auth-ready {
+      visibility: visible;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f4f4;
+      color: #222;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: #161616;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      padding: 28px 14px;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 0 12px 26px;
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo h1 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 3px;
+    }
+
+    .sidebar-logo p {
+      margin: 7px 0 0;
+      color: #888;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .sidebar-section-title {
+      padding: 0 12px;
+      margin: 18px 0 8px;
+      color: #666;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .sidebar-item {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #aaa;
+      padding: 12px 14px;
+      border-radius: 8px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .sidebar-item:hover {
+      background: #242424;
+      color: #fff;
+    }
+
+    .sidebar-item.active {
+      background: #fff;
+      color: #111;
+    }
+
+    .sidebar-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .logout-button {
+      width: calc(100% - 28px);
+      margin: 28px 14px 0;
+      border: 1px solid #444;
+      background: transparent;
+      color: #bbb;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .logout-button:hover {
+      color: #fff;
+      border-color: #777;
+    }
+
+    .main-area {
+      flex: 1;
+      margin-left: 220px;
+      min-width: 0;
+    }
+
+    header {
+      background: #111;
+      color: #fff;
+      padding: 28px 25px;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    header p {
+      margin: 7px 0 0;
+      color: #aaa;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+    }
+
+    .content {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 36px 30px 80px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section-head {
+      margin-bottom: 14px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: #888;
+      font-size: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      background: #fff;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 116px;
+    }
+
+    .summary-label {
+      color: #777;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .summary-value {
+      margin-top: 12px;
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .summary-note {
+      margin-top: 7px;
+      color: #aaa;
+      font-size: 11px;
+    }
+
+    .filter-box {
+      background: #fff;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field {
+      min-width: 180px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #666;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      padding: 11px 12px;
+      color: #222;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-black {
+      background: #111;
+      color: #fff;
+    }
+
+    .btn-light {
+      background: #eee;
+      color: #222;
+    }
+
+    .btn:hover {
+      opacity: 0.86;
+    }
+
+    .period-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .period-box {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 9px;
+      padding: 14px;
+    }
+
+    .period-box span {
+      display: block;
+      color: #888;
+      font-size: 11px;
+    }
+
+    .period-box strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      padding: 17px 18px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .ranking-list {
+      padding: 8px 18px 18px;
+    }
+
+    .ranking-item {
+      padding: 11px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .ranking-item:last-child {
+      border-bottom: 0;
+    }
+
+    .ranking-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .ranking-name {
+      min-width: 0;
+      font-weight: bold;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .ranking-number {
+      white-space: nowrap;
+      color: #555;
+      font-weight: bold;
+    }
+
+    .ranking-bar-wrap {
+      margin-top: 8px;
+      height: 6px;
+      background: #eee;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .ranking-bar {
+      height: 100%;
+      background: #111;
+      border-radius: 99px;
+    }
+
+    .table-wrap {
+      background: #fff;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th,
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      font-size: 12px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #fafafa;
+      color: #666;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .amount-cell {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 99px;
+      background: #eaf7ee;
+      color: #24753a;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .items-cell {
+      min-width: 270px;
+      line-height: 1.6;
+    }
+
+    .empty {
+      padding: 32px 18px;
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .loading {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 200;
+      background: #111;
+      color: #fff;
+      border-radius: 99px;
+      padding: 11px 16px;
+      font-size: 12px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .error-box {
+      display: none;
+      margin-bottom: 18px;
+      padding: 13px 15px;
+      border-radius: 9px;
+      background: #fff0f0;
+      border: 1px solid #f1caca;
+      color: #9b3030;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .error-box.show {
+      display: block;
+    }
+
+    @media (max-width: 1050px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+      }
+
+      .admin-layout {
+        display: block;
+      }
+
+      .main-area {
+        margin-left: 0;
+      }
+
+      .sidebar-menu {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .content {
+        padding: 24px 15px 60px;
+      }
+
+      .summary-grid,
+      .period-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-row {
+        display: block;
+      }
+
+      .field {
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        width: 100%;
+        margin-top: 7px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="admin-layout">
+
+    <aside class="sidebar">
+
+      <div class="sidebar-logo">
+        <h1>BOTTEGA</h1>
+        <p>ADMIN</p>
+      </div>
+
+      <div class="sidebar-section-title">
+        MANAGEMENT
+      </div>
+
+      <nav class="sidebar-menu">
+
+        <a class="sidebar-item" href="admin.html">
+          <span class="sidebar-dot"></span>
+          주문관리
+        </a>
+
+        <a class="sidebar-item" href="menu-admin.html">
+          <span class="sidebar-dot"></span>
+          메뉴관리
+        </a>
+
+        <a class="sidebar-item active" href="sales-admin.html">
+          <span class="sidebar-dot"></span>
+          매출관리
+        </a>
+
+        <a class="sidebar-item" href="menu-admin.html?view=design">
+          <span class="sidebar-dot"></span>
+          주문페이지 디자인
+        </a>
+
+      </nav>
+
+      <button
+        class="logout-button"
+        type="button"
+        onclick="adminLogout()"
+      >
+        로그아웃
+      </button>
+
+    </aside>
+
+
+    <main class="main-area">
+
+      <header>
+        <h2>매출관리</h2>
+        <p>ROOM SERVICE · SALES MANAGEMENT</p>
+      </header>
+
+
+      <div class="content">
+
+        <div
+          class="error-box"
+          id="error-box"
+        ></div>
+
+
+        <section class="section">
+
+          <div class="section-head">
+            <h3>매출 현황</h3>
+            <p>완료(completed) 처리된 주문만 매출로 집계합니다.</p>
+          </div>
+
+          <div class="summary-grid">
+
+            <div class="summary-card">
+              <div class="summary-label">
+                오늘 매출
+              </div>
+              <div
+                class="summary-value"
+                id="today-sales"
+              >
+                0원
+              </div>
+              <div class="summary-note">
+                오늘 완료 처리 기준
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                이번 달 매출
+              </div>
+              <div
+                class="summary-value"
+                id="month-sales"
+              >
+                0원
+              </div>
+              <div class="summary-note">
+                이번 달 완료 처리 기준
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                선택기간 주문 건수
+              </div>
+              <div
+                class="summary-value"
+                id="period-count"
+              >
+                0건
+              </div>
+              <div class="summary-note">
+                완료 주문만 집계
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                선택기간 평균 객단가
+              </div>
+              <div
+                class="summary-value"
+                id="period-average"
+              >
+                0원
+              </div>
+              <div class="summary-note">
+                매출 ÷ 완료 주문 수
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <section class="section">
+
+          <div class="section-head">
+            <h3>기간 조회</h3>
+            <p>조회할 시작일과 종료일을 선택해주세요.</p>
+          </div>
+
+          <div class="filter-box">
+
+            <div class="filter-row">
+
+              <div class="field">
+                <label for="start-date">시작일</label>
+                <input
+                  type="date"
+                  id="start-date"
+                >
+              </div>
+
+              <div class="field">
+                <label for="end-date">종료일</label>
+                <input
+                  type="date"
+                  id="end-date"
+                >
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-black"
+                onclick="loadSalesData()"
+              >
+                조회
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-light"
+                onclick="setTodayRange()"
+              >
+                오늘
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-light"
+                onclick="setMonthRange()"
+              >
+                이번 달
+              </button>
+
+            </div>
+
+
+            <div class="period-summary">
+
+              <div class="period-box">
+                <span>선택기간 매출</span>
+                <strong id="period-sales">0원</strong>
+              </div>
+
+              <div class="period-box">
+                <span>선택기간 완료 주문</span>
+                <strong id="period-orders">0건</strong>
+              </div>
+
+              <div class="period-box">
+                <span>조회기간</span>
+                <strong id="period-label">-</strong>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <section class="section">
+
+          <div class="section-head">
+            <h3>메뉴별 판매 분석</h3>
+            <p>선택한 기간의 완료 주문에 포함된 메뉴를 기준으로 계산합니다.</p>
+          </div>
+
+          <div class="split-grid">
+
+            <div class="panel">
+              <div class="panel-title">
+                판매수량 TOP 10
+              </div>
+              <div
+                class="ranking-list"
+                id="quantity-ranking"
+              ></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">
+                메뉴 매출 TOP 10
+              </div>
+              <div
+                class="ranking-list"
+                id="sales-ranking"
+              ></div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <section class="section">
+
+          <div class="section-head">
+            <h3>주문별 매출 내역</h3>
+            <p>선택한 기간에 완료 처리된 주문을 최신순으로 표시합니다.</p>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>주문번호</th>
+                  <th>주문시간</th>
+                  <th>객실번호</th>
+                  <th>고객명</th>
+                  <th>주문메뉴</th>
+                  <th>주문금액</th>
+                  <th>상태</th>
+                </tr>
+              </thead>
+
+              <tbody id="sales-table-body">
+              </tbody>
+            </table>
+
+            <div
+              class="empty"
+              id="table-empty"
+              style="display:none;"
+            >
+              해당 기간의 완료 주문이 없습니다.
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <div
+    class="loading"
+    id="loading"
+  >
+    매출 불러오는 중...
+  </div>
+
+
+<script>
+  const BOTTEGA_REMEMBER_KEY =
+    'bottega_admin_remember';
+
+  const bottegaAuthStorage = {
+
+    getItem(key) {
+      return (
+        sessionStorage.getItem(key) ??
+        localStorage.getItem(key)
+      );
+    },
+
+    setItem(key, value) {
+
+      const remember =
+        localStorage.getItem(
+          BOTTEGA_REMEMBER_KEY
+        ) === '1' ||
+        sessionStorage.getItem(
+          BOTTEGA_REMEMBER_KEY
+        ) === '1';
+
+      if (remember) {
+
+        localStorage.setItem(
+          key,
+          value
+        );
+
+        sessionStorage.removeItem(
+          key
+        );
+
+      } else {
+
+        sessionStorage.setItem(
+          key,
+          value
+        );
+
+        localStorage.removeItem(
+          key
+        );
+
+      }
+
+    },
+
+    removeItem(key) {
+
+      sessionStorage.removeItem(
+        key
+      );
+
+      localStorage.removeItem(
+        key
+      );
+
+    }
+
+  };
+
+
+  const bottegaAuthClient =
+    supabase.createClient(
+      'https://yookspgooyewhnkobckw.supabase.co',
+      'sb_publishable_uI5l3LBZPrZfuXJDLXMEqg_zFS3cbLp',
+      {
+        auth: {
+          persistSession:
+            true,
+          autoRefreshToken:
+            true,
+          detectSessionInUrl:
+            true,
+          storage:
+            bottegaAuthStorage
+        }
+      }
+    );
+
+
+  const supabaseClient =
+    bottegaAuthClient;
+
+
+  async function requireAdminLogin() {
+
+    const {
+      data,
+      error
+    } =
+      await bottegaAuthClient
+        .auth
+        .getUser();
+
+
+    if (
+      error ||
+      !data?.user
+    ) {
+
+      window.location.replace(
+        'https://a01082942388a-oss.github.io/bottega-room-service/login.html'
+      );
+
+      return false;
+
+    }
+
+
+    document
+      .documentElement
+      .classList
+      .add(
+        'auth-ready'
+      );
+
+
+    return true;
+
+  }
+
+
+  async function adminLogout() {
+
+    await bottegaAuthClient
+      .auth
+      .signOut({
+        scope:
+          'local'
+      });
+
+
+    localStorage.removeItem(
+      BOTTEGA_REMEMBER_KEY
+    );
+
+    sessionStorage.removeItem(
+      BOTTEGA_REMEMBER_KEY
+    );
+
+
+    window.location.replace(
+      'https://a01082942388a-oss.github.io/bottega-room-service/login.html'
+    );
+
+  }
+
+
+  function showLoading(
+    text =
+      '매출 불러오는 중...'
+  ) {
+
+    const loading =
+      document.getElementById(
+        'loading'
+      );
+
+    loading.textContent =
+      text;
+
+    loading.classList.add(
+      'show'
+    );
+
+  }
+
+
+  function hideLoading() {
+
+    document
+      .getElementById(
+        'loading'
+      )
+      .classList
+      .remove(
+        'show'
+      );
+
+  }
+
+
+  function showError(
+    message
+  ) {
+
+    const box =
+      document.getElementById(
+        'error-box'
+      );
+
+    box.textContent =
+      message;
+
+    box.classList.add(
+      'show'
+    );
+
+  }
+
+
+  function clearError() {
+
+    const box =
+      document.getElementById(
+        'error-box'
+      );
+
+    box.textContent =
+      '';
+
+    box.classList.remove(
+      'show'
+    );
+
+  }
+
+
+  function formatMoney(
+    value
+  ) {
+
+    const number =
+      Number(
+        value || 0
+      );
+
+    return (
+      Math.round(
+        number
+      )
+        .toLocaleString(
+          'ko-KR'
+        ) +
+      '원'
+    );
+
+  }
+
+
+  function formatDateInput(
+    date
+  ) {
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      );
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+
+    return (
+      year +
+      '-' +
+      month +
+      '-' +
+      day
+    );
+
+  }
+
+
+  function formatDateTime(
+    value
+  ) {
+
+    if (!value) {
+      return '-';
+    }
+
+
+    const date =
+      new Date(
+        value
+      );
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '-';
+    }
+
+
+    return new Intl.DateTimeFormat(
+      'ko-KR',
+      {
+        timeZone:
+          'Asia/Seoul',
+        year:
+          'numeric',
+        month:
+          '2-digit',
+        day:
+          '2-digit',
+        hour:
+          '2-digit',
+        minute:
+          '2-digit',
+        hour12:
+          false
+      }
+    ).format(
+      date
+    );
+
+  }
+
+
+  function toKstStartIso(
+    dateString
+  ) {
+
+    return new Date(
+      dateString +
+      'T00:00:00+09:00'
+    ).toISOString();
+
+  }
+
+
+  function toKstNextDayIso(
+    dateString
+  ) {
+
+    const date =
+      new Date(
+        dateString +
+        'T00:00:00+09:00'
+      );
+
+
+    date.setUTCDate(
+      date.getUTCDate() +
+      1
+    );
+
+
+    return date.toISOString();
+
+  }
+
+
+  function getTodayKstString() {
+
+    const parts =
+      new Intl.DateTimeFormat(
+        'en-CA',
+        {
+          timeZone:
+            'Asia/Seoul',
+          year:
+            'numeric',
+          month:
+            '2-digit',
+          day:
+            '2-digit'
+        }
+      )
+        .formatToParts(
+          new Date()
+        );
+
+
+    const map = {};
+
+    parts.forEach(
+      part => {
+        map[
+          part.type
+        ] =
+          part.value;
+      }
+    );
+
+
+    return (
+      map.year +
+      '-' +
+      map.month +
+      '-' +
+      map.day
+    );
+
+  }
+
+
+  function getMonthStartString() {
+
+    const today =
+      getTodayKstString();
+
+    return (
+      today.slice(
+        0,
+        8
+      ) +
+      '01'
+    );
+
+  }
+
+
+  function setTodayRange() {
+
+    const today =
+      getTodayKstString();
+
+
+    document.getElementById(
+      'start-date'
+    ).value =
+      today;
+
+    document.getElementById(
+      'end-date'
+    ).value =
+      today;
+
+
+    loadSalesData();
+
+  }
+
+
+  function setMonthRange() {
+
+    document.getElementById(
+      'start-date'
+    ).value =
+      getMonthStartString();
+
+    document.getElementById(
+      'end-date'
+    ).value =
+      getTodayKstString();
+
+
+    loadSalesData();
+
+  }
+
+
+  async function fetchCompletedOrders(
+    startDate,
+    endDate
+  ) {
+
+    const startIso =
+      toKstStartIso(
+        startDate
+      );
+
+    const endExclusiveIso =
+      toKstNextDayIso(
+        endDate
+      );
+
+
+    /*
+      주문관리 페이지에서 완료 처리할 때
+      status='completed' + completed_at을 저장합니다.
+
+      따라서 매출 귀속일은 completed_at을 우선 사용합니다.
+      예전 주문 중 completed_at이 없는 데이터는 created_at으로 보완합니다.
+    */
+
+    const [
+      completedResult,
+      legacyResult
+    ] =
+      await Promise.all([
+
+        supabaseClient
+          .from(
+            'orders'
+          )
+          .select(
+            'id, created_at, ordered_at, completed_at, room_number, guest_name, status, total_amount, request_note, order_items'
+          )
+          .eq(
+            'status',
+            'completed'
+          )
+          .not(
+            'completed_at',
+            'is',
+            null
+          )
+          .gte(
+            'completed_at',
+            startIso
+          )
+          .lt(
+            'completed_at',
+            endExclusiveIso
+          )
+          .order(
+            'completed_at',
+            {
+              ascending:
+                false
+            }
+          ),
+
+        supabaseClient
+          .from(
+            'orders'
+          )
+          .select(
+            'id, created_at, ordered_at, completed_at, room_number, guest_name, status, total_amount, request_note, order_items'
+          )
+          .eq(
+            'status',
+            'completed'
+          )
+          .is(
+            'completed_at',
+            null
+          )
+          .gte(
+            'created_at',
+            startIso
+          )
+          .lt(
+            'created_at',
+            endExclusiveIso
+          )
+          .order(
+            'created_at',
+            {
+              ascending:
+                false
+            }
+          )
+
+      ]);
+
+
+    if (
+      completedResult.error
+    ) {
+      throw completedResult.error;
+    }
+
+
+    if (
+      legacyResult.error
+    ) {
+      throw legacyResult.error;
+    }
+
+
+    const merged =
+      [
+        ...(
+          completedResult.data ||
+          []
+        ),
+        ...(
+          legacyResult.data ||
+          []
+        )
+      ];
+
+
+    merged.sort(
+      (
+        a,
+        b
+      ) =>
+        new Date(
+          b.completed_at ||
+          b.created_at ||
+          0
+        ).getTime() -
+        new Date(
+          a.completed_at ||
+          a.created_at ||
+          0
+        ).getTime()
+    );
+
+
+    return merged;
+
+  }
+
+
+  function getOrderTime(
+    order
+  ) {
+
+    return (
+      order.completed_at ||
+      order.ordered_at ||
+      order.created_at
+    );
+
+  }
+
+
+  function parseOrderItems(
+    orderItems
+  ) {
+
+    if (
+      Array.isArray(
+        orderItems
+      )
+    ) {
+
+      return orderItems;
+
+    }
+
+
+    if (
+      typeof orderItems ===
+      'string'
+    ) {
+
+      try {
+
+        const parsed =
+          JSON.parse(
+            orderItems
+          );
+
+
+        if (
+          Array.isArray(
+            parsed
+          )
+        ) {
+          return parsed;
+        }
+
+      }
+
+      catch (error) {
+
+        console.warn(
+          'order_items JSON parse failed:',
+          error
+        );
+
+      }
+
+    }
+
+
+    return [];
+
+  }
+
+
+  function getItemQuantity(
+    item
+  ) {
+
+    const candidates = [
+      item?.quantity,
+      item?.qty,
+      item?.count,
+      item?.amount
+    ];
+
+
+    for (
+      const value of
+      candidates
+    ) {
+
+      const number =
+        Number(
+          value
+        );
+
+
+      if (
+        Number.isFinite(
+          number
+        ) &&
+        number >
+          0
+      ) {
+
+        return number;
+
+      }
+
+    }
+
+
+    return 1;
+
+  }
+
+
+  function getItemPrice(
+    item
+  ) {
+
+    const candidates = [
+      item?.price,
+      item?.unit_price,
+      item?.unitPrice
+    ];
+
+
+    for (
+      const value of
+      candidates
+    ) {
+
+      const number =
+        Number(
+          value
+        );
+
+
+      if (
+        Number.isFinite(
+          number
+        )
+      ) {
+
+        return number;
+
+      }
+
+    }
+
+
+    return 0;
+
+  }
+
+
+  function getItemName(
+    item
+  ) {
+
+    return String(
+      item?.name ||
+      item?.menu_name ||
+      item?.title ||
+      '메뉴'
+    );
+
+  }
+
+
+  function calculateMenuStats(
+    orders
+  ) {
+
+    const map =
+      new Map();
+
+
+    orders.forEach(
+      order => {
+
+        parseOrderItems(
+          order.order_items
+        ).forEach(
+          item => {
+
+            const name =
+              getItemName(
+                item
+              );
+
+            const quantity =
+              getItemQuantity(
+                item
+              );
+
+            const price =
+              getItemPrice(
+                item
+              );
+
+
+            if (
+              !map.has(
+                name
+              )
+            ) {
+
+              map.set(
+                name,
+                {
+                  name,
+                  quantity:
+                    0,
+                  sales:
+                    0
+                }
+              );
+
+            }
+
+
+            const stats =
+              map.get(
+                name
+              );
+
+
+            stats.quantity +=
+              quantity;
+
+            stats.sales +=
+              price *
+              quantity;
+
+          }
+        );
+
+      }
+    );
+
+
+    return [
+      ...map.values()
+    ];
+
+  }
+
+
+  function renderRanking(
+    targetId,
+    items,
+    valueKey,
+    formatter
+  ) {
+
+    const target =
+      document.getElementById(
+        targetId
+      );
+
+
+    if (!items.length) {
+
+      target.innerHTML =
+        '<div class="empty">집계할 메뉴가 없습니다.</div>';
+
+      return;
+
+    }
+
+
+    const sorted =
+      [
+        ...items
+      ]
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            Number(
+              b[
+                valueKey
+              ] ||
+              0
+            ) -
+            Number(
+              a[
+                valueKey
+              ] ||
+              0
+            )
+        )
+        .slice(
+          0,
+          10
+        );
+
+
+    const max =
+      Math.max(
+        ...sorted.map(
+          item =>
+            Number(
+              item[
+                valueKey
+              ] ||
+              0
+            )
+        ),
+        1
+      );
+
+
+    target.innerHTML =
+      sorted
+        .map(
+          (
+            item,
+            index
+          ) => {
+
+            const value =
+              Number(
+                item[
+                  valueKey
+                ] ||
+                0
+              );
+
+            const width =
+              Math.max(
+                4,
+                Math.round(
+                  value /
+                  max *
+                  100
+                )
+              );
+
+
+            return `
+              <div class="ranking-item">
+                <div class="ranking-top">
+                  <div class="ranking-name">
+                    ${index + 1}. ${escapeHtml(item.name)}
+                  </div>
+                  <div class="ranking-number">
+                    ${formatter(value)}
+                  </div>
+                </div>
+                <div class="ranking-bar-wrap">
+                  <div
+                    class="ranking-bar"
+                    style="width:${width}%"
+                  ></div>
+                </div>
+              </div>
+            `;
+
+          }
+        )
+        .join(
+          ''
+        );
+
+  }
+
+
+  function renderOrders(
+    orders
+  ) {
+
+    const body =
+      document.getElementById(
+        'sales-table-body'
+      );
+
+    const empty =
+      document.getElementById(
+        'table-empty'
+      );
+
+
+    if (!orders.length) {
+
+      body.innerHTML =
+        '';
+
+      empty.style.display =
+        'block';
+
+      return;
+
+    }
+
+
+    empty.style.display =
+      'none';
+
+
+    body.innerHTML =
+      orders
+        .map(
+          order => {
+
+            const items =
+              parseOrderItems(
+                order.order_items
+              );
+
+
+            const itemsText =
+              items.length
+                ? items
+                    .map(
+                      item =>
+                        escapeHtml(
+                          getItemName(
+                            item
+                          )
+                        ) +
+                        ' × ' +
+                        getItemQuantity(
+                          item
+                        )
+                    )
+                    .join(
+                      '<br>'
+                    )
+                : '-';
+
+
+            return `
+              <tr>
+                <td>#${escapeHtml(order.id)}</td>
+                <td>${escapeHtml(formatDateTime(getOrderTime(order)))}</td>
+                <td>${escapeHtml(order.room_number || '-')}</td>
+                <td>${escapeHtml(order.guest_name || '-')}</td>
+                <td class="items-cell">${itemsText}</td>
+                <td class="amount-cell">${formatMoney(order.total_amount)}</td>
+                <td>
+                  <span class="status-badge">
+                    완료
+                  </span>
+                </td>
+              </tr>
+            `;
+
+          }
+        )
+        .join(
+          ''
+        );
+
+  }
+
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value ??
+      ''
+    )
+      .replaceAll(
+        '&',
+        '&amp;'
+      )
+      .replaceAll(
+        '<',
+        '&lt;'
+      )
+      .replaceAll(
+        '>',
+        '&gt;'
+      )
+      .replaceAll(
+        '"',
+        '&quot;'
+      )
+      .replaceAll(
+        "'",
+        '&#039;'
+      );
+
+  }
+
+
+  async function loadHeadlineSales() {
+
+    const today =
+      getTodayKstString();
+
+    const monthStart =
+      getMonthStartString();
+
+
+    const [
+      todayOrders,
+      monthOrders
+    ] =
+      await Promise.all([
+        fetchCompletedOrders(
+          today,
+          today
+        ),
+        fetchCompletedOrders(
+          monthStart,
+          today
+        )
+      ]);
+
+
+    const todaySales =
+      todayOrders.reduce(
+        (
+          sum,
+          order
+        ) =>
+          sum +
+          Number(
+            order.total_amount ||
+            0
+          ),
+        0
+      );
+
+
+    const monthSales =
+      monthOrders.reduce(
+        (
+          sum,
+          order
+        ) =>
+          sum +
+          Number(
+            order.total_amount ||
+            0
+          ),
+        0
+      );
+
+
+    document.getElementById(
+      'today-sales'
+    ).textContent =
+      formatMoney(
+        todaySales
+      );
+
+
+    document.getElementById(
+      'month-sales'
+    ).textContent =
+      formatMoney(
+        monthSales
+      );
+
+  }
+
+
+  async function loadSalesData() {
+
+    clearError();
+
+
+    const startDate =
+      document.getElementById(
+        'start-date'
+      ).value;
+
+    const endDate =
+      document.getElementById(
+        'end-date'
+      ).value;
+
+
+    if (
+      !startDate ||
+      !endDate
+    ) {
+
+      showError(
+        '조회할 시작일과 종료일을 선택해주세요.'
+      );
+
+      return;
+
+    }
+
+
+    if (
+      startDate >
+      endDate
+    ) {
+
+      showError(
+        '시작일은 종료일보다 늦을 수 없습니다.'
+      );
+
+      return;
+
+    }
+
+
+    showLoading();
+
+
+    try {
+
+      const [
+        orders
+      ] =
+        await Promise.all([
+          fetchCompletedOrders(
+            startDate,
+            endDate
+          ),
+          loadHeadlineSales()
+        ]);
+
+
+      const sales =
+        orders.reduce(
+          (
+            sum,
+            order
+          ) =>
+            sum +
+            Number(
+              order.total_amount ||
+              0
+            ),
+          0
+        );
+
+
+      const average =
+        orders.length
+          ? sales /
+            orders.length
+          : 0;
+
+
+      document.getElementById(
+        'period-count'
+      ).textContent =
+        orders.length
+          .toLocaleString(
+            'ko-KR'
+          ) +
+        '건';
+
+
+      document.getElementById(
+        'period-average'
+      ).textContent =
+        formatMoney(
+          average
+        );
+
+
+      document.getElementById(
+        'period-sales'
+      ).textContent =
+        formatMoney(
+          sales
+        );
+
+
+      document.getElementById(
+        'period-orders'
+      ).textContent =
+        orders.length
+          .toLocaleString(
+            'ko-KR'
+          ) +
+        '건';
+
+
+      document.getElementById(
+        'period-label'
+      ).textContent =
+        startDate === endDate
+          ? startDate
+          : (
+              startDate +
+              ' ~ ' +
+              endDate
+            );
+
+
+      const menuStats =
+        calculateMenuStats(
+          orders
+        );
+
+
+      renderRanking(
+        'quantity-ranking',
+        menuStats,
+        'quantity',
+        value =>
+          Number(
+            value
+          )
+            .toLocaleString(
+              'ko-KR'
+            ) +
+          '개'
+      );
+
+
+      renderRanking(
+        'sales-ranking',
+        menuStats,
+        'sales',
+        value =>
+          formatMoney(
+            value
+          )
+      );
+
+
+      renderOrders(
+        orders
+      );
+
+    }
+
+    catch (error) {
+
+      console.error(
+        'SALES LOAD ERROR:',
+        error
+      );
+
+
+      showError(
+        '매출 데이터를 불러오지 못했습니다. ' +
+        (
+          error.message ||
+          ''
+        )
+      );
+
+    }
+
+    finally {
+
+      hideLoading();
+
+    }
+
+  }
+
+
+  async function initializeSalesPage() {
+
+    const loggedIn =
+      await requireAdminLogin();
+
+
+    if (!loggedIn) {
+      return;
+    }
+
+
+    const today =
+      getTodayKstString();
+
+
+    document.getElementById(
+      'start-date'
+    ).value =
+      today;
+
+    document.getElementById(
+      'end-date'
+    ).value =
+      today;
+
+
+    await loadSalesData();
+
+  }
+
+
+  initializeSalesPage();
+</script>
+
+</body>
+</html>
