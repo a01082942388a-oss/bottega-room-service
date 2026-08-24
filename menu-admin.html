@@ -817,6 +817,7 @@ header p {
     <div class="tip-box" style="margin-bottom:14px;">
       한국어 메뉴명/설명만 입력해도 <b>+ 새 메뉴</b>를 누르면 비어 있는 영어 · 일본어 · 중국어 항목을 자동 번역합니다.
       기존에 번역 없이 등록된 메뉴는 아래 버튼으로 한 번에 채울 수 있습니다.
+      <br><span style="color:#777;">※ 자동번역은 Supabase Edge Function <b>translate-menu</b>를 사용합니다.</span>
       <div style="margin-top:10px;">
         <button
           type="button"
@@ -4109,98 +4110,85 @@ async function translateText(
   }
 
 
-  const targetMap = {
-    en:
-      'en',
-    ja:
-      'ja',
-    zh:
-      'zh-CN'
-  };
-
-
-  const target =
-    targetMap[
-      targetLanguage
-    ];
-
-  if (!target) {
-    return '';
-  }
-
-
-  const endpoint =
-    'https://translate.googleapis.com/translate_a/single' +
-    '?client=gtx' +
-    '&sl=ko' +
-    '&tl=' +
-    encodeURIComponent(
-      target
-    ) +
-    '&dt=t' +
-    '&q=' +
-    encodeURIComponent(
-      sourceText
-    );
-
-
-  const response =
-    await fetch(
-      endpoint,
-      {
-        method:
-          'GET',
-        cache:
-          'no-store'
-      }
-    );
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      '자동 번역 서버 응답 오류 (' +
-      response.status +
-      ')'
-    );
-
-  }
-
-
-  const data =
-    await response.json();
-
-
   if (
-    !Array.isArray(
-      data
-    ) ||
-    !Array.isArray(
-      data[0]
+    ![
+      'en',
+      'ja',
+      'zh'
+    ].includes(
+      targetLanguage
     )
   ) {
 
     throw new Error(
-      '자동 번역 결과 형식 오류'
+      '지원하지 않는 번역 언어입니다.'
     );
 
   }
 
 
-  return data[0]
-    .map(
-      item =>
-        Array.isArray(
-          item
-        )
-          ? (
-              item[0] ||
-              ''
-            )
-          : ''
-    )
-    .join('')
-    .trim();
+  /*
+    브라우저에서 Google 번역 주소를 직접 호출하면
+    CORS 정책 때문에 실패할 수 있으므로
+    Supabase Edge Function을 통해 서버에서 번역합니다.
+  */
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .functions
+      .invoke(
+        'translate-menu',
+        {
+          body: {
+            text:
+              sourceText,
+            target:
+              targetLanguage
+          }
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      'TRANSLATE EDGE FUNCTION ERROR:',
+      error
+    );
+
+    throw new Error(
+      '자동 번역 함수 호출에 실패했습니다. ' +
+      (
+        error.message ||
+        ''
+      )
+    );
+
+  }
+
+
+  if (
+    !data ||
+    typeof data.translatedText !==
+      'string' ||
+    !data.translatedText.trim()
+  ) {
+
+    console.error(
+      'TRANSLATE EDGE FUNCTION INVALID RESPONSE:',
+      data
+    );
+
+    throw new Error(
+      '자동 번역 결과를 받지 못했습니다.'
+    );
+
+  }
+
+
+  return data.translatedText.trim();
 
 }
 
