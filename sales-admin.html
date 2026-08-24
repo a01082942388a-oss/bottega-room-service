@@ -1339,7 +1339,7 @@
             'orders'
           )
           .select(
-            'id, created_at, ordered_at, completed_at, room_number, guest_name, status, total_amount, request_note, order_items'
+            'id, created_at, ordered_at, completed_at, room_number, guest_name, payment_method, status, total_amount, request_note, order_items'
           )
           .eq(
             'status',
@@ -1371,7 +1371,7 @@
             'orders'
           )
           .select(
-            'id, created_at, ordered_at, completed_at, room_number, guest_name, status, total_amount, request_note, order_items'
+            'id, created_at, ordered_at, completed_at, room_number, guest_name, payment_method, status, total_amount, request_note, order_items'
           )
           .eq(
             'status',
@@ -2010,6 +2010,79 @@
 
 
 
+
+  function formatExcelDate(
+    value
+  ) {
+
+    if (!value) {
+      return '';
+    }
+
+
+    const date =
+      new Date(
+        value
+      );
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '';
+    }
+
+
+    return new Intl.DateTimeFormat(
+      'ko-KR',
+      {
+        timeZone:
+          'Asia/Seoul',
+        year:
+          'numeric',
+        month:
+          '2-digit',
+        day:
+          '2-digit'
+      }
+    ).format(
+      date
+    );
+
+  }
+
+
+  function getPaymentText(
+    paymentMethod
+  ) {
+
+    if (
+      paymentMethod ===
+      'checkout'
+    ) {
+
+      return '체크아웃 시 결제';
+
+    }
+
+
+    if (
+      paymentMethod ===
+      'card'
+    ) {
+
+      return '카드결제';
+
+    }
+
+
+    return '-';
+
+  }
+
+
   function getExcelOrderItemsText(
     order
   ) {
@@ -2178,316 +2251,224 @@
     }
 
 
-    const orders =
-      currentSalesOrders;
+    /*
+      필터 / 피벗 분석을 쉽게 하기 위해
+      "주문 1건 = 1행"이 아니라
+      "메뉴 1개 = 1행" 구조로 내보냅니다.
+
+      한 주문에 메뉴가 3종류면
+      같은 객실번호/주문자/결제방법이 3행으로 반복됩니다.
+      대신 메뉴명 필터, 판매수량 합계, 메뉴매출 합계가 매우 쉬워집니다.
+    */
+    const rows = [];
 
 
-    const totalSales =
-      orders.reduce(
-        (
-          sum,
-          order
-        ) =>
-          sum +
-          Number(
-            order.total_amount ||
-            0
-          ),
-        0
+    currentSalesOrders.forEach(
+      order => {
+
+        const items =
+          parseOrderItems(
+            order.order_items
+          );
+
+
+        const orderDate =
+          formatExcelDate(
+            order.completed_at ||
+            order.created_at
+          );
+
+
+        const paymentText =
+          getPaymentText(
+            order.payment_method
+          );
+
+
+        if (!items.length) {
+
+          rows.push({
+            '날짜':
+              orderDate,
+            '객실번호':
+              order.room_number ||
+              '',
+            '주문자명':
+              order.guest_name ||
+              '',
+            '메뉴명':
+              '메뉴정보 없음',
+            '수량':
+              0,
+            '단가':
+              0,
+            '메뉴매출':
+              0,
+            '결제방법':
+              paymentText
+          });
+
+
+          return;
+
+        }
+
+
+        items.forEach(
+          item => {
+
+            const quantity =
+              getItemQuantity(
+                item
+              );
+
+            const price =
+              getItemPrice(
+                item
+              );
+
+
+            rows.push({
+              '날짜':
+                orderDate,
+              '객실번호':
+                order.room_number ||
+                '',
+              '주문자명':
+                order.guest_name ||
+                '',
+              '메뉴명':
+                getItemName(
+                  item
+                ),
+              '수량':
+                quantity,
+              '단가':
+                price,
+              '메뉴매출':
+                price *
+                quantity,
+              '결제방법':
+                paymentText
+            });
+
+          }
+        );
+
+      }
+    );
+
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(
+        rows
       );
 
 
-    const averageSales =
-      orders.length
-        ? totalSales /
-          orders.length
-        : 0;
+    /*
+      필터가 바로 적용되도록 첫 행 전체에 AutoFilter 설정.
+    */
+    if (
+      worksheet['!ref']
+    ) {
+
+      worksheet['!autofilter'] = {
+        ref:
+          worksheet['!ref']
+      };
+
+    }
 
 
-    const menuStats =
-      calculateMenuStats(
-        orders
-      );
+    /*
+      헤더 고정을 위한 Excel pane 정보.
+      일부 뷰어에서는 무시될 수 있지만 Excel에서는 유용합니다.
+    */
+    worksheet['!freeze'] = {
+      xSplit:
+        0,
+      ySplit:
+        1,
+      topLeftCell:
+        'A2',
+      activePane:
+        'bottomLeft',
+      state:
+        'frozen'
+    };
+
+
+    applyExcelColumnWidths(
+      worksheet,
+      [
+        14,
+        12,
+        16,
+        34,
+        10,
+        14,
+        16,
+        18
+      ]
+    );
+
+
+    /*
+      단가 / 메뉴매출은 숫자 형식으로 저장합니다.
+      그래서 Excel 필터·합계·피벗테이블에서 바로 계산 가능합니다.
+    */
+    for (
+      let row = 2;
+      row <=
+        rows.length + 1;
+      row += 1
+    ) {
+
+      const unitPriceCell =
+        worksheet[
+          'F' +
+          row
+        ];
+
+      const salesCell =
+        worksheet[
+          'G' +
+          row
+        ];
+
+
+      if (unitPriceCell) {
+
+        unitPriceCell.z =
+          '#,##0"원"';
+
+      }
+
+
+      if (salesCell) {
+
+        salesCell.z =
+          '#,##0"원"';
+
+      }
+
+    }
 
 
     const workbook =
       XLSX.utils.book_new();
 
 
-    /*
-      1. 매출 요약
-    */
-    const summaryRows = [
-      [
-        'BOTTEGA ROOM SERVICE 매출 요약'
-      ],
-      [],
-      [
-        '조회기간',
-        currentSalesStartDate === currentSalesEndDate
-          ? currentSalesStartDate
-          : (
-              currentSalesStartDate +
-              ' ~ ' +
-              currentSalesEndDate
-            )
-      ],
-      [
-        '완료 주문 건수',
-        orders.length
-      ],
-      [
-        '총 매출',
-        Math.round(
-          totalSales
-        )
-      ],
-      [
-        '평균 객단가',
-        Math.round(
-          averageSales
-        )
-      ],
-      [],
-      [
-        '※ 완료(completed) 처리된 주문만 집계'
-      ]
-    ];
-
-
-    const summarySheet =
-      XLSX.utils.aoa_to_sheet(
-        summaryRows
-      );
-
-
-    summarySheet['B5'].z =
-      '#,##0"원"';
-
-    summarySheet['B6'].z =
-      '#,##0"원"';
-
-
-    applyExcelColumnWidths(
-      summarySheet,
-      [
-        22,
-        24
-      ]
-    );
-
-
     XLSX.utils.book_append_sheet(
       workbook,
-      summarySheet,
-      '매출요약'
-    );
-
-
-    /*
-      2. 주문 상세
-    */
-    const orderRows =
-      orders.map(
-        order => ({
-          '주문번호':
-            order.id,
-          '완료시간':
-            formatDateTime(
-              order.completed_at ||
-              order.created_at
-            ),
-          '주문시간':
-            formatDateTime(
-              order.ordered_at ||
-              order.created_at
-            ),
-          '객실번호':
-            order.room_number ||
-            '',
-          '고객명':
-            order.guest_name ||
-            '',
-          '주문메뉴':
-            getExcelOrderItemsText(
-              order
-            ),
-          '메뉴상세':
-            getExcelOrderItemsDetail(
-              order
-            ),
-          '요청사항':
-            order.request_note ||
-            '',
-          '주문금액':
-            Number(
-              order.total_amount ||
-              0
-            ),
-          '상태':
-            '완료'
-        })
-      );
-
-
-    const ordersSheet =
-      XLSX.utils.json_to_sheet(
-        orderRows
-      );
-
-
-    applyExcelColumnWidths(
-      ordersSheet,
-      [
-        12,
-        20,
-        20,
-        12,
-        14,
-        34,
-        42,
-        30,
-        14,
-        10
-      ]
-    );
-
-
-    if (
-      orders.length
-    ) {
-
-      for (
-        let row = 2;
-        row <=
-          orders.length + 1;
-        row += 1
-      ) {
-
-        const cell =
-          ordersSheet[
-            'I' +
-            row
-          ];
-
-
-        if (cell) {
-          cell.z =
-            '#,##0"원"';
-        }
-
-      }
-
-    }
-
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      ordersSheet,
-      '주문상세'
-    );
-
-
-    /*
-      3. 메뉴별 판매 분석
-    */
-    const menuRows =
-      [
-        ...menuStats
-      ]
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            Number(
-              b.sales ||
-              0
-            ) -
-            Number(
-              a.sales ||
-              0
-            )
-        )
-        .map(
-          (
-            item,
-            index
-          ) => ({
-            '순위':
-              index +
-              1,
-            '메뉴명':
-              item.name,
-            '판매수량':
-              Number(
-                item.quantity ||
-                0
-              ),
-            '메뉴매출':
-              Number(
-                item.sales ||
-                0
-              )
-          })
-        );
-
-
-    const menuSheet =
-      XLSX.utils.json_to_sheet(
-        menuRows
-      );
-
-
-    applyExcelColumnWidths(
-      menuSheet,
-      [
-        8,
-        34,
-        12,
-        16
-      ]
-    );
-
-
-    if (
-      menuRows.length
-    ) {
-
-      for (
-        let row = 2;
-        row <=
-          menuRows.length + 1;
-        row += 1
-      ) {
-
-        const cell =
-          menuSheet[
-            'D' +
-            row
-          ];
-
-
-        if (cell) {
-          cell.z =
-            '#,##0"원"';
-        }
-
-      }
-
-    }
-
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      menuSheet,
-      '메뉴별매출'
+      worksheet,
+      '메뉴별매출내역'
     );
 
 
     const fileName =
       makeSafeExcelFileName(
-        'BOTTEGA_매출_' +
+        'BOTTEGA_메뉴별매출_' +
         currentSalesStartDate +
         '_' +
         currentSalesEndDate +
