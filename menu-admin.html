@@ -1318,6 +1318,18 @@ const supabaseClient =
 let allMenus = [];
 let sortDraft = [];
 let categoryDraft = [];
+
+let categoryTranslations = {};
+
+const DEFAULT_CATEGORY_TRANSLATIONS = {
+  SALAD: { ko:'샐러드', en:'Salad', ja:'サラダ', zh:'沙拉' },
+  APPETIZER: { ko:'에피타이저', en:'Appetizer', ja:'前菜', zh:'前菜' },
+  PASTA: { ko:'파스타', en:'Pasta', ja:'パスタ', zh:'意大利面' },
+  PIZZA: { ko:'피자', en:'Pizza', ja:'ピザ', zh:'披萨' },
+  RISOTTO_PILAF: { ko:'리조또 / 필라프', en:'Risotto & Pilaf', ja:'リゾット・ピラフ', zh:'烩饭 / 抓饭' },
+  RISOTTO: { ko:'리조또', en:'Risotto', ja:'リゾット', zh:'烩饭' },
+  SPECIAL: { ko:'스페셜', en:'Special', ja:'スペシャル', zh:'特色菜' }
+};
 let tempCategories = [];
 let currentCategory = 'all';
 let draggedMenuId = null;
@@ -1596,6 +1608,52 @@ function showView(viewName = 'sort') {
    데이터 로드
 ========================= */
 
+
+async function loadCategoryTranslations() {
+  const { data, error } =
+    await supabaseClient
+      .from('site_settings')
+      .select('settings')
+      .eq('key', 'category_translations')
+      .maybeSingle();
+
+  if (error) {
+    console.error('CATEGORY TRANSLATIONS LOAD ERROR:', error);
+    categoryTranslations = JSON.parse(JSON.stringify(DEFAULT_CATEGORY_TRANSLATIONS));
+    return;
+  }
+
+  categoryTranslations = {
+    ...JSON.parse(JSON.stringify(DEFAULT_CATEGORY_TRANSLATIONS)),
+    ...(data && data.settings && typeof data.settings === 'object' ? data.settings : {})
+  };
+}
+
+async function saveCategoryTranslations() {
+  const { error } =
+    await supabaseClient
+      .from('site_settings')
+      .upsert(
+        { key: 'category_translations', settings: categoryTranslations },
+        { onConflict: 'key' }
+      );
+
+  if (error) {
+    console.error('CATEGORY TRANSLATIONS SAVE ERROR:', error);
+    throw error;
+  }
+}
+
+function getCategoryTranslationDraft(category) {
+  const saved = categoryTranslations[category] || {};
+  return {
+    ko: saved.ko || category || '',
+    en: saved.en || category || '',
+    ja: saved.ja || category || '',
+    zh: saved.zh || category || ''
+  };
+}
+
 async function loadMenus() {
 
   const {
@@ -1653,6 +1711,16 @@ async function loadMenus() {
     getCategoryOrderFromMenus(
       sortDraft
     );
+
+  if (categoryTranslations[categoryName]) {
+    delete categoryTranslations[categoryName];
+    try {
+      await saveCategoryTranslations();
+    } catch (error) {
+      console.error('CATEGORY TRANSLATION DELETE ERROR:', error);
+    }
+  }
+
 
   tempCategories =
     tempCategories.filter(
@@ -3494,231 +3562,107 @@ async function deleteCategory(
    카테고리 이름 변경
 ========================= */
 
-async function renameCategory(
-  oldCategory
-) {
+async function renameCategory(oldCategory) {
+  const categoryName = String(oldCategory || '').trim();
+  if (!categoryName) return;
 
-  const categoryName =
-    String(
-      oldCategory || ''
-    ).trim();
+  const currentTranslations = getCategoryTranslationDraft(categoryName);
 
-  if (!categoryName) {
-    return;
-  }
-
-
-  const entered =
-    prompt(
-      '새 카테고리명을 입력해주세요.',
-      categoryName
-    );
-
-  if (entered === null) {
-    return;
-  }
-
-
-  const newCategory =
-    entered.trim();
-
-  if (!newCategory) {
-
-    alert(
-      '카테고리명을 입력해주세요.'
-    );
-
-    return;
-
-  }
-
-
-  if (
-    newCategory ===
+  const entered = prompt(
+    '카테고리 코드/기본 이름을 입력해주세요.\n(메뉴 DB category 값으로 사용됩니다.)',
     categoryName
-  ) {
+  );
+  if (entered === null) return;
+
+  const newCategory = entered.trim();
+  if (!newCategory) {
+    alert('카테고리명을 입력해주세요.');
     return;
   }
 
-
-  if (
-    categoryDraft.includes(
-      newCategory
-    )
-  ) {
-
-    alert(
-      '이미 존재하는 카테고리명입니다.'
-    );
-
+  if (newCategory !== categoryName && categoryDraft.includes(newCategory)) {
+    alert('이미 존재하는 카테고리명입니다.');
     return;
-
   }
 
+  const ko = prompt('한국어 카테고리명을 입력해주세요.', currentTranslations.ko);
+  if (ko === null) return;
+
+  const en = prompt('영어 카테고리명을 입력해주세요.', currentTranslations.en);
+  if (en === null) return;
+
+  const ja = prompt('일본어 카테고리명을 입력해주세요.', currentTranslations.ja);
+  if (ja === null) return;
+
+  const zh = prompt('중국어 카테고리명을 입력해주세요.', currentTranslations.zh);
+  if (zh === null) return;
+
+  const nextTranslations = {
+    ko: ko.trim() || newCategory,
+    en: en.trim() || newCategory,
+    ja: ja.trim() || newCategory,
+    zh: zh.trim() || newCategory
+  };
 
   const categoryMenus =
-    allMenus.filter(
-      menu =>
-        (menu.category || 'ETC') ===
-        categoryName
-    );
+    allMenus.filter(menu => (menu.category || 'ETC') === categoryName);
 
+  if (!confirm(
+    `"${categoryName}" 카테고리 설정을 저장하시겠습니까?\n\n` +
+    `한국어: ${nextTranslations.ko}\n` +
+    `English: ${nextTranslations.en}\n` +
+    `日本語: ${nextTranslations.ja}\n` +
+    `中文: ${nextTranslations.zh}\n\n` +
+    `포함된 메뉴 ${categoryMenus.length}개에도 적용됩니다.`
+  )) return;
 
-  if (
-    !confirm(
-      `"${categoryName}" 카테고리를 "${newCategory}"(으)로 변경하시겠습니까?\n\n포함된 메뉴 ${categoryMenus.length}개의 카테고리도 함께 변경됩니다.`
-    )
-  ) {
-    return;
-  }
+  showSaving('카테고리 설정 저장 중...');
 
+  try {
+    if (newCategory !== categoryName && categoryMenus.length) {
+      const { error } =
+        await supabaseClient
+          .from('menus')
+          .update({ category: newCategory })
+          .eq('category', categoryName);
 
-  showSaving(
-    '카테고리 이름 변경 중...'
-  );
-
-
-  /*
-    실제 메뉴가 들어있는 카테고리는
-    menus 테이블의 category 값을 한 번에 변경합니다.
-  */
-  if (
-    categoryMenus.length
-  ) {
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .from('menus')
-        .update({
-          category:
-            newCategory
-        })
-        .eq(
-          'category',
-          categoryName
-        );
-
-
-    if (error) {
-
-      console.error(
-        'CATEGORY RENAME ERROR:',
-        error
-      );
-
-      hideSaving();
-
-      alert(
-        '카테고리 이름 변경에 실패했습니다.\n' +
-        (
-          error.message ||
-          ''
-        )
-      );
-
-      return;
-
+      if (error) throw error;
     }
 
+    if (newCategory !== categoryName) {
+      delete categoryTranslations[categoryName];
+    }
+
+    categoryTranslations[newCategory] = nextTranslations;
+    await saveCategoryTranslations();
+
+    tempCategories = tempCategories.map(c => c === categoryName ? newCategory : c);
+    categoryDraft = categoryDraft.map(c => c === categoryName ? newCategory : c);
+    sortDraft = sortDraft.map(menu =>
+      (menu.category || 'ETC') === categoryName ? { ...menu, category: newCategory } : menu
+    );
+    allMenus = allMenus.map(menu =>
+      (menu.category || 'ETC') === categoryName ? { ...menu, category: newCategory } : menu
+    );
+
+    if (currentCategory === categoryName) currentCategory = newCategory;
+
+    buildCategoryOrderList();
+    buildCategoryTabs();
+    renderSortList();
+    fillCategorySelect();
+
+    showSaving('카테고리 설정 저장 완료');
+    setTimeout(hideSaving, 800);
+
+    if (categoryMenus.length && newCategory !== categoryName) {
+      await loadMenus();
+    }
+  } catch (error) {
+    console.error('CATEGORY RENAME ERROR:', error);
+    hideSaving();
+    alert('카테고리 설정 저장에 실패했습니다.\n' + (error.message || ''));
   }
-
-
-  /*
-    메뉴가 아직 없는 임시 카테고리도
-    현재 관리화면에서 이름 변경이 가능하도록 처리합니다.
-  */
-  tempCategories =
-    tempCategories.map(
-      category =>
-        category === categoryName
-          ? newCategory
-          : category
-    );
-
-
-  categoryDraft =
-    categoryDraft.map(
-      category =>
-        category === categoryName
-          ? newCategory
-          : category
-    );
-
-
-  sortDraft =
-    sortDraft.map(
-      menu =>
-        (
-          (menu.category || 'ETC') ===
-          categoryName
-        )
-          ? {
-              ...menu,
-              category:
-                newCategory
-            }
-          : menu
-    );
-
-
-  allMenus =
-    allMenus.map(
-      menu =>
-        (
-          (menu.category || 'ETC') ===
-          categoryName
-        )
-          ? {
-              ...menu,
-              category:
-                newCategory
-            }
-          : menu
-    );
-
-
-  if (
-    currentCategory ===
-    categoryName
-  ) {
-
-    currentCategory =
-      newCategory;
-
-  }
-
-
-  buildCategoryOrderList();
-  buildCategoryTabs();
-  renderSortList();
-  fillCategorySelect();
-
-
-  showSaving(
-    '카테고리 이름 변경 완료'
-  );
-
-
-  setTimeout(
-    hideSaving,
-    800
-  );
-
-
-  /*
-    DB에 메뉴가 있는 카테고리는
-    실제 저장값을 다시 불러와 최종 동기화합니다.
-  */
-  if (
-    categoryMenus.length
-  ) {
-
-    await loadMenus();
-
-  }
-
 }
 
 
@@ -5453,6 +5397,8 @@ async function initializeAdminPage() {
   if (!authenticated) {
     return;
   }
+
+  await loadCategoryTranslations();
 
   await loadMenus();
 
