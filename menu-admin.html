@@ -199,6 +199,27 @@ header p {
   color: #a33;
 }
 
+.category-edit {
+  border: 0;
+  min-width: 42px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 7px;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-edit:hover {
+  background: #333;
+}
+
 .modal-danger-zone {
   margin-top: 18px;
   padding-top: 15px;
@@ -792,12 +813,12 @@ header p {
     <div class="panel-head">
       <div>
         <h2>카테고리 순서</h2>
-        <p>카테고리 자체의 노출 순서를 드래그로 변경할 수 있습니다.</p>
+        <p>카테고리 이름 수정 · 삭제 · 노출 순서 변경을 할 수 있습니다.</p>
       </div>
     </div>
 
     <div class="help">
-      카테고리를 잡아서 좌우 순서를 바꾼 뒤 아래의 <b>전체 순서 저장</b>을 누르면 메뉴 순서와 함께 저장됩니다.
+      카테고리의 <b>이름수정</b> 버튼으로 이름을 변경할 수 있습니다. 드래그로 순서를 바꾼 뒤 아래의 <b>전체 순서 저장</b>을 누르면 메뉴 순서와 함께 저장됩니다.
     </div>
 
     <div
@@ -1773,6 +1794,16 @@ function buildCategoryOrderList() {
           >
             <span class="category-handle">☰</span>
             <strong>${escapeHtml(category)}</strong>
+
+            <button
+              type="button"
+              class="category-edit"
+              title="카테고리 이름 수정"
+              onmousedown="event.stopPropagation()"
+              onclick="event.stopPropagation(); renameCategory('${escapeJs(category)}')"
+            >
+              이름수정
+            </button>
 
             <button
               type="button"
@@ -3454,6 +3485,239 @@ async function deleteCategory(
   );
 
   await loadMenus();
+
+}
+
+
+
+/* =========================
+   카테고리 이름 변경
+========================= */
+
+async function renameCategory(
+  oldCategory
+) {
+
+  const categoryName =
+    String(
+      oldCategory || ''
+    ).trim();
+
+  if (!categoryName) {
+    return;
+  }
+
+
+  const entered =
+    prompt(
+      '새 카테고리명을 입력해주세요.',
+      categoryName
+    );
+
+  if (entered === null) {
+    return;
+  }
+
+
+  const newCategory =
+    entered.trim();
+
+  if (!newCategory) {
+
+    alert(
+      '카테고리명을 입력해주세요.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    newCategory ===
+    categoryName
+  ) {
+    return;
+  }
+
+
+  if (
+    categoryDraft.includes(
+      newCategory
+    )
+  ) {
+
+    alert(
+      '이미 존재하는 카테고리명입니다.'
+    );
+
+    return;
+
+  }
+
+
+  const categoryMenus =
+    allMenus.filter(
+      menu =>
+        (menu.category || 'ETC') ===
+        categoryName
+    );
+
+
+  if (
+    !confirm(
+      `"${categoryName}" 카테고리를 "${newCategory}"(으)로 변경하시겠습니까?\n\n포함된 메뉴 ${categoryMenus.length}개의 카테고리도 함께 변경됩니다.`
+    )
+  ) {
+    return;
+  }
+
+
+  showSaving(
+    '카테고리 이름 변경 중...'
+  );
+
+
+  /*
+    실제 메뉴가 들어있는 카테고리는
+    menus 테이블의 category 값을 한 번에 변경합니다.
+  */
+  if (
+    categoryMenus.length
+  ) {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from('menus')
+        .update({
+          category:
+            newCategory
+        })
+        .eq(
+          'category',
+          categoryName
+        );
+
+
+    if (error) {
+
+      console.error(
+        'CATEGORY RENAME ERROR:',
+        error
+      );
+
+      hideSaving();
+
+      alert(
+        '카테고리 이름 변경에 실패했습니다.\n' +
+        (
+          error.message ||
+          ''
+        )
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /*
+    메뉴가 아직 없는 임시 카테고리도
+    현재 관리화면에서 이름 변경이 가능하도록 처리합니다.
+  */
+  tempCategories =
+    tempCategories.map(
+      category =>
+        category === categoryName
+          ? newCategory
+          : category
+    );
+
+
+  categoryDraft =
+    categoryDraft.map(
+      category =>
+        category === categoryName
+          ? newCategory
+          : category
+    );
+
+
+  sortDraft =
+    sortDraft.map(
+      menu =>
+        (
+          (menu.category || 'ETC') ===
+          categoryName
+        )
+          ? {
+              ...menu,
+              category:
+                newCategory
+            }
+          : menu
+    );
+
+
+  allMenus =
+    allMenus.map(
+      menu =>
+        (
+          (menu.category || 'ETC') ===
+          categoryName
+        )
+          ? {
+              ...menu,
+              category:
+                newCategory
+            }
+          : menu
+    );
+
+
+  if (
+    currentCategory ===
+    categoryName
+  ) {
+
+    currentCategory =
+      newCategory;
+
+  }
+
+
+  buildCategoryOrderList();
+  buildCategoryTabs();
+  renderSortList();
+  fillCategorySelect();
+
+
+  showSaving(
+    '카테고리 이름 변경 완료'
+  );
+
+
+  setTimeout(
+    hideSaving,
+    800
+  );
+
+
+  /*
+    DB에 메뉴가 있는 카테고리는
+    실제 저장값을 다시 불러와 최종 동기화합니다.
+  */
+  if (
+    categoryMenus.length
+  ) {
+
+    await loadMenus();
+
+  }
 
 }
 
