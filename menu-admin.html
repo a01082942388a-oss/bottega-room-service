@@ -1712,16 +1712,6 @@ async function loadMenus() {
       sortDraft
     );
 
-  if (categoryTranslations[categoryName]) {
-    delete categoryTranslations[categoryName];
-    try {
-      await saveCategoryTranslations();
-    } catch (error) {
-      console.error('CATEGORY TRANSLATION DELETE ERROR:', error);
-    }
-  }
-
-
   tempCategories =
     tempCategories.filter(
       category =>
