@@ -795,10 +795,23 @@ header p {
     </div>
 
     <div class="tool-row" style="margin-bottom:10px;">
-      <input id="new-menu-name" class="form-control" placeholder="새 메뉴명">
+      <input id="new-menu-name" class="form-control" placeholder="한국어 메뉴명">
       <input id="new-menu-price" class="form-control" type="number" min="0" step="100" placeholder="가격">
       <select id="new-menu-category" class="form-control"></select>
       <button class="btn btn-green" onclick="addNewMenu()">+ 새 메뉴</button>
+    </div>
+
+    <div class="tool-row" style="margin-bottom:10px;">
+      <input id="new-menu-name-en" class="form-control" placeholder="English menu name">
+      <input id="new-menu-name-ja" class="form-control" placeholder="日本語メニュー名">
+      <input id="new-menu-name-zh" class="form-control" placeholder="中文菜单名">
+    </div>
+
+    <div class="tool-row" style="margin-bottom:10px;">
+      <input id="new-menu-description" class="form-control" placeholder="한국어 메뉴 설명">
+      <input id="new-menu-description-en" class="form-control" placeholder="English description">
+      <input id="new-menu-description-ja" class="form-control" placeholder="日本語説明">
+      <input id="new-menu-description-zh" class="form-control" placeholder="中文说明">
     </div>
 
     <div class="tool-row">
@@ -1166,8 +1179,43 @@ header p {
     </div>
 
     <div class="modal-field">
-      <label>메뉴명</label>
+      <label>메뉴명 · 한국어</label>
       <input id="modal-name">
+    </div>
+
+    <div class="modal-field">
+      <label>Menu Name · English</label>
+      <input id="modal-name-en">
+    </div>
+
+    <div class="modal-field">
+      <label>メニュー名 · 日本語</label>
+      <input id="modal-name-ja">
+    </div>
+
+    <div class="modal-field">
+      <label>菜单名 · 中文</label>
+      <input id="modal-name-zh">
+    </div>
+
+    <div class="modal-field">
+      <label>메뉴 설명 · 한국어</label>
+      <textarea id="modal-description" rows="3"></textarea>
+    </div>
+
+    <div class="modal-field">
+      <label>Description · English</label>
+      <textarea id="modal-description-en" rows="3"></textarea>
+    </div>
+
+    <div class="modal-field">
+      <label>説明 · 日本語</label>
+      <textarea id="modal-description-ja" rows="3"></textarea>
+    </div>
+
+    <div class="modal-field">
+      <label>说明 · 中文</label>
+      <textarea id="modal-description-zh" rows="3"></textarea>
     </div>
 
     <div class="modal-field">
@@ -1176,7 +1224,7 @@ header p {
     </div>
 
     <button class="btn btn-black" style="width:100%" onclick="saveModalBasicInfo()">
-      이름 / 가격 저장
+      메뉴 정보 저장
     </button>
 
     <div class="modal-section-title">노출 상태</div>
@@ -3004,6 +3052,34 @@ function openMenuModal(menuId) {
     .value =
       menu.name || '';
 
+  document.getElementById('modal-name-en')
+    .value =
+      menu.name_en || '';
+
+  document.getElementById('modal-name-ja')
+    .value =
+      menu.name_ja || '';
+
+  document.getElementById('modal-name-zh')
+    .value =
+      menu.name_zh || '';
+
+  document.getElementById('modal-description')
+    .value =
+      menu.description || '';
+
+  document.getElementById('modal-description-en')
+    .value =
+      menu.description_en || '';
+
+  document.getElementById('modal-description-ja')
+    .value =
+      menu.description_ja || '';
+
+  document.getElementById('modal-description-zh')
+    .value =
+      menu.description_zh || '';
+
   document.getElementById('modal-price')
     .value =
       Number(menu.price || 0);
@@ -3075,6 +3151,41 @@ async function saveModalBasicInfo() {
       .value
       .trim();
 
+  const nameEn =
+    document.getElementById('modal-name-en')
+      .value
+      .trim();
+
+  const nameJa =
+    document.getElementById('modal-name-ja')
+      .value
+      .trim();
+
+  const nameZh =
+    document.getElementById('modal-name-zh')
+      .value
+      .trim();
+
+  const description =
+    document.getElementById('modal-description')
+      .value
+      .trim();
+
+  const descriptionEn =
+    document.getElementById('modal-description-en')
+      .value
+      .trim();
+
+  const descriptionJa =
+    document.getElementById('modal-description-ja')
+      .value
+      .trim();
+
+  const descriptionZh =
+    document.getElementById('modal-description-zh')
+      .value
+      .trim();
+
   const price =
     Number(
       document.getElementById('modal-price')
@@ -3082,7 +3193,7 @@ async function saveModalBasicInfo() {
     );
 
   if (!name) {
-    alert('메뉴명을 입력해주세요.');
+    alert('한국어 메뉴명을 입력해주세요.');
     return;
   }
 
@@ -3101,6 +3212,20 @@ async function saveModalBasicInfo() {
       .from('menus')
       .update({
         name,
+        name_en:
+          nameEn || null,
+        name_ja:
+          nameJa || null,
+        name_zh:
+          nameZh || null,
+        description:
+          description || null,
+        description_en:
+          descriptionEn || null,
+        description_ja:
+          descriptionJa || null,
+        description_zh:
+          descriptionZh || null,
         price
       })
       .eq(
@@ -3110,7 +3235,10 @@ async function saveModalBasicInfo() {
 
   if (error) {
     console.error(error);
-    alert('이름/가격 저장에 실패했습니다.');
+    alert(
+      '메뉴 정보 저장에 실패했습니다.\n' +
+      (error.message || '')
+    );
     return;
   }
 
@@ -3804,6 +3932,62 @@ async function addNewMenu() {
       .value
       .trim();
 
+  const nameEn =
+    document
+      .getElementById(
+        'new-menu-name-en'
+      )
+      .value
+      .trim();
+
+  const nameJa =
+    document
+      .getElementById(
+        'new-menu-name-ja'
+      )
+      .value
+      .trim();
+
+  const nameZh =
+    document
+      .getElementById(
+        'new-menu-name-zh'
+      )
+      .value
+      .trim();
+
+  const description =
+    document
+      .getElementById(
+        'new-menu-description'
+      )
+      .value
+      .trim();
+
+  const descriptionEn =
+    document
+      .getElementById(
+        'new-menu-description-en'
+      )
+      .value
+      .trim();
+
+  const descriptionJa =
+    document
+      .getElementById(
+        'new-menu-description-ja'
+      )
+      .value
+      .trim();
+
+  const descriptionZh =
+    document
+      .getElementById(
+        'new-menu-description-zh'
+      )
+      .value
+      .trim();
+
   const price =
     Number(
       document
@@ -3821,7 +4005,7 @@ async function addNewMenu() {
       .value;
 
   if (!name) {
-    alert('메뉴명을 입력해주세요.');
+    alert('한국어 메뉴명을 입력해주세요.');
     return;
   }
 
@@ -3855,6 +4039,20 @@ async function addNewMenu() {
       .from('menus')
       .insert({
         name,
+        name_en:
+          nameEn || null,
+        name_ja:
+          nameJa || null,
+        name_zh:
+          nameZh || null,
+        description:
+          description || null,
+        description_en:
+          descriptionEn || null,
+        description_ja:
+          descriptionJa || null,
+        description_zh:
+          descriptionZh || null,
         price,
         category,
         sort_order:
@@ -3869,12 +4067,33 @@ async function addNewMenu() {
 
   if (error) {
     console.error(error);
-    alert('메뉴 추가에 실패했습니다.');
+    alert(
+      '메뉴 추가에 실패했습니다.\n' +
+      (error.message || '')
+    );
     return;
   }
 
-  document.getElementById('new-menu-name').value = '';
-  document.getElementById('new-menu-price').value = '';
+  [
+    'new-menu-name',
+    'new-menu-price',
+    'new-menu-name-en',
+    'new-menu-name-ja',
+    'new-menu-name-zh',
+    'new-menu-description',
+    'new-menu-description-en',
+    'new-menu-description-ja',
+    'new-menu-description-zh'
+  ].forEach(
+    id => {
+      const element =
+        document.getElementById(id);
+
+      if (element) {
+        element.value = '';
+      }
+    }
+  );
 
   tempCategories =
     tempCategories.filter(
