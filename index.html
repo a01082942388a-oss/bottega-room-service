@@ -2822,7 +2822,7 @@ main,
   };
 
 
-  const categoryTranslations = {
+  let categoryTranslations = {
 
     SALAD: {
       ko: '샐러드',
@@ -3511,6 +3511,29 @@ main,
 
     }
 
+  }
+
+
+
+  async function loadCategoryTranslations() {
+    const { data, error } =
+      await supabaseClient
+        .from('site_settings')
+        .select('settings')
+        .eq('key', 'category_translations')
+        .maybeSingle();
+
+    if (error) {
+      console.error('CATEGORY TRANSLATIONS LOAD ERROR:', error);
+      return;
+    }
+
+    if (data && data.settings && typeof data.settings === 'object') {
+      categoryTranslations = {
+        ...categoryTranslations,
+        ...data.settings
+      };
+    }
   }
 
 
@@ -5247,9 +5270,12 @@ function changeCutleryQty(change) {
 
   loadOrderTheme();
 
-  loadMenus();
+  loadCategoryTranslations()
+    .then(
+      () => loadMenus()
+    );
 
-loadServiceStatus();
+  loadServiceStatus();
 
   // 영업상태는 최초 진입 시 1회만 확인합니다.
   // 메뉴 화면 자동 폴링은 사용하지 않습니다.
