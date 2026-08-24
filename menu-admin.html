@@ -3449,6 +3449,38 @@ async function deleteCategory(
           categoryName
       );
 
+    if (
+      categoryTranslations[
+        categoryName
+      ]
+    ) {
+
+      const previousTranslations =
+        JSON.parse(
+          JSON.stringify(
+            categoryTranslations
+          )
+        );
+
+      delete categoryTranslations[
+        categoryName
+      ];
+
+      try {
+        await saveCategoryTranslations();
+      }
+      catch (translationError) {
+        categoryTranslations =
+          previousTranslations;
+
+        console.error(
+          'TEMP CATEGORY TRANSLATION DELETE ERROR:',
+          translationError
+        );
+      }
+
+    }
+
     categoryDraft =
       categoryDraft.filter(
         item =>
@@ -3536,6 +3568,38 @@ async function deleteCategory(
     );
 
   if (
+    categoryTranslations[
+      categoryName
+    ]
+  ) {
+
+    const previousTranslations =
+      JSON.parse(
+        JSON.stringify(
+          categoryTranslations
+        )
+      );
+
+    delete categoryTranslations[
+      categoryName
+    ];
+
+    try {
+      await saveCategoryTranslations();
+    }
+    catch (translationError) {
+      categoryTranslations =
+        previousTranslations;
+
+      console.error(
+        'CATEGORY TRANSLATION DELETE ERROR:',
+        translationError
+      );
+    }
+
+  }
+
+  if (
     currentCategory ===
     categoryName
   ) {
@@ -3618,6 +3682,15 @@ async function renameCategory(oldCategory) {
 
   showSaving('카테고리 설정 저장 중...');
 
+  let menuCategoryUpdated = false;
+
+  const previousTranslations =
+    JSON.parse(
+      JSON.stringify(
+        categoryTranslations
+      )
+    );
+
   try {
     if (newCategory !== categoryName && categoryMenus.length) {
       const { error } =
@@ -3627,6 +3700,8 @@ async function renameCategory(oldCategory) {
           .eq('category', categoryName);
 
       if (error) throw error;
+
+      menuCategoryUpdated = true;
     }
 
     if (newCategory !== categoryName) {
@@ -3660,8 +3735,44 @@ async function renameCategory(oldCategory) {
     }
   } catch (error) {
     console.error('CATEGORY RENAME ERROR:', error);
+
+    categoryTranslations =
+      previousTranslations;
+
+    if (menuCategoryUpdated) {
+      const {
+        error: rollbackError
+      } =
+        await supabaseClient
+          .from('menus')
+          .update({
+            category:
+              categoryName
+          })
+          .eq(
+            'category',
+            newCategory
+          );
+
+      if (rollbackError) {
+        console.error(
+          'CATEGORY RENAME ROLLBACK ERROR:',
+          rollbackError
+        );
+      }
+    }
+
     hideSaving();
-    alert('카테고리 설정 저장에 실패했습니다.\n' + (error.message || ''));
+
+    alert(
+      '카테고리 설정 저장에 실패했습니다.\n' +
+      (error.message || '') +
+      (
+        menuCategoryUpdated
+          ? '\n메뉴 카테고리는 기존 값으로 복구를 시도했습니다.'
+          : ''
+      )
+    );
   }
 }
 
