@@ -1520,7 +1520,6 @@ main,
 .menu-card {
   background: var(--theme-card-bg-color) !important;
 }
-
 </style>
 </head>
 
@@ -1544,7 +1543,7 @@ main,
 
 
 <div id="order-section">
-  </div>
+
 
   <div
     class="service-banner-wrap"
@@ -1740,6 +1739,7 @@ main,
 
 
     <div class="form-group">
+
       <label for="room-number-input">
         <span id="room-number-label">객실번호</span>
         <span class="required">*</span>
@@ -1757,6 +1757,7 @@ main,
       <p class="phone-notice" id="room-number-help">
         주문하실 객실번호를 정확히 입력해주세요.
       </p>
+
     </div>
 
 
@@ -2900,8 +2901,9 @@ main,
   let serviceStatusTimer = null;
 
 
-  /* 공용 주문페이지: 객실번호는 고객이 직접 입력 */
+  /* 공용 주문페이지: 객실번호는 주문창에서 직접 입력 */
   let roomNumber = '';
+
 
   const orderStorageKey =
     'bottega_active_order';
@@ -3430,45 +3432,56 @@ main,
       return;
     }
 
+
     const roomTexts = {
+
       ko: {
         label: '객실번호',
         placeholder: '객실번호를 입력해주세요',
         help: '주문하실 객실번호를 정확히 입력해주세요.'
       },
+
       en: {
         label: 'Room Number',
         placeholder: 'Enter your room number',
         help: 'Please enter the correct room number for your order.'
       },
+
       ja: {
         label: '客室番号',
         placeholder: '客室番号を入力してください',
         help: 'ご注文のお部屋番号を正確に入力してください。'
       },
+
       zh: {
         label: '房间号',
         placeholder: '请输入房间号',
         help: '请输入正确的客房号码。'
       }
+
     };
+
 
     const copy =
       roomTexts[currentLanguage] ||
       roomTexts.ko;
+
 
     if (roomLabel) {
       roomLabel.textContent =
         copy.label;
     }
 
+
     roomInput.placeholder =
       copy.placeholder;
+
 
     if (roomHelp) {
       roomHelp.textContent =
         copy.help;
     }
+
 
     roomInput.oninput =
       function () {
@@ -4327,12 +4340,21 @@ function changeCutleryQty(change) {
 
 
     const roomInput =
-      document.getElementById('room-number-input');
+      document.getElementById(
+        'room-number-input'
+      );
+
 
     roomNumber =
-      roomInput ? roomInput.value.trim() : '';
+      roomInput
+        ? roomInput.value.trim()
+        : '';
 
-    if (!roomNumber) {
+
+    if (
+      !roomNumber
+    ) {
+
       const roomRequiredMessages = {
         ko: '객실번호를 입력해주세요.',
         en: 'Please enter your room number.',
@@ -4340,13 +4362,20 @@ function changeCutleryQty(change) {
         zh: '请输入房间号。'
       };
 
+
       alert(
         roomRequiredMessages[currentLanguage] ||
         roomRequiredMessages.ko
       );
 
-      if (roomInput) roomInput.focus();
+
+      if (roomInput) {
+        roomInput.focus();
+      }
+
+
       return;
+
     }
 
 
@@ -4598,6 +4627,22 @@ function changeCutleryQty(change) {
     document.getElementById(
       'request-note'
     ).value =
+      '';
+
+
+    const roomInputAfterOrder =
+      document.getElementById(
+        'room-number-input'
+      );
+
+
+    if (roomInputAfterOrder) {
+      roomInputAfterOrder.value =
+        '';
+    }
+
+
+    roomNumber =
       '';
 
 
