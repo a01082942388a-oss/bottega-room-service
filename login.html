@@ -410,7 +410,7 @@ const bottegaAuthStorage = {
         await supabaseClient.auth.getUser();
 
       if (!error && data?.user) {
-        window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/admin.html');
+        window.location.replace('https://hotel-museo.github.io/bottega-room-service/admin.html');
       }
     }
 
@@ -446,7 +446,7 @@ const bottegaAuthStorage = {
           await supabaseClient.auth.resetPasswordForEmail(
             email,
             {
-              redirectTo: 'https://a01082942388a-oss.github.io/bottega-room-service/reset-password.html'
+              redirectTo: 'https://hotel-museo.github.io/bottega-room-service/reset-password.html'
             }
           );
 
@@ -515,7 +515,7 @@ const bottegaAuthStorage = {
 
         showMessage('로그인되었습니다. 이동합니다.', 'info');
 
-        window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/admin.html');
+        window.location.replace('https://hotel-museo.github.io/bottega-room-service/admin.html');
       }
     );
 
