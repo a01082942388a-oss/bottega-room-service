@@ -740,7 +740,7 @@ header p {
 
   <div class="sidebar-menu">
 
-    <button type="button" class="sidebar-item" onclick="window.location.href='https://a01082942388a-oss.github.io/bottega-room-service/admin.html'">
+    <button type="button" class="sidebar-item" onclick="window.location.href='admin.html'">
       <span class="sidebar-dot"></span>
       주문관리
     </button>
@@ -753,7 +753,7 @@ header p {
     <button
       type="button"
       class="sidebar-item"
-      onclick="window.location.href='https://a01082942388a-oss.github.io/bottega-room-service/sales-admin.html'"
+      onclick="window.location.href='sales-admin.html'"
     >
       <span class="sidebar-dot"></span>
       매출관리
@@ -1128,7 +1128,7 @@ header p {
         <iframe
           id="theme-preview-frame"
           title="주문페이지 디자인 미리보기"
-          src="https://a01082942388a-oss.github.io/bottega-room-service/?room=301"
+          src="?room=301"
         ></iframe>
       </div>
 
@@ -1345,7 +1345,7 @@ const bottegaAuthStorage = {
       error ||
       !data?.user
     ) {
-      window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/login.html');
+      window.location.replace('login.html');
       return false;
     }
 
@@ -1361,7 +1361,7 @@ const bottegaAuthStorage = {
     localStorage.removeItem(BOTTEGA_REMEMBER_KEY);
     sessionStorage.removeItem(BOTTEGA_REMEMBER_KEY);
 
-    window.location.replace('https://a01082942388a-oss.github.io/bottega-room-service/login.html');
+    window.location.replace('login.html');
   }
 
 </script>
