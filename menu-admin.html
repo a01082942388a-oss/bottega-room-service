@@ -805,21 +805,20 @@ header p {
     </div>
 
     <div class="tool-row" style="margin-bottom:10px;">
-      <input id="new-menu-name-en" class="form-control" placeholder="English menu name">
-      <input id="new-menu-name-ja" class="form-control" placeholder="日本語メニュー名">
-      <input id="new-menu-name-zh" class="form-control" placeholder="中文菜单名">
+      <input id="new-menu-name-en" class="form-control" placeholder="English menu name · 직접 수정 가능">
+      <input id="new-menu-description" class="form-control" placeholder="한국어 메뉴 설명">
+      <input id="new-menu-description-en" class="form-control" placeholder="English description · 직접 수정 가능">
     </div>
 
-    <div class="tool-row" style="margin-bottom:10px;">
-      <input id="new-menu-description" class="form-control" placeholder="한국어 메뉴 설명">
-      <input id="new-menu-description-en" class="form-control" placeholder="English description">
-      <input id="new-menu-description-ja" class="form-control" placeholder="日本語説明">
-      <input id="new-menu-description-zh" class="form-control" placeholder="中文说明">
-    </div>
+    <!-- 일본어/중국어는 자동번역용으로만 보관 -->
+    <input id="new-menu-name-ja" type="hidden">
+    <input id="new-menu-name-zh" type="hidden">
+    <input id="new-menu-description-ja" type="hidden">
+    <input id="new-menu-description-zh" type="hidden">
 
     <div class="tip-box" style="margin-bottom:14px;">
-      한국어 메뉴명/설명만 입력해도 <b>+ 새 메뉴</b>를 누르면 비어 있는 영어 · 일본어 · 중국어 항목을 자동 번역합니다.
-      기존에 번역 없이 등록된 메뉴는 아래 버튼으로 한 번에 채울 수 있습니다.
+      <b>영어 메뉴명/설명은 직접 수정할 수 있습니다.</b><br>
+      일본어·중국어는 화면에 표시하지 않고 자동번역하여 저장합니다.
       <br><span style="color:#777;">※ 자동번역은 Supabase Edge Function <b>hyper-action</b>를 사용합니다.</span>
       <div style="margin-top:10px;">
         <button
@@ -827,7 +826,7 @@ header p {
           class="btn btn-black"
           onclick="translateMissingMenus()"
         >
-          미번역 메뉴 자동번역
+          메뉴 자동번역
         </button>
       </div>
     </div>
@@ -835,6 +834,7 @@ header p {
     <div class="tool-row">
       <input id="new-category-name" class="form-control" placeholder="새 카테고리명 예: PASTA">
       <button class="btn btn-black" onclick="addNewCategory()">+ 새 카테고리</button>
+      <button class="btn btn-black" onclick="translateAllCategories()">카테고리 자동번역</button>
     </div>
 
   </div>
@@ -1206,15 +1206,6 @@ header p {
       <input id="modal-name-en">
     </div>
 
-    <div class="modal-field">
-      <label>メニュー名 · 日本語</label>
-      <input id="modal-name-ja">
-    </div>
-
-    <div class="modal-field">
-      <label>菜单名 · 中文</label>
-      <input id="modal-name-zh">
-    </div>
 
     <div class="modal-field">
       <label>메뉴 설명 · 한국어</label>
@@ -1226,15 +1217,12 @@ header p {
       <textarea id="modal-description-en" rows="3"></textarea>
     </div>
 
-    <div class="modal-field">
-      <label>説明 · 日本語</label>
-      <textarea id="modal-description-ja" rows="3"></textarea>
-    </div>
 
-    <div class="modal-field">
-      <label>说明 · 中文</label>
-      <textarea id="modal-description-zh" rows="3"></textarea>
-    </div>
+    <!-- 일본어/중국어는 자동번역용으로만 보관 -->
+    <input id="modal-name-ja" type="hidden">
+    <input id="modal-name-zh" type="hidden">
+    <textarea id="modal-description-ja" hidden></textarea>
+    <textarea id="modal-description-zh" hidden></textarea>
 
     <div class="modal-field">
       <label>가격</label>
@@ -3948,17 +3936,11 @@ async function renameCategory(oldCategory) {
   const en = prompt('영어 카테고리명을 입력해주세요.', currentTranslations.en);
   if (en === null) return;
 
-  const ja = prompt('일본어 카테고리명을 입력해주세요.', currentTranslations.ja);
-  if (ja === null) return;
-
-  const zh = prompt('중국어 카테고리명을 입력해주세요.', currentTranslations.zh);
-  if (zh === null) return;
-
   const nextTranslations = {
     ko: ko.trim() || newCategory,
     en: en.trim() || newCategory,
-    ja: ja.trim() || newCategory,
-    zh: zh.trim() || newCategory
+    ja: currentTranslations.ja || '',
+    zh: currentTranslations.zh || ''
   };
 
   const categoryMenus =
@@ -3967,9 +3949,7 @@ async function renameCategory(oldCategory) {
   if (!confirm(
     `"${categoryName}" 카테고리 설정을 저장하시겠습니까?\n\n` +
     `한국어: ${nextTranslations.ko}\n` +
-    `English: ${nextTranslations.en}\n` +
-    `日本語: ${nextTranslations.ja}\n` +
-    `中文: ${nextTranslations.zh}\n\n` +
+    `English: ${nextTranslations.en}\n\n` +
     `포함된 메뉴 ${categoryMenus.length}개에도 적용됩니다.`
   )) return;
 
@@ -4897,6 +4877,64 @@ async function addNewMenu() {
     800
   );
 
+}
+
+
+
+async function translateAllCategories() {
+
+  const targets = categoryDraft.filter(category => category && category !== 'all');
+
+  if (!targets.length) {
+    alert('번역할 카테고리가 없습니다.');
+    return;
+  }
+
+  if (!confirm(
+    `카테고리 ${targets.length}개를 자동번역하시겠습니까?\n\n` +
+    '영어는 직접 수정한 값이 있으면 유지하고, 일본어·중국어는 한국어명을 기준으로 자동번역합니다.'
+  )) return;
+
+  showSaving(`카테고리 자동번역 중... 0 / ${targets.length}`);
+
+  try {
+    for (let index = 0; index < targets.length; index += 1) {
+      const category = targets[index];
+      const current = getCategoryTranslationDraft(category);
+      const source = String(current.ko || category).trim();
+
+      showSaving(`카테고리 자동번역 중... ${index + 1} / ${targets.length}`);
+
+      let en = String(current.en || '').trim();
+      if (!en || en === category) {
+        en = await translateText(source, 'en');
+      }
+
+      const [ja, zh] = await Promise.all([
+        translateText(source, 'ja'),
+        translateText(source, 'zh')
+      ]);
+
+      categoryTranslations[category] = {
+        ko: source,
+        en: en || category,
+        ja: ja || category,
+        zh: zh || category
+      };
+    }
+
+    await saveCategoryTranslations();
+    showSaving('카테고리 자동번역 완료');
+    setTimeout(hideSaving, 900);
+
+  } catch (error) {
+    console.error('CATEGORY AUTO TRANSLATION ERROR:', error);
+    hideSaving();
+    alert(
+      '카테고리 자동번역에 실패했습니다.\n\n' +
+      (error.message || '')
+    );
+  }
 }
 
 
